@@ -1,23 +1,31 @@
 // Errores y resultado común de las Server Actions (research R-10).
 
 /**
+ * Enlace que acompaña a un mensaje de error. Lo usan los duplicados de un registro inactivo:
+ * "Ver y reactivar" lleva a su ficha, donde se decide con los datos a la vista (F-002, research C-04).
+ */
+export type EnlaceDeAviso = { texto: string; ruta: string };
+
+/**
  * Error esperable: el usuario intentó algo que una regla de negocio no permite
  * (un duplicado, desactivarse a sí mismo, etc.). Su mensaje se muestra tal cual.
  */
 export class ErrorDeNegocio extends Error {
   readonly campo?: string;
+  readonly enlace?: EnlaceDeAviso;
 
-  constructor(mensaje: string, campo?: string) {
+  constructor(mensaje: string, campo?: string, enlace?: EnlaceDeAviso) {
     super(mensaje);
     this.name = "ErrorDeNegocio";
     this.campo = campo;
+    this.enlace = enlace;
   }
 }
 
 /** Lo que devuelve toda Server Action (contracts/acciones-f001.md). */
 export type ResultadoAccion<T = void> =
   | { ok: true; datos: T; mensaje?: string }
-  | { ok: false; mensaje: string; errores?: Partial<Record<string, string[]>> };
+  | { ok: false; mensaje: string; errores?: Partial<Record<string, string[]>>; enlace?: EnlaceDeAviso };
 
 const MENSAJE_INESPERADO = "Ocurrió un error inesperado. Intenta nuevamente";
 
@@ -32,6 +40,7 @@ export function aResultadoDeError(error: unknown): ResultadoAccion<never> {
       ok: false,
       mensaje: error.message,
       errores: error.campo ? { [error.campo]: [error.message] } : undefined,
+      enlace: error.enlace,
     };
   }
 

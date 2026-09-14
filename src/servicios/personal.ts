@@ -1,7 +1,7 @@
 // Reglas del personal que opera el sistema (F-001, historias 3 a 5).
 // El personal nunca se borra: se desactiva (D-15, RN-12).
 import { Prisma } from "@/generado/prisma/client";
-import { prisma } from "@/lib/prisma";
+import { esErrorDeDuplicado, prisma } from "@/lib/prisma";
 import { ErrorDeNegocio } from "@/lib/errores";
 import { calcularHashContrasena, compararContrasena } from "@/lib/contrasenas";
 import { recortarEspacios } from "@/lib/texto";
@@ -23,11 +23,6 @@ const camposPublicos = {
 
 function mensajeDuplicado(nombreUsuario: string) {
   return `Ya existe un usuario con el nombre de usuario '${nombreUsuario}'`;
-}
-
-/** ¿El error de Prisma es de valor único repetido? (código P2002) */
-function esDuplicado(error: unknown): boolean {
-  return error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002";
 }
 
 /**
@@ -70,7 +65,7 @@ export async function registrarPersonal(datos: DatosRegistroPersonal): Promise<{
       select: { id: true },
     });
   } catch (error) {
-    if (esDuplicado(error)) throw new ErrorDeNegocio(mensajeDuplicado(datos.nombreUsuario), "nombreUsuario");
+    if (esErrorDeDuplicado(error)) throw new ErrorDeNegocio(mensajeDuplicado(datos.nombreUsuario), "nombreUsuario");
     throw error;
   }
 }
@@ -87,7 +82,7 @@ export async function modificarPersonal(id: number, datos: DatosPersonales): Pro
   try {
     await prisma.usuario.update({ where: { id }, data: prepararDatosPersonales(datos) });
   } catch (error) {
-    if (esDuplicado(error)) throw new ErrorDeNegocio(mensajeDuplicado(datos.nombreUsuario), "nombreUsuario");
+    if (esErrorDeDuplicado(error)) throw new ErrorDeNegocio(mensajeDuplicado(datos.nombreUsuario), "nombreUsuario");
     throw error;
   }
 }

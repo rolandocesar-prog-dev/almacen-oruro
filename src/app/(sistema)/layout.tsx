@@ -9,6 +9,17 @@ const menu = [
   { ruta: "/cambiar-contrasena", texto: "Cambiar mi contraseña" },
 ] as const;
 
+// Los catálogos van agrupados en una segunda fila del menú; en pantallas chicas los enlaces pasan a
+// varias líneas sin desplazamiento horizontal (F-002, research C-10).
+const menuCatalogos = [
+  { ruta: "/productos", texto: "Productos" },
+  { ruta: "/categorias", texto: "Categorías" },
+  { ruta: "/unidades", texto: "Unidades" },
+  { ruta: "/proveedores", texto: "Proveedores" },
+  { ruta: "/centros-salud", texto: "Centros de salud" },
+  { ruta: "/representantes", texto: "Representantes" },
+] as const;
+
 // Estructura común de las páginas del sistema: encabezado, usuario y menú.
 // La comprobación de sesión se repite también en cada página y acción: el layout no se vuelve a
 // ejecutar al navegar entre páginas, así que no alcanza como única protección (FR-004).
@@ -46,6 +57,22 @@ export default async function LayoutSistema({ children }: { children: React.Reac
                 </li>
               ))}
             </ul>
+            <div className="border-t border-marca">
+              <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-1 px-4 text-sm">
+                <span id="menu-catalogos" className="px-3 py-2 font-semibold">
+                  Catálogos:
+                </span>
+                <ul aria-labelledby="menu-catalogos" className="flex flex-wrap gap-1">
+                  {menuCatalogos.map((opcion) => (
+                    <li key={opcion.ruta}>
+                      <Link href={opcion.ruta} className="block px-3 py-2 hover:bg-marca">
+                        {opcion.texto}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </nav>
         )}
       </header>

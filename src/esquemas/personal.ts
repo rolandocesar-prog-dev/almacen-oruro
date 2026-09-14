@@ -1,25 +1,7 @@
 // Esquemas del personal: los usan los formularios (cliente) y las Server Actions (servidor)
 // con las mismas reglas (constitución, principio VI). Límites de data-model.md §5.1.
 import { z } from "zod";
-
-/** Texto obligatorio: se recortan los extremos y se exige entre 1 y `maximo` caracteres. */
-function textoObligatorio(queFalta: string, campo: string, maximo: number) {
-  return z
-    .string()
-    .trim()
-    .min(1, { error: `Escribe ${queFalta}`, abort: true })
-    .max(maximo, { error: `${campo} admite hasta ${maximo} caracteres` });
-}
-
-/** Texto opcional: un campo vacío se guarda como "sin dato". */
-function textoOpcional(campo: string, maximo: number) {
-  return z
-    .string()
-    .trim()
-    .max(maximo, { error: `${campo} admite hasta ${maximo} caracteres` })
-    .transform((valor) => (valor ? valor : undefined))
-    .optional();
-}
+import { esquemaFiltroCatalogo, telefonoOpcional, textoObligatorio, textoOpcional } from "./comunes";
 
 const REGLA_NOMBRE_USUARIO = /^[a-z0-9._]{3,30}$/;
 
@@ -28,13 +10,7 @@ export const esquemaDatosPersonales = z.object({
   apellido: textoObligatorio("el apellido", "El apellido", 60),
   cargo: textoObligatorio("el cargo", "El cargo", 60),
   direccion: textoOpcional("La dirección", 150),
-  telefono: z
-    .string()
-    .trim()
-    .max(20, { error: "El teléfono admite hasta 20 caracteres" })
-    .regex(/^[0-9 +-]*$/, { error: "El teléfono solo admite dígitos, espacios, + y -" })
-    .transform((valor) => (valor ? valor : undefined))
-    .optional(),
+  telefono: telefonoOpcional(),
   // Se guarda en minúsculas y sin espacios en los extremos: la unicidad no distingue mayúsculas (FR-011).
   nombreUsuario: z
     .string()
@@ -88,11 +64,8 @@ export const esquemaRestablecimiento = z
     path: ["confirmacion"],
   });
 
-/** Filtros del listado de personal. Un valor inválido en la URL toma el valor por defecto. */
-export const esquemaFiltroPersonal = z.object({
-  q: z.string().trim().max(60, { error: "La búsqueda admite hasta 60 caracteres" }).optional(),
-  estado: z.enum(["activos", "inactivos", "todos"]).catch("activos"),
-});
+/** Filtros del listado de personal: los mismos que los catálogos (búsqueda y estado). */
+export const esquemaFiltroPersonal = esquemaFiltroCatalogo;
 
 export type DatosPersonales = z.infer<typeof esquemaDatosPersonales>;
 export type DatosRegistroPersonal = z.infer<typeof esquemaRegistroPersonal>;

@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { CambioDeEstado } from "@/componentes/catalogos/cambio-de-estado";
+import { InsigniaActivo } from "@/componentes/catalogos/insignia-estado";
 import { Aviso } from "@/componentes/ui/aviso";
 import { formatearFechaHora } from "@/lib/fechas";
 import { requerirSesion } from "@/lib/sesion";
 import { obtenerPersonal } from "@/servicios/personal";
 import { desactivarPersonalAccion, reactivarPersonalAccion, restablecerContrasenaAccion } from "../acciones";
-import { CambioDeEstado } from "./cambio-de-estado";
 import { RestablecerContrasena } from "./restablecer-contrasena";
 
 export const metadata = { title: "Ficha de personal · Almacén Regional Oruro" };
@@ -50,9 +51,7 @@ export default async function PaginaFichaPersonal({
         <h1 className="text-2xl font-semibold">
           {persona.nombre} {persona.apellido}
         </h1>
-        <span className={`rounded-full px-3 py-1 text-xs font-medium ${persona.activo ? "bg-green-100 text-exito" : "bg-gray-200 text-gray-700"}`}>
-          {persona.activo ? "Activo" : "Inactivo"}
-        </span>
+        <InsigniaActivo activo={persona.activo} />
       </div>
 
       {/* La contraseña no aparece en ningún lugar de la ficha (Historia 3, escenario 6). */}
@@ -68,10 +67,11 @@ export default async function PaginaFichaPersonal({
         <Link href={`/personal/${persona.id}/editar`} className="rounded-md border border-marca bg-white px-4 py-2 text-sm font-medium text-marca hover:bg-fondo">
           Editar
         </Link>
+        {/* Nadie puede desactivarse a sí mismo (RN-04): el botón ni siquiera se muestra. */}
         <CambioDeEstado
-          nombreCompleto={`${persona.nombre} ${persona.apellido}`}
           activo={persona.activo}
-          esElMismoUsuario={persona.id === usuario.id}
+          ocultarDesactivar={persona.id === usuario.id}
+          confirmacionDesactivar={`¿Desactivar a ${persona.nombre} ${persona.apellido}? Ya no podrá ingresar y se cerrarán sus sesiones abiertas.`}
           desactivar={desactivarPersonalAccion.bind(null, persona.id)}
           reactivar={reactivarPersonalAccion.bind(null, persona.id)}
         />

@@ -5,6 +5,12 @@ import { requerirSesion } from "@/lib/sesion";
 export const metadata = { title: "Inicio · Almacén Regional Oruro" };
 
 const modulos = [
+  { ruta: "/productos", titulo: "Productos", descripcion: "Código, categoría, unidad, stock actual y stock mínimo" },
+  { ruta: "/categorias", titulo: "Categorías", descripcion: "Grupos para ordenar los productos" },
+  { ruta: "/unidades", titulo: "Unidades de medida", descripcion: "Cómo se cuenta cada producto" },
+  { ruta: "/proveedores", titulo: "Proveedores", descripcion: "A quiénes se compra y qué productos ofrecen" },
+  { ruta: "/centros-salud", titulo: "Centros de salud", descripcion: "Dónde trabajan los representantes" },
+  { ruta: "/representantes", titulo: "Representantes", descripcion: "Quiénes hacen los pedidos de cada servicio" },
   { ruta: "/personal", titulo: "Personal", descripcion: "Registrar y mantener a quienes operan el sistema" },
   { ruta: "/sesiones", titulo: "Sesiones", descripcion: "Consultar quién ingresó y cuándo" },
 ] as const;

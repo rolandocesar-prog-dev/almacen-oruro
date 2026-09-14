@@ -4,7 +4,7 @@
 // (Vitest), donde ese paquete lanza un error. En la aplicación solo lo importan los servicios,
 // que corren en el servidor.
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "@/generado/prisma/client";
+import { Prisma, PrismaClient } from "@/generado/prisma/client";
 
 function crearCliente() {
   const adaptador = new PrismaPg({
@@ -26,4 +26,13 @@ export const prisma = globalConPrisma.prisma ?? crearCliente();
 
 if (process.env.NODE_ENV !== "production") {
   globalConPrisma.prisma = prisma;
+}
+
+/**
+ * ¿El error de Prisma es de valor único repetido? (código P2002)
+ * Los servicios verifican los duplicados antes de guardar para dar un mensaje claro; este error solo
+ * aparece si dos personas guardan el mismo valor al mismo tiempo y decide la restricción UNIQUE.
+ */
+export function esErrorDeDuplicado(error: unknown): boolean {
+  return error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002";
 }
