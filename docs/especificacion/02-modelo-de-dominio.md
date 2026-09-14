@@ -146,7 +146,10 @@ erDiagram
 | observacion | texto(200) | opcional |
 | estado | enum `PENDIENTE`, `PARCIAL`, `ATENDIDO`, `ANULADO` | ver RN-41 |
 | motivo_anulacion | texto(200) | obligatorio si está ANULADO |
+| anulada_en, anulada_por_id | | como en compra |
 | usuario_id | FK usuario | |
+
+> El número de pedido que ve el usuario es su `id` correlativo; no hay talonario físico de pedidos.
 
 **pedido_detalle** — `pedido_id` · `producto_id` (activo; único dentro del pedido) · `cantidad_solicitada` entero > 0 · `cantidad_entregada` entero ≥ 0 y ≤ solicitada (se actualiza con cada distribución y anulación)
 
