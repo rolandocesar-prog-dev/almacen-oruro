@@ -102,7 +102,7 @@ El orden de corte está fijado **ahora**, para no discutirlo el sábado a median
 |---|---|---|
 | P1 · imprescindible | F-001, F-002, F-003 (compra + kardex + existencias), F-004, F-005, pronóstico y reposición de F-007 | No hay proyecto |
 | P2 · importante | Informes IA redactados (F-007), reportes de compras, distribuciones y existencias (F-006), anulaciones | Se pierde la cobertura literal de los requerimientos 14 y 15, o la corrección de errores |
-| P3 · deseable | Reporte de pedidos, reporte de kardex imprimible, impresión del vale, panel de inicio, relación proveedor–producto con precio referencial | Se documenta como trabajo futuro |
+| P3 · deseable | Reporte de pedidos, reporte de kardex imprimible, impresión del vale, panel de inicio, relación proveedor–producto con precio referencial, gráfico de consumo por producto, resaltado automático de cifras en los informes IA | Se documenta como trabajo futuro |
 
 ---
 

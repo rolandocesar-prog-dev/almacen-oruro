@@ -199,7 +199,7 @@ Exportar a Excel o PDF descargable (se imprime o guarda como PDF desde el navega
 
 ### Texto para `/speckit-specify`
 
-> Módulo de inteligencia artificial con dos capas. **Capa de pronóstico:** a partir del kardex, el sistema arma la serie mensual de consumo (salidas por distribución menos sus anulaciones) de cada producto y pronostica el consumo del mes siguiente. Muestra, para cada producto, el pronóstico, el stock actual, el stock mínimo y una cantidad sugerida de reposición; y para un producto elegido, un gráfico con el consumo histórico y el pronóstico. El sistema evalúa la calidad del pronóstico reservando los últimos 6 meses y comparando el error del método contra dos métodos de referencia simples, y muestra esa comparación. **Capa de informes:** el encargado elige un período y genera el "Informe IA de compras" o el "Informe IA de distribuciones": el sistema calcula los datos agregados del período y un modelo de lenguaje redacta en español un informe con hallazgos y recomendaciones basado solo en esos datos. El informe muestra el texto junto a la tabla de datos que lo originó, se guarda con su fecha y se puede volver a consultar e imprimir sin conexión. Como no existen datos históricos reales, el sistema incluye un generador de 36 meses de histórico simulado, claramente identificado como simulado. Motivo: cubrir los requerimientos 14 y 15 ("emitir informe con IA") con un componente de IA verificable y conectado a la operación (qué comprar), en lugar de un texto decorativo.
+> Módulo de inteligencia artificial con dos capas. **Capa de pronóstico:** a partir del kardex, el sistema arma la serie mensual de consumo (salidas por distribución menos sus anulaciones) de cada producto y pronostica el consumo del mes en curso (el primero sin datos completos). Muestra, para cada producto, el pronóstico, el stock actual, el stock mínimo y una cantidad sugerida de reposición; y para un producto elegido, un gráfico con el consumo histórico y el pronóstico. El sistema evalúa la calidad del pronóstico reservando los últimos 6 meses y comparando el error del método contra dos métodos de referencia simples, y muestra esa comparación. **Capa de informes:** el encargado elige un período y genera el "Informe IA de compras" o el "Informe IA de distribuciones": el sistema calcula los datos agregados del período y un modelo de lenguaje redacta en español un informe con hallazgos y recomendaciones basado solo en esos datos. El informe muestra el texto junto a la tabla de datos que lo originó, se guarda con su fecha y se puede volver a consultar e imprimir sin conexión. Como no existen datos históricos reales, el sistema incluye un generador de 36 meses de histórico simulado, claramente identificado como simulado. Motivo: cubrir los requerimientos 14 y 15 ("emitir informe con IA") con un componente de IA verificable y conectado a la operación (qué comprar), en lugar de un texto decorativo.
 
 ### Definición técnica que la especificación debe dejar explícita (se detalla en `/speckit-plan`)
 
@@ -213,11 +213,11 @@ Exportar a Excel o PDF descargable (se imprime o guarda como PDF desde el navega
 - Métricas: **MAE** (error absoluto medio, en unidades) y **WAPE** (Σ|error| / Σ real, en porcentaje; no se indefine cuando un mes vale 0).
 - Resultado mostrado: tabla por producto y promedio general, con el mejor método resaltado. Ese resultado alimenta el capítulo de resultados del proyecto.
 
-**Reposición sugerida.** `max(0, ⌈pronóstico del próximo mes + stock mínimo − stock actual⌉)`. Se muestra la fórmula en pantalla.
+**Reposición sugerida.** `max(0, ⌈pronóstico del mes en curso + stock mínimo − stock actual⌉)`. El mes pronosticado es el mes en curso, el primero sin datos completos (aclarado en F-007). Se muestra la fórmula en pantalla.
 
 **Informe IA de compras** — datos enviados: total gastado y Nº de compras en el período y en el período anterior de igual duración; gasto por proveedor; los 10 productos con más gasto; productos bajo mínimo; reposición sugerida.
 
-**Informe IA de distribuciones** — datos enviados: cantidad entregada por representante y servicio; los 10 productos más distribuidos; pedidos por estado; comparación con el período anterior; pronóstico del próximo mes de los 10 productos principales.
+**Informe IA de distribuciones** — datos enviados: cantidad entregada por representante y servicio; los 10 productos más distribuidos; pedidos por estado; comparación con el período anterior; pronóstico del mes en curso de los 10 productos principales.
 
 **Reglas del informe.**
 - Al modelo se le indica que no invente cifras, que use solo los datos entregados, y que responda con secciones fijas: *Resumen*, *Hallazgos*, *Alertas*, *Recomendaciones*.
@@ -235,7 +235,7 @@ Exportar a Excel o PDF descargable (se imprime o guarda como PDF desde el navega
 
 | # | Prioridad | Historia |
 |---|---|---|
-| HU-007-1 | P1 | Como encargado, quiero ver el pronóstico de consumo del próximo mes por producto |
+| HU-007-1 | P1 | Como encargado, quiero ver el pronóstico de consumo del mes en curso por producto |
 | HU-007-2 | P1 | Como encargado, quiero una cantidad sugerida de compra por producto para no quedarme sin stock |
 | HU-007-3 | P1 | Como responsable del proyecto, quiero ver la evaluación del error del pronóstico frente a métodos simples, para demostrar que funciona |
 | HU-007-4 | P1 | Como responsable del proyecto, quiero generar un histórico simulado reproducible para disponer de datos con los que probar |

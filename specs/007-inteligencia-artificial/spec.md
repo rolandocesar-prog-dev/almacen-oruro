@@ -27,6 +27,22 @@ simulados y criterios) · `docs/especificacion/02-modelo-de-dominio.md` §2.7 (`
 `configuracion`) y reglas RN-50 a RN-53 · Capítulo II: requerimientos 14 y 15; RF 6 · Decisiones
 D-06 y D-07 · Supuestos S-05 y S-06 · Pendientes Q-01 y Q-02 · Constitución, principio VIII.
 
+## Clarifications
+
+### Session 2026-09-13
+
+- Q: ¿Con qué datos se eligen los parámetros de suavizado del método principal antes de medir su
+  error? → A: Solo con los meses de entrenamiento, minimizando el error de pronóstico a un mes
+  dentro de ese período; los 6 meses de validación se usan únicamente para medir.
+- Q: ¿El pronóstico y la reposición sugerida son para el mes en curso o para el mes siguiente? →
+  A: Para el mes en curso, con la fórmula `máx(0, ⌈pronóstico del mes en curso + mínimo − stock
+  actual⌉)`.
+- Q: ¿Desde dónde se ejecuta el generador de histórico simulado? → A: Solo desde un comando de
+  instalación documentado en la guía; no hay opción en el menú. Para regenerar, se recrea la base.
+- Q: ¿El resaltado automático de cifras no encontradas en los datos es obligatorio? → A: No; es
+  deseable (P3) y se implementa solo si alcanza el tiempo. La verificación que vale es la manual,
+  con el texto junto a la tabla de datos.
+
 ## Escenarios de usuario y pruebas *(obligatorio)*
 
 **Actores:**
@@ -194,9 +210,10 @@ verifica cada cifra del texto contra la tabla de datos.
    las secciones fijas *Resumen*, *Hallazgos*, *Alertas* y *Recomendaciones*.
 3. **Dado** el informe generado, **cuando** se muestra, **entonces** el texto aparece junto a la tabla
    de datos que se envió, con el modelo usado, la fecha y hora de generación y el usuario.
-4. **Dado** el texto de un informe, **cuando** se compara con la tabla, **entonces** toda cifra del
-   texto existe en la tabla de datos; si el sistema detecta en el texto un número que no está en la
-   tabla, lo resalta con la advertencia "Cifra no encontrada en los datos".
+4. **Dado** el texto de un informe, **cuando** se compara a mano con la tabla, **entonces** toda cifra
+   del texto existe en la tabla de datos. Si está implementado el resaltado automático (P3,
+   FR-025), los números del texto que no están en la tabla aparecen con la advertencia "Cifra no
+   encontrada en los datos".
 5. **Dado** el informe, **cuando** termina de generarse, **entonces** queda guardado con tipo,
    período, datos de entrada, texto, modelo, fecha y usuario.
 6. **Dado** un período sin compras vigentes, **cuando** se intenta generar, **entonces** no se llama
@@ -316,8 +333,10 @@ comparan algunos meses con el kardex.
   menos de 3); y 0 con la indicación "Sin historial" si no tiene consumo. Los valores negativos se
   muestran como 0.
 - **FR-003**: El método principal DEBE elegir sus tres parámetros de suavizado entre los valores 0,1
-  a 0,9 (de 0,1 en 0,1), probando todas las combinaciones y quedándose con la de menor error dentro
-  de los datos que usa para ajustarse.
+  a 0,9 (de 0,1 en 0,1), probando las 729 combinaciones y quedándose con la de menor error absoluto
+  medio de pronóstico a un mes dentro de los datos que usa para ajustarse: en la evaluación, solo
+  los meses de entrenamiento; para el pronóstico del mes en curso, la serie completa. Ante un
+  empate, gana la combinación con valores más bajos, para que el resultado sea determinista.
 - **FR-004**: El pronóstico y la evaluación DEBEN ser deterministas: con los mismos datos, dan
   exactamente el mismo resultado. No se guardan; se calculan al consultarlos.
 - **FR-005**: El sistema DEBE calcular la reposición sugerida como
@@ -355,8 +374,7 @@ comparan algunos meses con el kardex.
   secciones *Resumen*, *Hallazgos*, *Alertas* y *Recomendaciones*. NO DEBE enviar contraseñas,
   teléfonos, direcciones, correos ni CI.
 - **FR-013**: El sistema DEBE mostrar el texto del informe junto a la tabla de datos que lo originó,
-  el modelo usado, la fecha y hora de generación y el usuario, y resaltar todo número del texto que
-  no se encuentre en la tabla de datos.
+  el modelo usado, la fecha y hora de generación y el usuario.
 - **FR-014**: El sistema DEBE guardar cada informe generado con tipo, período, datos de entrada,
   texto, modelo, fecha y usuario; cada generación crea un informe nuevo y los guardados no se
   modifican ni se borran.
@@ -366,6 +384,11 @@ comparan algunos meses con el kardex.
 - **FR-016**: El sistema DEBE listar los informes guardados (filtrables por tipo) y mostrarlos e
   imprimirlos sin conexión a internet, con el formato de impresión de F-006, la nota de que el texto
   fue redactado por un modelo de lenguaje y, si corresponde, la leyenda de datos simulados.
+
+**Resaltado de cifras (P3)**
+
+- **FR-025**: Si alcanza el tiempo, el sistema DEBERÍA resaltar en el texto de un informe los números
+  que no se encuentran en su tabla de datos, sin considerar años, fechas ni la numeración de listas.
 
 **Gráfico (P3)**
 
@@ -392,6 +415,9 @@ comparan algunos meses con el kardex.
   con fines de demostración" (D-07).
 - **FR-022**: El generador DEBE rechazar su ejecución sobre una base con documentos, sin cambiar
   nada.
+- **FR-024**: El generador DEBE ejecutarse solo como un paso de instalación documentado en la guía de
+  instalación, que admite indicar la semilla (con un valor por defecto fijo); el sistema NO DEBE
+  ofrecerlo en ningún menú ni pantalla. Para volver a generar, se recrea la base.
 
 **Generales**
 
@@ -425,7 +451,7 @@ comparan algunos meses con el kardex.
   evaluación completa, se muestra en menos de 10 segundos.
 - **SC-006**: Un informe IA se genera en menos de 60 segundos con conexión normal.
 - **SC-007**: En la demostración, el 100 % de las cifras del texto de un informe IA existe en su
-  tabla de datos de entrada (verificación manual, apoyada por el resaltado automático).
+  tabla de datos de entrada (verificación manual).
 - **SC-008**: Sin conexión a internet, el 100 % de las funciones de pronóstico, reposición y
   evaluación funcionan, y el 100 % de los informes guardados se pueden abrir e imprimir.
 - **SC-009**: En el 100 % de las pantallas y reportes de una base de demostración aparece la leyenda
@@ -436,16 +462,12 @@ comparan algunos meses con el kardex.
 
 ## Supuestos
 
-- **Mes pronosticado:** el mes en curso, porque es el primero sin datos completos; la reposición
-  sugerida responde "¿cuánto comprar para este mes?".
-- **Selección de parámetros:** los parámetros del método principal se ajustan solo con los datos de
-  entrenamiento; si se eligieran mirando los meses de validación, la evaluación quedaría sesgada a
-  favor del método. Esto precisa el insumo de `03-funcionalidades.md`, que decía "minimizando el
-  error sobre el período de validación".
+- **Mes pronosticado:** el mes en curso es el primero sin datos completos; la reposición sugerida
+  responde "¿cuánto comprar para este mes?". Pronosticar el mes siguiente queda como trabajo futuro.
 - **Mínimos de datos:** 24 meses para el método principal (dos ciclos anuales completos) y 30 para
   evaluar (24 de entrenamiento más 6 de validación).
-- **Ejecución del generador:** lo ejecuta el responsable del proyecto como parte de la instalación de
-  la demostración, no desde el menú del encargado; para volver a generar, se recrea la base.
+- **Ejecución del generador (FR-024):** la guía de instalación deja la base de demostración lista en
+  un solo procedimiento: crear la base, cargar el usuario inicial y generar el histórico.
 - **Usuario de los datos simulados:** los documentos generados quedan registrados a nombre del
   usuario inicial.
 - **Modelo de lenguaje:** se accede a un servicio externo con una clave que vive en la configuración
