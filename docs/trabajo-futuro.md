@@ -14,6 +14,13 @@ Alcance general fuera de la entrega: ver
 - Autenticación en dos pasos.
 - Cierre de sesión por inactividad (hoy la sesión vence a las 8 h desde el ingreso).
 
+## F-002 · Catálogos
+
+- Importación masiva de catálogos, imágenes de productos, lotes y vencimientos, historial de precios.
+- Búsqueda en la base con la extensión `unaccent` de PostgreSQL si algún catálogo llegara a miles de
+  registros: hoy se filtra en memoria porque son decenas (`specs/002-catalogos/research.md`, C-01).
+- Paginación de los listados de catálogos, por el mismo motivo (C-02).
+
 ## Otras funcionalidades
 
 Se completa a medida que se implementan F-002 a F-007.

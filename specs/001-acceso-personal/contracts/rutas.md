@@ -31,7 +31,7 @@ que los planes siguientes usen los mismos nombres. Todas las rutas usan el App R
 | `/personal/[id]` | Ficha de una persona (desactivar, reactivar, restablecer contraseña) | **F-001** |
 | `/personal/[id]/editar` | Modificar datos de una persona | **F-001** |
 | `/sesiones` | Historial de sesiones | **F-001** |
-| `/categorias`, `/unidades`, `/productos`, `/proveedores`, `/centros-salud`, `/representantes` | Catálogos (listado, `nuevo`, `[id]`, `[id]/editar`) | F-002 |
+| `/categorias`, `/unidades`, `/productos`, `/proveedores`, `/centros-salud`, `/representantes` | Catálogos (listado, `nuevo` o `nueva`, `[id]`, `[id]/editar`; detalle en `specs/002-catalogos/contracts/acciones-f002.md`) | F-002 |
 | `/compras`, `/compras/nueva`, `/compras/[id]` | Compras | F-003 |
 | `/existencias`, `/kardex/[productoId]` | Inventario | F-003 |
 | `/pedidos`, `/pedidos/nuevo`, `/pedidos/[id]`, `/pedidos/[id]/editar` | Pedidos | F-004 |
