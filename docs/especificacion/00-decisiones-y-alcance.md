@@ -127,6 +127,6 @@ El orden de corte está fijado **ahora**, para no discutirlo el sábado a median
 | Q-01 | Objetivos general y específicos del Capítulo I, para verificar que la IA propuesta los cumple | Raymond | No, pero es urgente | Se asume D-06 |
 | Q-02 | **Cuenta y clave de API del modelo de lenguaje** para los informes redactados (quién la aporta y quién la paga) | Rolando / Raymond | **Sí, para F-007 el sábado 19/09** | Se desarrolla con la clave de la asesoría |
 | Q-03 | Despliegue: ¿dónde lo va a correr Raymond para estudiar y para la defensa? | Rolando | No | Propuesta: local, con PostgreSQL en Docker, sin depender de internet salvo para generar informes |
-| Q-04 | Confirmar S-01 (qué es un representante) y S-02 (vale manual o automático) | Raymond | No | Se asumen |
+| Q-04 | Confirmar S-01 (qué es un representante) y S-02 (vale manual o automático; si el talonario reinicia su numeración cada año) | Raymond | No | Se asumen; el vale es único en toda la historia (F-005) |
 | Q-05 | Catálogo real de productos, categorías y unidades, si existe | Raymond | No | Catálogo simulado verosímil |
 | Q-06 | Actualizar el Capítulo II del Word con los cambios de este documento (IA definida, un rol, baja lógica, anulación, kardex) | Raymond | No | Se entrega la lista de cambios junto con el sistema |

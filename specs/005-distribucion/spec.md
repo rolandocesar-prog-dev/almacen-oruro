@@ -23,6 +23,17 @@ RN-41, RN-50 a RN-53 · `docs/especificacion/03-funcionalidades.md` §F-005 · C
 requerimiento 7; RF 3 · Decisiones D-05 y D-16 · Supuestos S-02, S-03 y S-04 · Constitución,
 principios III y IV · Defectos corregidos X-02, X-03, X-08 y X-09.
 
+## Clarifications
+
+### Session 2026-09-13
+
+- Q: ¿El número de vale es único entre todas las distribuciones vigentes o solo dentro del mismo
+  año? → A: Entre todas las distribuciones REGISTRADAS, sin importar el año. Si Raymond confirma
+  que el talonario reinicia su numeración (pendiente Q-04), se revisa esta regla.
+- Q: Si un pedido está ANULADO y una de sus distribuciones se registró mal, ¿se puede anular esa
+  distribución? → A: Sí; se repone el stock, se descuenta lo entregado y el pedido sigue ANULADO,
+  con más saldo anulado.
+
 ## Escenarios de usuario y pruebas *(obligatorio)*
 
 **Actor único:** Encargado de almacén, con sesión iniciada (F-001). Atiende pedidos registrados en
@@ -156,8 +167,9 @@ estado del pedido y que el vale queda libre.
    `PENDIENTE` y el stock se repone.
 3. **Dado** un pedido ATENDIDO con dos distribuciones, **cuando** se anula una de ellas,
    **entonces** el pedido pasa a PARCIAL.
-4. **Dado** un pedido ANULADO, **cuando** se intenta anular una de sus distribuciones, **entonces**
-   se rechaza indicando que el pedido está anulado (RN-35).
+4. **Dado** un pedido ANULADO con una línea de 10 solicitadas y 6 entregadas por una distribución,
+   **cuando** se anula esa distribución, **entonces** el stock sube 6, lo entregado baja a 0, el
+   saldo anulado de la línea pasa a 10 y el pedido sigue ANULADO (RN-35).
 5. **Dado** un motivo vacío, **cuando** se intenta anular, **entonces** se rechaza indicando que el
    motivo es obligatorio.
 6. **Dada** una distribución ANULADA, **cuando** se consulta, **entonces** no se puede volver a
@@ -230,7 +242,7 @@ contenido.
   producto (RN-32). Las líneas sin cantidad no se incluyen, y la distribución DEBE tener al menos
   una línea (RN-33).
 - **FR-004**: El sistema DEBE impedir registrar una distribución con un Nº de vale que ya tiene otra
-  distribución REGISTRADA (RN-31), avisándolo al escribir el número y verificándolo de nuevo al
+  distribución REGISTRADA de cualquier fecha y representante (RN-31), avisándolo al escribir el número y verificándolo de nuevo al
   guardar.
 - **FR-005**: Al guardar, el sistema DEBE, en una sola operación indivisible: verificar de nuevo lo
   pendiente y el stock de cada línea con los valores vigentes, guardar la cabecera y las líneas,
@@ -264,9 +276,9 @@ contenido.
   como ANULADA, registrar un movimiento `ANULACION_DISTRIBUCION` por línea con la cantidad en
   positivo, su saldo resultante y como fecha del documento la de la distribución anulada; sumar la
   cantidad al stock actual; restarla de lo entregado de la línea del pedido; y recalcular el estado
-  del pedido (RN-35, RN-41, RN-53).
-- **FR-015**: El sistema DEBE impedir anular una distribución ya ANULADA o cuyo pedido está ANULADO
-  (RN-35).
+  del pedido, salvo que esté ANULADO, en cuyo caso sigue ANULADO (RN-35, RN-41, RN-53).
+- **FR-015**: El sistema DEBE impedir anular una distribución ya ANULADA. Una distribución de un
+  pedido ANULADO sí se puede anular (RN-35).
 
 **Impresión (P3)**
 

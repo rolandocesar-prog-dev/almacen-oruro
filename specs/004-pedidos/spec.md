@@ -199,8 +199,9 @@ cantidades y stock; se intenta anular uno ATENDIDO.
 - **Anulación de una distribución de un pedido ATENDIDO** (F-005): lo entregado se descuenta y el
   estado se recalcula, pudiendo volver a PARCIAL o PENDIENTE; si vuelve a PENDIENTE, se puede
   editar otra vez.
-- **Distribución anulada de un pedido ANULADO:** no se permite (RN-35), para que el pedido anulado
-  conserve lo entregado tal como estaba al anularse.
+- **Distribución anulada de un pedido ANULADO:** se permite, para poder corregir una salida mal
+  registrada (aclarado en F-005); se repone el stock, lo entregado baja, el saldo anulado sube y el
+  pedido sigue ANULADO (RN-35).
 - **Anulación simultánea con una distribución:** si la distribución se guarda primero y completa el
   pedido, la anulación se rechaza porque el pedido ya está ATENDIDO; si la anulación se guarda
   primero, la distribución se rechaza porque el pedido ya está ANULADO.

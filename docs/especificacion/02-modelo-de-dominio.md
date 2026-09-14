@@ -249,7 +249,7 @@ erDiagram
 - **RN-32** Por cada línea, la cantidad debe cumplir: `> 0`, `≤ saldo pendiente de esa línea del pedido` y `≤ stock_actual`. Se valida dentro de la transacción con bloqueo del producto, para que dos distribuciones simultáneas no dejen stock negativo.
 - **RN-33** Se permite atender parcialmente; no hace falta incluir todas las líneas del pedido.
 - **RN-34** Cada línea genera `SALIDA_DISTRIBUCION`, resta `stock_actual`, suma `pedido_detalle.cantidad_entregada` y recalcula el estado del pedido (RN-41).
-- **RN-35** Anular una distribución exige motivo; genera `ANULACION_DISTRIBUCION`, repone el stock, descuenta `cantidad_entregada` y recalcula el estado del pedido. No se puede anular si el pedido está ANULADO.
+- **RN-35** Anular una distribución exige motivo; genera `ANULACION_DISTRIBUCION`, repone el stock, descuenta `cantidad_entregada` y recalcula el estado del pedido. Si el pedido está ANULADO, la distribución igual se puede anular (es la única forma de corregir una salida mal registrada) y el pedido sigue ANULADO.
 - **RN-36** El formulario muestra, por producto: solicitado, entregado, pendiente y stock disponible.
 
 ### Inventario (RN-5x)
