@@ -24,7 +24,7 @@ erDiagram
     producto ||--o{ pedido_detalle : ""
     pedido ||--o{ distribucion : "se atiende con"
     distribucion ||--|{ distribucion_detalle : "contiene"
-    producto ||--o{ distribucion_detalle : ""
+    pedido_detalle ||--o{ distribucion_detalle : "se entrega en"
     producto ||--o{ movimiento_inventario : "registra"
     compra ||--o{ movimiento_inventario : "origina"
     distribucion ||--o{ movimiento_inventario : "origina"
@@ -36,7 +36,9 @@ erDiagram
 
 **18 tablas.** Frente al modelo 2022: `Personal` → `usuario`; `ProvProc` → `proveedor_producto`; `Realiza` → `distribucion_detalle`; nuevas: `unidad_medida`, `movimiento_inventario`, `informe_ia`, `configuracion`. Ya **no hay tabla de roles** (D-10).
 
-**Campos comunes a todas las tablas:** `id` (entero autoincremental), `creado_en` (fecha y hora), `actualizado_en` (fecha y hora). Los catálogos agregan `activo` (booleano, por defecto verdadero).
+**Campos comunes a todas las tablas:** `id` (entero autoincremental), `creado_en` (fecha y hora), `actualizado_en` (fecha y hora). Los catálogos (incluido `proveedor_producto`) agregan `activo` (booleano, por defecto verdadero).
+
+**Unicidad normalizada (plan F-001):** los nombres únicos de `categoria`, `unidad_medida`, `producto` y `centro_salud` tienen además una columna `nombre_normalizado` (sin espacios extra y en minúsculas) que lleva la restricción única (RN-10). El esquema físico completo está en `specs/001-acceso-personal/data-model.md`.
 
 ---
 
@@ -63,6 +65,7 @@ erDiagram
 | Campo | Tipo | Reglas |
 |---|---|---|
 | usuario_id | FK usuario | |
+| token_hash | texto(64), único | hash SHA-256 del token de la cookie; el token nunca se guarda (plan F-001) |
 | inicio | fecha y hora | |
 | fin | fecha y hora | nulo mientras esté abierta; se llena al cerrar sesión o al expirar |
 | motivo_cierre | enum `USUARIO`, `EXPIRADA`, `DESACTIVACION`, `RESTABLECIMIENTO`, nulo | nulo mientras esté abierta |
@@ -167,7 +170,7 @@ erDiagram
 | motivo_anulacion, anulada_en, anulada_por_id | | como en compra |
 | usuario_id | FK usuario | |
 
-**distribucion_detalle** — `distribucion_id` · `producto_id` (debe estar en el pedido) · `cantidad` entero > 0
+**distribucion_detalle** — `distribucion_id` · `pedido_detalle_id` (la línea del pedido que se entrega; de ella sale el producto, así que siempre está en el pedido y no se guarda dos veces) · `cantidad` entero > 0
 
 ### 2.6 Inventario
 
@@ -262,6 +265,6 @@ erDiagram
 
 ### Inventario (RN-5x)
 - **RN-50** `stock_actual` de un producto = suma de `cantidad` de todos sus movimientos. Se incluye una verificación automatizada de esta igualdad.
-- **RN-51** `saldo_resultante` de cada movimiento = saldo del movimiento anterior del producto, en orden de `registrado_en`, + cantidad. Ningún saldo ya registrado se recalcula.
+- **RN-51** `saldo_resultante` de cada movimiento = saldo del movimiento anterior del producto, en orden de `registrado_en`, + cantidad. Ningún saldo ya registrado se recalcula. En la implementación, ese orden es el `id` del movimiento dentro del producto, que coincide con el orden de registro porque cada movimiento bloquea la fila del producto (plan F-001, research R-11).
 - **RN-52** Un producto **activo** está **bajo mínimo** cuando `stock_actual ≤ stock_minimo`. Los inactivos no se consideran bajo mínimo, porque no se van a reponer.
 - **RN-53** Toda consulta, reporte o cálculo por período (kardex filtrado, reportes, serie mensual del pronóstico) agrupa por `fecha_documento`. El saldo al inicio o al fin de un período es la suma de las cantidades con `fecha_documento` anterior al inicio o hasta el fin.
