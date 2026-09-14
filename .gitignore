@@ -1,0 +1,13 @@
+# Dependencias y compilación
+node_modules/
+.next/
+out/
+coverage/
+
+# Secretos: nunca se versionan
+.env
+.env.*
+!.env.example
+
+# Datos locales de Claude Code (puede contener credenciales)
+.claude/settings.local.json
