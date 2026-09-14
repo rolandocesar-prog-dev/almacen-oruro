@@ -1,6 +1,6 @@
 # Especificación de funcionalidad: F-001 · Acceso y personal
 
-**Rama de la funcionalidad**: `001-acceso-personal` (sin rama propia; se trabaja en la rama actual)
+**Rama de la funcionalidad**: `001-acceso-personal` (sin rama propia; se trabaja en `main`)
 
 **Creada**: 2026-09-13
 
@@ -52,8 +52,9 @@ sesión, se puede ver sin haber ingresado.
 **Por qué esta prioridad**: sin ingreso no se puede usar ninguna otra funcionalidad, y proteger
 el acceso es la corrección principal frente al sistema de 2022 (X-04).
 
-**Prueba independiente**: con el usuario inicial que crea la carga de datos inicial, se ingresa
-con credenciales correctas e incorrectas y se intenta abrir una página interna sin sesión.
+**Prueba independiente**: con un usuario activo que no tenga pendiente el cambio de contraseña, se
+ingresa con credenciales correctas e incorrectas y se intenta abrir una página interna sin sesión
+(el usuario inicial se prueba en la Historia 5, porque debe cambiar su contraseña al ingresar).
 
 **Escenarios de aceptación**:
 

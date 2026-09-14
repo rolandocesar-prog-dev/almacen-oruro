@@ -10,7 +10,7 @@ que los planes siguientes usen los mismos nombres. Todas las rutas usan el App R
 | Grupo | Carpeta | Quién entra | Comprobación |
 |---|---|---|---|
 | Público | `src/app/ingreso/` | cualquiera sin sesión; con sesión vigente se redirige a `/` | `proxy.ts` (optimista) + la propia página |
-| Sistema | `src/app/(sistema)/` | solo con sesión vigente | `requerirSesion()` al inicio de **cada** página y **cada** Server Action |
+| Sistema | `src/app/(sistema)/` | solo con sesión vigente | `requerirSesion()` al inicio de **cada** página y **cada** Server Action, salvo `salir()`, que debe funcionar con la sesión vencida o con cambio de contraseña pendiente |
 | Cambio obligatorio | `src/app/(sistema)/cambiar-contrasena/` | con sesión vigente, aunque tenga el cambio de contraseña pendiente | `requerirSesion({ permitirCambioPendiente: true })` |
 
 - `proxy.ts` solo mira si existe la cookie `sesion`: sin cookie, cualquier ruta del grupo Sistema

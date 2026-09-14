@@ -96,6 +96,8 @@ crea en F-001.
 ```text
 almacen-oruro/
 ├── docker-compose.yml             # PostgreSQL 16 + creación de la base de pruebas
+├── docker/postgres/crear-base-pruebas.sql  # Crea almacen_oruro_test al iniciar el contenedor
+├── postcss.config.mjs             # Tailwind CSS 4
 ├── .env.example                   # Variables necesarias, sin secretos reales
 ├── package.json                   # Versiones exactas; scripts dev, build, start, test, semilla
 ├── next.config.ts
@@ -146,7 +148,9 @@ almacen-oruro/
 │   │   └── personal.ts
 │   ├── lib/
 │   │   ├── prisma.ts              # Cliente único con @prisma/adapter-pg
+│   │   ├── token-sesion.ts        # Token aleatorio y su hash (sin Next.js; lo usan los servicios)
 │   │   ├── sesion.ts              # Cookie y requerirSesion() (server-only, cache)
+│   │   ├── contrasenas.ts         # bcrypt: calcular y comparar
 │   │   ├── errores.ts             # ErrorDeNegocio y ResultadoAccion
 │   │   ├── texto.ts               # normalizarTexto()
 │   │   └── fechas.ts              # hoy y mes en curso en America/La_Paz

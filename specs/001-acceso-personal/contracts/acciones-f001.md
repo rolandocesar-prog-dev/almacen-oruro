@@ -23,7 +23,7 @@ type ResultadoAccion<T = void> =
 
 **Orden fijo dentro de cada Server Action**:
 
-1. `requerirSesion()` (salvo `ingresar`).
+1. `requerirSesion()` (salvo `ingresar` y `salir`).
 2. Validar `FormData` con el esquema Zod compartido; si falla, devolver `ok: false` con `errores`.
 3. Llamar al servicio.
 4. Capturar `ErrorDeNegocio` → `ok: false` con su mensaje; otro error → mensaje genérico y log sin
@@ -43,7 +43,7 @@ usuario no debe cambiar (`activo`, `debeCambiarContrasena`, `contrasenaHash`, id
 |---|---|
 | Entrada (`esquemaIngreso`) | `nombreUsuario`: texto, se recorta y pasa a minúsculas, obligatorio · `contrasena`: texto, obligatorio |
 | Servicio | `iniciarSesion(nombreUsuario, contrasena)` en `src/servicios/acceso.ts` |
-| Éxito | crea la fila de `sesion`, escribe la cookie `sesion` (HttpOnly, SameSite=Lax, Path=/, expira en 8 h) y redirige a `/`, o a `/cambiar-contrasena` si tiene el cambio pendiente |
+| Éxito | crea la fila de `sesion`, escribe la cookie `sesion` (HttpOnly, SameSite=Lax, Path=/, dura 24 h; la vigencia de 8 h la controla el servidor) y redirige a `/`, o a `/cambiar-contrasena` si tiene el cambio pendiente |
 | Error | `ok: false`, `mensaje: "Usuario o contraseña incorrectos"` — **idéntico** para usuario inexistente, contraseña incorrecta o usuario inactivo (FR-003) |
 | Requisitos | FR-001 a FR-005, FR-021 |
 
@@ -154,7 +154,7 @@ ni `tokenHash`.
 |---|---|---|---|
 | `listarPersonal` | `{ texto?, estado: 'activos' \| 'inactivos' \| 'todos' }` | `{ id, nombreCompleto, cargo, nombreUsuario, activo }[]` ordenado por apellido y nombre | FR-018 |
 | `obtenerPersonal` | `id` | `{ id, nombre, apellido, cargo, direccion, telefono, nombreUsuario, activo, debeCambiarContrasena, creadoEn }` o `null` | FR-015 |
-| `listarSesiones` | `{ usuarioId?, desde, hasta, pagina }` | `{ filas: { id, persona, nombreUsuario, inicio, fin, estado }[], total }` de 50 en 50, de la más reciente a la más antigua; antes de consultar cierra en la base las sesiones vencidas sin fin | FR-022, Historia 2 escenario 3 |
+| `listarSesiones` | `{ usuarioId?, desde, hasta, pagina }` | `{ filas: { id, persona, nombreUsuario, inicio, fin, estado }[], total }` de 50 en 50, de la más reciente a la más antigua; antes de consultar llama a `cerrarSesionesVencidas()` | FR-022, Historia 2 escenario 3 |
 
 `estado` de una sesión: `"Abierta"`, `"Cerrada por el usuario"`, `"Expirada"` o `"Cerrada por
 desactivación o restablecimiento"`.

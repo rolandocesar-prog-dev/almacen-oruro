@@ -640,8 +640,8 @@ el usuario está activo.
 
 **Sesiones abandonadas:** si nadie vuelve a usar una sesión vencida, su `fin` queda nulo. La consulta
 del historial (FR-022) la muestra como "Expirada" con fin igual a `inicio + 8 h` (escenario 3 de la
-Historia 2), y la próxima vez que se lista el historial el servicio cierra en la base las sesiones
-vencidas con esos valores, para que la bitácora quede completa.
+Historia 2), y el servicio las cierra en la base con esos valores cada vez que alguien ingresa y cada
+vez que se consulta el historial, para que la bitácora quede completa.
 
 ---
 

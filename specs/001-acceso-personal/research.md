@@ -65,15 +65,24 @@ repositorios genéricos o capa de casos de uso (principio I).
 siguiendo la guía de autenticación de Next.js 16 y *The Copenhagen Book*:
 
 1. Al ingresar se genera un token aleatorio de 32 bytes (`crypto.randomBytes`) y se envía al navegador
-   en una cookie `sesion` con `HttpOnly`, `SameSite=Lax`, `Path=/` y expiración a las 8 horas.
+   en una cookie `sesion` con `HttpOnly`, `SameSite=Lax` y `Path=/`, que dura **24 horas**. La
+   vigencia de 8 horas la decide siempre el servidor con `inicio` de la tabla: si la cookie venciera
+   a las 8 h, el navegador la borraría y el servidor no podría distinguir "sesión expirada" de
+   "nunca ingresó", así que no se mostraría el aviso ni se registraría la expiración.
 2. En la tabla `sesion` se guarda **solo el hash SHA-256 del token** (`token_hash`), nunca el token.
-3. En cada página y cada Server Action, la función `requerirSesion()` busca la sesión por el hash y
+3. En cada página y cada Server Action (salvo `salir()`), la función `requerirSesion()` busca la sesión por el hash y
    verifica: que exista, que no tenga `fin`, que `inicio + 8 h` no haya pasado y que el usuario siga
-   activo. Si expiró, la cierra con motivo `EXPIRADA` antes de redirigir.
+   activo. Si expiró, la cierra con motivo `EXPIRADA` antes de redirigir. Las sesiones que nadie
+   vuelve a usar se cierran con `cerrarSesionesVencidas()` cada vez que alguien ingresa y al
+   consultar el historial.
 4. Cerrar sesión, desactivar un usuario o restablecer su contraseña llenan `fin` y `motivo_cierre`:
    la sesión deja de valer de inmediato en todas las computadoras.
 5. `proxy.ts` solo hace una comprobación optimista (¿existe la cookie?) para redirigir rápido; la
    comprobación que vale es la de `requerirSesion()`, junto a los datos.
+
+Las utilidades del token (generarlo y calcular su hash) están en `src/lib/token-sesion.ts`, sin
+dependencias de Next.js, y las de la cookie y `requerirSesion()` en `src/lib/sesion.ts`. Así los
+servicios se pueden probar con Vitest y no se forma un ciclo de imports entre `lib` y `servicios`.
 
 **Fundamento**:
 - La especificación exige cosas que solo una sesión en base de datos resuelve: bitácora con inicio,
