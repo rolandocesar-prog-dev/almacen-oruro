@@ -130,6 +130,7 @@ erDiagram
 | estado | enum `REGISTRADA`, `ANULADA` | |
 | motivo_anulacion | texto(200) | obligatorio si está ANULADA |
 | anulada_en | fecha y hora | |
+| anulada_por_id | FK usuario, nulo | quien la anuló |
 | usuario_id | FK usuario | quien la registró |
 
 **compra_detalle** — `compra_id` · `producto_id` (activo; no se repite dentro de la misma compra) · `cantidad` entero > 0 · `precio_unitario` decimal(12,2) > 0 · `subtotal` decimal(12,2), calculado
@@ -160,7 +161,7 @@ erDiagram
 | fecha | fecha | obligatoria, no futura, no anterior a la fecha del pedido |
 | observacion | texto(200) | opcional |
 | estado | enum `REGISTRADA`, `ANULADA` | |
-| motivo_anulacion, anulada_en | | como en compra |
+| motivo_anulacion, anulada_en, anulada_por_id | | como en compra |
 | usuario_id | FK usuario | |
 
 **distribucion_detalle** — `distribucion_id` · `producto_id` (debe estar en el pedido) · `cantidad` entero > 0
