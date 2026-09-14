@@ -137,7 +137,7 @@ de este producto están expresados en '{unidad actual}'". Los demás campos sí 
 ## 4. Relaciones que usan otras funcionalidades
 
 Los selectores devuelven solo registros activos. En un formulario de **edición**, si el valor actual
-del registro está inactivo, se agrega marcado "(inactivo)" para no perderlo (FR-003).
+del registro está inactivo, se agrega marcado "(inactivo)" o "(inactiva)" según el catálogo para no perderlo (FR-003).
 
 | Selector | Lo usan | Devuelve |
 |---|---|---|

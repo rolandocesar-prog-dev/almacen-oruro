@@ -56,3 +56,15 @@ Con la aplicación en marcha (`npm run dev`) y una sesión iniciada.
 
 Los escenarios que dependen de pedidos o movimientos (H2 · E6, E8; H4 · E8) se validan con las pruebas
 de integración hasta que existan F-003 a F-005.
+
+## 4. Estado de la validación (14/09/2026)
+
+| Qué | Estado | Cómo se verificó |
+|---|---|---|
+| Pruebas automatizadas (§2) | ✅ | 198 pruebas en verde en 27 archivos (77 de F-001 y 121 de F-002), más `lint`, `typecheck` y `build` sin errores |
+| Pasos 1, 3, 5, 8, 11 (centro preseleccionado), 13, 14, 15 y 16 | ✅ | Páginas pedidas con una sesión de prueba contra la base de pruebas, con los datos del recorrido cargados por los esquemas y servicios reales: listados, fichas, stock de solo lectura sin campo `stockActual`, insignia "Bajo mínimo", búsqueda "lava" y "LAVANDÍNA", "No hay resultados para 'xyz'" con "Limpiar búsqueda", filtros inválidos en la URL, "Bs 12,50" en las dos fichas, id inexistente → 404 y sin sesión → `/ingreso` |
+| Pasos 2, 4, 6, 7, 9, 10, 12, 13 (mensaje) y 17: mensajes al enviar formularios y al desactivar | ✅ por pruebas · ⏳ en pantalla | Cada mensaje está comprobado con su texto exacto en las pruebas unitarias y de integración; falta verlos en el navegador con una sesión real |
+| Paso 18 y T044 (375 px, accesibilidad) | ✅ revisión de código · ⏳ visual | Etiquetas en todos los campos y selectores, tablas con desplazamiento propio, menú y filtros con `flex-wrap`; falta mirarlo en un teléfono o con el navegador en 375 px |
+| SC-001 (registrar un producto en menos de 1 minuto) | ⏳ | Se mide en el recorrido manual con Raymond |
+| SC-006 (encontrar un registro en menos de 10 s) | ✅ parte del sistema · ⏳ persona | La búsqueda respondió en unos 100 ms; el tiempo de la persona se mide en el recorrido manual |
+| H2 · E6, E8 y H4 · E8 (pedidos y movimientos) | ✅ | Pruebas de integración con pedidos y movimientos de prueba (research C-11) |

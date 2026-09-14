@@ -33,6 +33,26 @@ Detalle completo en [`specs/001-acceso-personal/research.md`](../specs/001-acces
 
 ---
 
+## Catálogos (plan de F-002, 14/09/2026)
+
+Detalle completo en [`specs/002-catalogos/research.md`](../specs/002-catalogos/research.md).
+
+| # | Fecha | Decisión | Fundamento | Alternativas descartadas |
+|---|---|---|---|---|
+| C-01 | 14/09 | Búsqueda sin mayúsculas ni tildes filtrando en memoria con `coincideBusqueda` (`src/lib/texto.ts`) | Los catálogos tienen decenas de registros; la regla queda en una función pura con pruebas unitarias | Extensión `unaccent` con SQL crudo, columna de búsqueda normalizada, `mode: "insensitive"` (distingue tildes) |
+| C-02 | 14/09 | Listados de catálogos sin paginar, con el total de registros | Con decenas de filas una tabla completa se lee y se busca más rápido (SC-006) | Paginar de 50 en 50, desplazamiento infinito |
+| C-03 | 14/09 | Un archivo explícito por catálogo en esquemas, servicios y páginas, más utilidades comunes pequeñas | Cada regla especial (RN-13, RN-16, RN-17) queda en el archivo de su catálogo | CRUD genérico parametrizado, una página con pestañas |
+| C-04 | 14/09 | Duplicado de un registro inactivo: mensaje con enlace "Ver y reactivar" a su ficha (campo `enlace` en `ErrorDeNegocio`) | No reactiva nada por sorpresa y no requiere una acción nueva | Botón "Reactivar" en el formulario de alta, solo texto |
+| C-05 | 14/09 | Nombres únicos con `nombre_normalizado`; código y CI en mayúsculas; el servicio verifica y la restricción UNIQUE decide en simultáneo (P2002 → mismo mensaje) | Aplica T-06 a cada catálogo | — |
+| C-06 | 14/09 | RN-13, RN-16 y RN-17 en los servicios de catálogo, con conteos en transacción | Las reglas pertenecen a la baja del catálogo; se prueban insertando pedidos y movimientos de prueba | Esperar a F-003–F-005, bloquear filas |
+| C-07 | 14/09 | `listar…ParaSelector(idActual?)`: solo activos, más el actual marcado si está inactivo | Una sola función decide qué se puede elegir (RN-14, FR-003) | Repetir el filtro en cada pantalla |
+| C-08 | 14/09 | Precio referencial como texto con coma o punto, guardado con `Prisma.Decimal` y mostrado "Bs 12,50" | Sin redondeos de coma flotante; en Bolivia se escribe con coma | Campo numérico del navegador |
+| C-09 | 14/09 | La ficha del producto advierte el stock al confirmar la baja | Desactivar con stock está permitido, pero conviene saberlo | Bloquear la baja con stock |
+| C-10 | 14/09 | Menú con una segunda fila "Catálogos" que se ajusta en pantallas chicas | Sin JavaScript extra y sin desplazamiento horizontal | Menú desplegable, barra lateral |
+| C-11 | 14/09 | Ayudantes de prueba `tests/ayudantes/catalogos.ts`, incluidos pedidos con saldo y movimientos mínimos | Las reglas que dependen de otras funcionalidades se prueban ya contra la base real | Depender de los servicios de F-003 y F-004 |
+
+---
+
 ## Implementación
 
 Decisiones tomadas durante la implementación que no estaban en el plan.
@@ -47,3 +67,10 @@ Decisiones tomadas durante la implementación que no estaban en el plan.
 | I-07 | 14/09 | Cada listado tiene su propio componente de filtros de cliente (`filtros-personal.tsx`, `filtros-sesiones.tsx`) | Un esquema Zod no se puede pasar desde una página del servidor a un componente de cliente; el componente importa su esquema y usa el genérico `Filtros` |
 | I-08 | 14/09 | La verificación visual de páginas internas se hizo con una sesión de prueba creada en la base, sin escribir contraseñas en el navegador | Los pasos del recorrido manual que requieren contraseñas quedan para la revisión con Raymond; sus reglas están cubiertas por pruebas de integración |
 | I-03 | 13/09 | Vulnerabilidades de `npm audit` aceptadas | Las 4 alertas están en dependencias de desarrollo de la CLI de Prisma (`deepmerge-ts`, `mysql2`); las dependencias de producción tienen 0 vulnerabilidades |
+| I-09 | 14/09 | Esquemas comunes en `src/esquemas/comunes.ts` (textos, teléfono, enteros, ids, filtro de estado, aviso de ficha) usados también por personal | Mismas reglas y mensajes en todos los formularios; las 77 pruebas de F-001 siguieron en verde tras la extracción |
+| I-10 | 14/09 | Un campo vacío de número o selector se convierte en "sin valor" antes de `z.coerce.number` (`vacioComoAusente`) | `Number("")` es 0: sin esto, un stock mínimo o un selector vacíos pasaban como válidos |
+| I-11 | 14/09 | Al editar un producto con movimientos, el selector de unidad va deshabilitado y el valor viaja en un campo oculto | Un `<select>` deshabilitado no se envía; el servidor vuelve a verificar RN-16 |
+| I-12 | 14/09 | Etiqueta "(inactiva)" o "(inactivo)" según el género del catálogo en selectores y fichas | Se lee natural ("Desinfectantes (inactiva)"); la regla FR-003 no cambia |
+| I-13 | 14/09 | Componentes compartidos de catálogos: `CambioDeEstado` (generalizado desde personal), `InsigniaEstado`, `Selector`, `Dato`, `MensajeVacio`, `EncabezadoListado` | Evita repetir el mismo marcado en seis catálogos sin esconder la lógica de cada uno |
+| I-14 | 14/09 | La búsqueda y el filtro por categoría se implementaron junto con cada catálogo (fases 3 a 6) y la fase de la Historia 5 agregó su prueba | Escribir cada listado una sola vez; el resultado es el mismo que el orden de tareas previsto |
+| I-15 | 14/09 | El recorrido de F-002 se verificó con un servidor de desarrollo contra la base de pruebas, datos cargados por esquemas y servicios, y una sesión de prueba creada en la base | Mismo criterio que I-08: sin escribir contraseñas en el navegador y sin dejar datos en la base de desarrollo |

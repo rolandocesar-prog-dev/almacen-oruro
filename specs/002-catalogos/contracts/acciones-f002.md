@@ -37,6 +37,7 @@ Todas bajo `src/app/(sistema)/`, protegidas con `requerirSesion()`.
 | `q` | todos | texto de hasta 60 caracteres | vacío |
 | `estado` | todos | `activos`, `inactivos`, `todos` | `activos` |
 | `categoria` | productos | id de categoría | todas |
+| `aviso` | fichas | `registrado`, `modificado` (`esquemaAvisoFicha`); otro valor se ignora | sin aviso |
 | `asociaciones` | ficha de proveedor, sección productos | `activas`, `inactivas` (`esquemaFiltroAsociaciones`) | `activas` |
 
 **Campos en los que busca `q`** (sin mayúsculas ni tildes, research C-01):
@@ -80,7 +81,7 @@ categorías; las demás cambian el esquema, el servicio y las rutas.
 | Acción | Entrada | Servicio (`proveedor-producto.ts`) | Éxito | Errores |
 |---|---|---|---|---|
 | `asociarProductoAccion(proveedorId, estadoPrevio, formData)` | `esquemaProveedorProducto` | `asociarProducto(proveedorId, datos)` | `ok: true`, revalida la ficha | proveedor o producto inactivo; par repetido |
-| `cambiarPrecioReferencialAccion(asociacionId, estadoPrevio, formData)` | `esquemaPrecioReferencial` | `cambiarPrecioReferencial(id, precio)` | `ok: true` | inexistente |
+| `cambiarPrecioReferencialAccion(asociacionId, estadoPrevio, formData)` | `esquemaCambioPrecio` (`{ precioReferencial: esquemaPrecioReferencial }`) | `cambiarPrecioReferencial(id, precio)` | `ok: true` | inexistente |
 | `desactivarAsociacionAccion(asociacionId)` | — | `desactivarAsociacion(id)` | `ok: true` | ya inactiva |
 | `reactivarAsociacionAccion(asociacionId)` | — | `reactivarAsociacion(id)` | `ok: true` | ya activa; proveedor o producto inactivo |
 

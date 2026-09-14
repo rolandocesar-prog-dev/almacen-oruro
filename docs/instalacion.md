@@ -92,6 +92,17 @@ pedirá definir una contraseña nueva antes de continuar: en "Contraseña actual
 **4. Registrar al personal** desde el menú **Personal → Registrar personal**. Cada persona podrá ingresar
 con el usuario y la contraseña que se le asignen.
 
+**5. Cargar los catálogos** desde la fila **Catálogos** del menú, en este orden, porque cada uno usa
+los anteriores:
+
+1. **Categorías** (por ejemplo, Desinfectantes) y **Unidades** (por ejemplo, Bidón 5 L).
+2. **Productos**, eligiendo su categoría y unidad. Empiezan con stock 0: el stock solo cambia con
+   compras y distribuciones.
+3. **Proveedores** y, en la ficha de cada uno, los productos que ofrece con su precio referencial.
+4. **Centros de salud** y después **Representantes**.
+
+Nada se borra: un registro que ya no se usa se **desactiva** desde su ficha y se puede reactivar.
+
 Para detener el sistema, presionar `Ctrl + C` en la ventana de PowerShell. La base de datos sigue
 guardada: la próxima vez basta con abrir Docker Desktop, ejecutar `docker compose up -d` y `npm start`.
 
