@@ -20,6 +20,17 @@ pedido guardaba el producto en dos lugares y pasaba a "Enviado" sin comparar can
 `docs/especificacion/03-funcionalidades.md` §F-004 · Capítulo II: requerimiento 4; RF 5 ·
 Decisiones D-10 y D-16 · Supuestos S-01 y S-04 · Defectos corregidos X-07, X-09 y X-10.
 
+## Clarifications
+
+### Session 2026-09-13
+
+- Q: ¿Se puede desactivar un representante que tiene pedidos PENDIENTE o PARCIAL? → A: No; se
+  rechaza indicando cuántos pedidos tiene por atender, que primero se completan o anulan (misma
+  regla que para productos, RN-13).
+- Q: Cuando se anula un pedido PARCIAL, ¿su estado final es ANULADO o uno distinto? → A: ANULADO,
+  igual que un pedido PENDIENTE anulado; el detalle y los reportes distinguen lo entregado y el
+  saldo anulado.
+
 ## Escenarios de usuario y pruebas *(obligatorio)*
 
 **Actor único:** Encargado de almacén, con sesión iniciada (F-001). El representante no usa el
@@ -193,11 +204,10 @@ cantidades y stock; se intenta anular uno ATENDIDO.
 - **Anulación simultánea con una distribución:** si la distribución se guarda primero y completa el
   pedido, la anulación se rechaza porque el pedido ya está ATENDIDO; si la anulación se guarda
   primero, la distribución se rechaza porque el pedido ya está ANULADO.
-- **Representante desactivado con pedidos por atender:** los pedidos se siguen mostrando y se
-  pueden distribuir, editar (si están PENDIENTE) y anular; al editar, el representante inactivo se
-  conserva, pero no se puede elegir otro inactivo.
-- **Producto con saldo pendiente:** no se puede desactivar mientras esté en pedidos PENDIENTE o
-  PARCIAL (F-002, RN-13); por eso ningún pedido por atender contiene productos inactivos.
+- **Representante o producto con pedidos por atender:** no se pueden desactivar mientras tengan
+  pedidos PENDIENTE o PARCIAL (F-002, RN-13); por eso ningún pedido por atender tiene un
+  representante ni un producto inactivo. Si el representante deja su cargo, el encargado completa
+  o anula sus pedidos antes de darlo de baja.
 - **Quitar una línea al editar:** solo se permite en pedidos PENDIENTE, así que ninguna línea con
   entregas se puede quitar.
 - **Pedido con muchas líneas:** no hay un límite de productos por pedido; el catálogo simulado
@@ -240,8 +250,10 @@ cantidades y stock; se intenta anular uno ATENDIDO.
 
 - **FR-010**: El sistema DEBE permitir anular un pedido PENDIENTE o PARCIAL con motivo (obligatorio,
   hasta 200 caracteres), registrando quién lo anuló y cuándo (RN-43).
-- **FR-011**: Al anular, el sistema DEBE conservar lo entregado de cada línea y considerar anulado
-  el saldo pendiente; NO DEBE modificar stock ni generar movimientos.
+- **FR-011**: Al anular, el sistema DEBE dejar el pedido en estado ANULADO (tenga o no entregas),
+  conservar lo entregado de cada línea y considerar anulado el saldo pendiente; NO DEBE modificar
+  stock ni generar movimientos. Toda vista o reporte que muestre pedidos ANULADOS DEBE poder
+  mostrar sus unidades entregadas y su saldo anulado.
 - **FR-012**: El sistema DEBE impedir anular un pedido ATENDIDO o ANULADO, y registrar
   distribuciones para un pedido ANULADO.
 

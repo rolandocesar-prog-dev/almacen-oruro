@@ -180,6 +180,9 @@ rechazo de un CI duplicado y de la baja del centro con representantes activos.
    aparece en el selector, pero sus pedidos anteriores lo siguen mostrando.
 7. **Dado** un representante inactivo cuyo centro de salud está inactivo, **cuando** se intenta
    reactivarlo, **entonces** se rechaza indicando que primero se debe reactivar el centro (RN-17).
+8. **Dado** un representante con 3 pedidos PENDIENTE o PARCIAL, **cuando** se intenta desactivarlo,
+   **entonces** se rechaza indicando "No se puede desactivar: tiene 3 pedidos por atender" (RN-13,
+   aclarado en F-004).
 
 ---
 
@@ -335,8 +338,8 @@ par y que la asociación se puede desactivar.
   dígitos separado por guion, por ejemplo `4567890-1B`), servicio o área (obligatorio, hasta 60),
   teléfono (opcional, hasta 20) y centro de salud activo.
 - **FR-022**: El sistema DEBE preseleccionar el centro de salud cuando hay uno solo activo.
-- **FR-023**: El sistema DEBE impedir desactivar un centro de salud con representantes activos,
-  indicando cuántos son (RN-13).
+- **FR-023**: El sistema DEBE impedir desactivar un centro de salud con representantes activos, y
+  un representante con pedidos PENDIENTE o PARCIAL, indicando cuántos son (RN-13).
 
 **Reactivación**
 

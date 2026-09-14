@@ -218,7 +218,7 @@ erDiagram
 - **RN-10** Los campos únicos se comparan normalizados: sin espacios al inicio ni al final, espacios internos simples y sin distinguir mayúsculas. En los catálogos, la unicidad incluye los registros inactivos: el valor queda reservado y se ofrece reactivar el registro existente.
 - **RN-11** Un duplicado se informa nombrando el campo ("Ya existe un producto con el nombre 'Lavandina 1 L'").
 - **RN-12** Dar de baja no borra: marca `activo = falso`. Se puede reactivar.
-- **RN-13** No se puede dar de baja una categoría o unidad de medida con productos activos asociados, ni un centro de salud con representantes activos, ni un producto con saldo pendiente en pedidos PENDIENTE o PARCIAL (un producto con stock sí se puede dar de baja, con aviso).
+- **RN-13** No se puede dar de baja una categoría o unidad de medida con productos activos asociados, ni un centro de salud con representantes activos, ni un representante con pedidos PENDIENTE o PARCIAL, ni un producto con saldo pendiente en pedidos PENDIENTE o PARCIAL (un producto con stock sí se puede dar de baja, con aviso).
 - **RN-14** Los registros inactivos no aparecen en los selectores de documentos nuevos, pero sí en consultas, reportes e histórico.
 - **RN-15** `stock_actual` no se puede modificar desde el catálogo de productos.
 - **RN-16** La unidad de medida de un producto no se puede cambiar si el producto ya tiene movimientos de inventario: su stock y su histórico están expresados en esa unidad.
