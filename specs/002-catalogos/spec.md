@@ -23,6 +23,21 @@ duplicados."
 `docs/especificacion/03-funcionalidades.md` §F-002 · Capítulo II: requerimientos 2, 3, 5, 6, 9,
 10 y 12; RF 2 · Decisiones D-11 y D-15 · Defectos corregidos X-11 y X-13.
 
+## Clarifications
+
+### Session 2026-09-13
+
+- Q: ¿Se puede desactivar un producto que todavía tiene stock o que figura en pedidos pendientes?
+  → A: Con stock sí, con aviso previo; se rechaza si tiene saldo pendiente en pedidos PENDIENTE o
+  PARCIAL.
+- Q: Cuando un registro está inactivo, ¿su valor único sigue reservado? → A: Sí; se rechaza el
+  duplicado y el mensaje ofrece reactivar el registro inactivo.
+- Q: ¿Se pueden modificar los identificadores (código, nombre, NIT, CI) de un registro ya usado en
+  documentos? → A: Sí, siempre, respetando la unicidad; los documentos muestran el valor vigente.
+- Q: ¿El catálogo de centros de salud permite registrar varios centros o se limita a uno? → A:
+  Permite varios (requerimientos 9 y 12); se opera, prueba y simula con uno, que se preselecciona
+  si es el único activo.
+
 ## Escenarios de usuario y pruebas *(obligatorio)*
 
 **Actor único:** Encargado de almacén, con sesión iniciada (F-001).
@@ -93,15 +108,19 @@ stock no se puede editar y que se rechazan los duplicados de código y de nombre
 6. **Dado** un producto con movimientos de inventario, **cuando** se intenta cambiar su unidad de
    medida, **entonces** se rechaza indicando que la unidad no puede cambiar porque su stock e
    histórico están expresados en ella (RN-16).
-7. **Dado** un producto activo, **cuando** se desactiva, **entonces** deja de aparecer para elegir
-   en compras y pedidos nuevos, conserva su stock y sigue apareciendo en su kardex, existencias e
-   histórico.
-8. **Dado** un producto inactivo cuya categoría o unidad también está inactiva, **cuando** se
+7. **Dado** un producto activo con 15 unidades en stock y sin saldo pendiente en pedidos,
+   **cuando** se desactiva, **entonces** se avisa antes "Este producto tiene 15 unidades en stock"
+   y, al confirmar, deja de aparecer para elegir en compras y pedidos nuevos, conserva su stock y
+   sigue apareciendo en su kardex, existencias e histórico.
+8. **Dado** un producto con saldo pendiente en 2 pedidos PENDIENTE o PARCIAL, **cuando** se intenta
+   desactivarlo, **entonces** se rechaza indicando "No se puede desactivar: 2 pedidos tienen saldo
+   pendiente de este producto" (RN-13).
+9. **Dado** un producto inactivo cuya categoría o unidad también está inactiva, **cuando** se
    intenta reactivarlo, **entonces** se rechaza indicando que primero se debe reactivar la
    categoría o unidad, o cambiarle una activa (RN-17).
-9. **Dado** el listado de productos, **cuando** se consulta, **entonces** muestra código, nombre,
-   categoría, unidad, stock actual, stock mínimo, estado y un indicador "Bajo mínimo" en los
-   productos con stock actual menor o igual al mínimo (RN-52).
+10. **Dado** el listado de productos, **cuando** se consulta, **entonces** muestra código, nombre,
+    categoría, unidad, stock actual, stock mínimo, estado y un indicador "Bajo mínimo" en los
+    productos con stock actual menor o igual al mínimo (RN-52).
 
 ---
 
@@ -229,8 +248,9 @@ par y que la asociación se puede desactivar.
 - **Categoría o unidad inactiva en un producto activo:** no puede ocurrir, porque RN-13 impide
   desactivarlas mientras tengan productos activos.
 - **Producto con stock desactivado:** se permite; el formulario avisa cuántas unidades tiene en
-  stock antes de confirmar. Los pedidos ya registrados con ese producto se pueden seguir atendiendo
-  (F-005).
+  stock antes de confirmar. Como no puede tener saldo pendiente en pedidos, ninguna distribución
+  queda esperando un producto inactivo. Si un pedido con ese producto se anula o se completa, la
+  baja pasa a ser posible.
 - **Proveedor desactivado con asociaciones de productos:** las asociaciones se conservan y dejan de
   mostrarse en la ficha del producto mientras el proveedor esté inactivo.
 - **Último centro de salud:** no se puede desactivar mientras tenga representantes activos; si no
@@ -289,7 +309,8 @@ par y que la asociación se puede desactivar.
 - **FR-015**: El sistema DEBE impedir cambiar la unidad de medida de un producto que ya tiene
   movimientos de inventario (RN-16).
 - **FR-016**: El sistema DEBE permitir desactivar un producto aunque tenga stock, avisando antes
-  cuántas unidades tiene.
+  cuántas unidades tiene, y DEBE impedirlo si el producto tiene saldo pendiente (solicitado mayor
+  que entregado) en algún pedido PENDIENTE o PARCIAL, indicando cuántos pedidos son (RN-13).
 - **FR-017**: El listado de productos DEBE mostrar código, nombre, categoría, unidad, stock actual,
   stock mínimo, estado e indicador "Bajo mínimo" cuando stock actual ≤ stock mínimo (RN-52), y
   permitir filtrar por categoría.
@@ -305,7 +326,8 @@ par y que la asociación se puede desactivar.
 
 **Centros de salud y representantes**
 
-- **FR-020**: Un centro de salud DEBE tener nombre (obligatorio, único, hasta 100 caracteres),
+- **FR-020**: El sistema DEBE permitir registrar uno o más centros de salud. Un centro de salud DEBE
+  tener nombre (obligatorio, único, hasta 100 caracteres),
   teléfono (opcional, hasta 20) y dirección (opcional, hasta 150).
 - **FR-021**: Un representante DEBE tener nombre (obligatorio, hasta 60), apellido (obligatorio,
   hasta 60), CI (obligatorio, único, hasta 15; dígitos, con complemento opcional de letras y
@@ -327,6 +349,13 @@ par y que la asociación se puede desactivar.
   activos con precio referencial opcional (mayor que 0, con 2 decimales), sin repetir el par.
 - **FR-026**: La ficha de un producto DEBE mostrar los proveedores activos que lo ofrecen, con su
   precio referencial.
+
+**Edición de identificadores**
+
+- **FR-027**: El sistema DEBE permitir modificar los campos de identificación (nombre, código, NIT,
+  CI) aunque el registro ya se haya usado en documentos, respetando la unicidad; los documentos
+  anteriores muestran el valor vigente, no una copia del valor original. La única excepción es la
+  unidad de medida de un producto con movimientos (FR-015).
 
 ### Entidades clave
 
@@ -367,13 +396,13 @@ par y que la asociación se puede desactivar.
 ## Supuestos
 
 - **Actor:** un solo rol con acceso total (D-10); todas las acciones exigen sesión (F-001).
-- **Varios centros de salud:** el catálogo permite registrar más de un centro, pero la operación,
-  las pruebas y la simulación usan uno solo (D-11); no se agrega lógica específica para varios.
+- **Varios centros de salud:** el catálogo admite varios (FR-020), pero la operación, las pruebas y
+  la simulación usan uno solo (D-11); no se agrega lógica específica para varios, como reportes por
+  centro.
 - **Código de producto:** lo escribe el encargado; el sistema no lo genera.
-- **Unicidad con inactivos:** un valor único queda reservado aunque el registro esté inactivo,
-  para que el histórico no muestre dos registros distintos con el mismo identificador.
-- **Edición de identificadores:** código, nombre, NIT y CI se pueden modificar respetando la
-  unicidad; los documentos anteriores muestran el valor vigente.
+- **Unicidad con inactivos (FR-004):** el valor queda reservado para que el histórico no muestre
+  dos registros distintos con el mismo identificador; si la empresa o persona vuelve, se reactiva
+  su registro.
 - **Abreviatura de unidad:** no es única.
 - **Volumen:** decenas de registros por catálogo (S-05); no se requiere carga masiva.
 - **Carga inicial:** los catálogos empiezan vacíos; el generador de datos simulados de F-007 los
