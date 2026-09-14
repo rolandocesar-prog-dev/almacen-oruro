@@ -21,6 +21,15 @@ Alcance general fuera de la entrega: ver
   registros: hoy se filtra en memoria porque son decenas (`specs/002-catalogos/research.md`, C-01).
 - Paginación de los listados de catálogos, por el mismo motivo (C-02).
 
+## F-003 · Compras e inventario
+
+- Órdenes de compra, aprobación, pagos y cuentas por pagar.
+- Ajustes manuales de inventario (P3 de la especificación, fuera de la entrega).
+- Valorización del inventario y precio promedio ponderado.
+- Paginación del kardex si un producto llegara a miles de movimientos: hoy son unos cientos
+  (`specs/003-compras-inventario/research.md`, K-08).
+- Mostrar en pantalla la verificación encadenada de saldos (RN-51); hoy la demuestran las pruebas.
+
 ## Otras funcionalidades
 
 Se completa a medida que se implementan F-002 a F-007.

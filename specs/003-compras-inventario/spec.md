@@ -240,6 +240,8 @@ factura queda libre; se intenta anular una compra cuyo stock ya se distribuyó.
 - **Proveedor desactivado después de la compra:** la compra se sigue consultando y se puede anular.
 - **Montos grandes:** el total no puede superar 9 999 999 999,99; se rechaza indicando el máximo.
 - **Precio con más de 2 decimales:** se rechaza indicando que el precio admite hasta 2 decimales.
+- **Cantidad desmedida en una línea:** más de 1 000 000 unidades se rechaza indicando el máximo; ninguna
+  compra real del almacén se acerca a ese valor y así el stock nunca desborda su columna.
 - **Sesión expirada al guardar:** no se guarda nada (F-001) y los datos escritos se pierden; el
   mensaje lo advierte.
 - **Documento con fecha anterior a otros ya registrados:** en el kardex aparece según su orden de
@@ -256,7 +258,7 @@ factura queda libre; se intenta anular una compra cuyo stock ya se distribuyó.
 - **FR-001**: El sistema DEBE permitir registrar una compra con cabecera: proveedor activo
   (obligatorio), Nº de factura (obligatorio, hasta 20 caracteres, solo dígitos), fecha
   (obligatoria, no futura) y observación (opcional, hasta 200); y detalle con una o más líneas.
-- **FR-002**: Cada línea DEBE tener un producto activo, cantidad (entero mayor que 0) y precio
+- **FR-002**: Cada línea DEBE tener un producto activo, cantidad (entero mayor que 0 y hasta 1 000 000) y precio
   unitario (mayor que 0, hasta 2 decimales); un producto NO DEBE repetirse en la misma compra
   (RN-22).
 - **FR-003**: El sistema DEBE calcular `subtotal = cantidad × precio unitario` por línea y
@@ -302,7 +304,8 @@ factura queda libre; se intenta anular una compra cuyo stock ya se distribuyó.
 - **FR-017**: Cada movimiento DEBE registrar producto, fecha del documento, momento de registro,
   tipo, cantidad con signo, saldo resultante, documento de origen y usuario. Su saldo resultante
   DEBE ser igual al saldo del movimiento anterior del mismo producto, en orden de registro, más su
-  cantidad (RN-51). Ningún saldo ya registrado se recalcula.- **FR-018**: El sistema DEBE ofrecer la consulta de existencias con código, producto, categoría,
+  cantidad (RN-51). Ningún saldo ya registrado se recalcula.
+- **FR-018**: El sistema DEBE ofrecer la consulta de existencias con código, producto, categoría,
   unidad, stock actual, stock mínimo e indicador "Bajo mínimo" (RN-52); con filtros por categoría,
   "solo bajo mínimo", estado (activos e inactivos con stock, que es el valor por defecto;
   inactivos; todos) y búsqueda por código o nombre; y el conteo de productos bajo mínimo. Los

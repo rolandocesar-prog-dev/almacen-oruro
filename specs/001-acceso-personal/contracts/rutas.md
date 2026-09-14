@@ -32,8 +32,8 @@ que los planes siguientes usen los mismos nombres. Todas las rutas usan el App R
 | `/personal/[id]/editar` | Modificar datos de una persona | **F-001** |
 | `/sesiones` | Historial de sesiones | **F-001** |
 | `/categorias`, `/unidades`, `/productos`, `/proveedores`, `/centros-salud`, `/representantes` | Catálogos (listado, `nuevo` o `nueva`, `[id]`, `[id]/editar`; detalle en `specs/002-catalogos/contracts/acciones-f002.md`) | F-002 |
-| `/compras`, `/compras/nueva`, `/compras/[id]` | Compras | F-003 |
-| `/existencias`, `/kardex/[productoId]` | Inventario | F-003 |
+| `/compras`, `/compras/nueva`, `/compras/[id]` | Compras (detalle en `specs/003-compras-inventario/contracts/acciones-f003.md`) | F-003 |
+| `/existencias`, `/existencias/verificacion`, `/kardex/[productoId]` | Inventario | F-003 |
 | `/pedidos`, `/pedidos/nuevo`, `/pedidos/[id]`, `/pedidos/[id]/editar` | Pedidos | F-004 |
 | `/distribuciones`, `/distribuciones/nueva`, `/distribuciones/[id]`, `/distribuciones/[id]/vale` | Distribución | F-005 |
 | `/reportes/compras`, `/reportes/distribuciones`, `/reportes/existencias`, `/reportes/kardex`, `/reportes/pedidos` | Reportes | F-006 |
