@@ -174,12 +174,12 @@ categoría en productos y mensaje de "sin resultados".
 
 ### Pruebas de la Historia 5
 
-- [ ] T034 [P] [US5] Crear `tests/integracion/catalogo-busqueda.test.ts`: con datos de los seis catálogos, `q` busca en los campos de [contrato §1](contracts/acciones-f002.md#1-rutas) ("lava" y "LAVANDÍNA" encuentran "Lavandina 1 L" por nombre y "LIM" por código; "andina" encuentra un proveedor por razón social y "1020" por NIT; "enferm" encuentra un representante por servicio); combina con `estado`; `listarProductos({ categoriaId })` filtra por categoría; los resultados siguen ordenados
+- [X] T034 [P] [US5] Crear `tests/integracion/catalogo-busqueda.test.ts`: con datos de los seis catálogos, `q` busca en los campos de [contrato §1](contracts/acciones-f002.md#1-rutas) ("lava" y "LAVANDÍNA" encuentran "Lavandina 1 L" por nombre y "LIM" por código; "andina" encuentra un proveedor por razón social y "1020" por NIT; "enferm" encuentra un representante por servicio); combina con `estado`; `listarProductos({ categoriaId })` filtra por categoría; los resultados siguen ordenados
 
 ### Implementación de la Historia 5
 
-- [ ] T035 [US5] Agregar el parámetro `q` a `listarCategorias`, `listarUnidadesMedida`, `listarProductos` (más `categoriaId`), `listarProveedores`, `listarCentrosSalud` y `listarRepresentantes` en `src/servicios/catalogos/`, filtrando después de la consulta con `coincideBusqueda(q, ...campos)` sobre los campos del contrato §1 y con un comentario que remita a research C-01
-- [ ] T036 [US5] Crear `esquemaFiltroProductos` en `src/esquemas/catalogos/producto.ts` (`esquemaFiltroCatalogo` + `categoria` opcional con `z.coerce.number().int().positive()`, vacío como ausente) y agregar a los seis `filtros-….tsx` el campo "Buscar" (`q`, máximo 60) y, en `filtros-productos.tsx`, el selector de categoría con todas las categorías (activas e inactivas, marcadas); en los seis `page.tsx`, pasar `q` al servicio y, si hay `q` y no hay filas, mostrar "No hay resultados para '{q}'" con el enlace "Limpiar búsqueda" que conserva el estado (Historia 5 · E3)
+- [X] T035 [US5] Agregar el parámetro `q` a `listarCategorias`, `listarUnidadesMedida`, `listarProductos` (más `categoriaId`), `listarProveedores`, `listarCentrosSalud` y `listarRepresentantes` en `src/servicios/catalogos/`, filtrando después de la consulta con `coincideBusqueda(q, ...campos)` sobre los campos del contrato §1 y con un comentario que remita a research C-01
+- [X] T036 [US5] Crear `esquemaFiltroProductos` en `src/esquemas/catalogos/producto.ts` (`esquemaFiltroCatalogo` + `categoria` opcional con `z.coerce.number().int().positive()`, vacío como ausente) y agregar a los seis `filtros-….tsx` el campo "Buscar" (`q`, máximo 60) y, en `filtros-productos.tsx`, el selector de categoría con todas las categorías (activas e inactivas, marcadas); en los seis `page.tsx`, pasar `q` al servicio y, si hay `q` y no hay filas, mostrar "No hay resultados para '{q}'" con el enlace "Limpiar búsqueda" que conserva el estado (Historia 5 · E3)
 
 **Punto de control**: T034 en verde; quickstart pasos 14 y 15.
 
