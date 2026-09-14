@@ -2,7 +2,14 @@
 node_modules/
 .next/
 out/
+build/
 coverage/
+next-env.d.ts
+*.tsbuildinfo
+*.log
+
+# Cliente de Prisma generado (se regenera con `npm install`)
+src/generado/
 
 # Secretos: nunca se versionan
 .env
@@ -11,3 +18,9 @@ coverage/
 
 # Datos locales de Claude Code (puede contener credenciales)
 .claude/settings.local.json
+
+# Sistema operativo y editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

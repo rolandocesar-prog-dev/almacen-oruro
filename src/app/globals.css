@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+/* Colores base con contraste suficiente para lectura prolongada (principio de accesibilidad). */
+@theme {
+  --color-marca: #1f4e79;
+  --color-marca-oscuro: #163a5a;
+  --color-fondo: #f5f7fa;
+  --color-texto: #1f2933;
+  --color-borde: #cbd2d9;
+  --color-exito: #1e7b34;
+  --color-error: #b3261e;
+  --color-aviso: #8a5a00;
+}
+
+body {
+  background-color: var(--color-fondo);
+  color: var(--color-texto);
+}
+
+/* Foco visible para quien navega con teclado. */
+:focus-visible {
+  outline: 3px solid var(--color-marca);
+  outline-offset: 2px;
+}

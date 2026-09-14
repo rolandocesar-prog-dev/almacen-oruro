@@ -1,0 +1,26 @@
+# Base de datos local del Sistema de almacén Regional Oruro.
+# Levantar con: docker compose up -d
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: almacen-oruro-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-almacen}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-almacen}
+      POSTGRES_DB: almacen_oruro
+      TZ: America/La_Paz
+    ports:
+      - "5432:5432"
+    volumes:
+      - datos-postgres:/var/lib/postgresql/data
+      # Al crear el contenedor por primera vez, crea también la base de pruebas.
+      - ./docker/postgres/crear-base-pruebas.sql:/docker-entrypoint-initdb.d/crear-base-pruebas.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-almacen} -d almacen_oruro"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  datos-postgres:
