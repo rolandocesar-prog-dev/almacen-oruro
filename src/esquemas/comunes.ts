@@ -66,6 +66,11 @@ export const esquemaFiltroCatalogo = z.object({
 });
 
 export type FiltroCatalogo = z.infer<typeof esquemaFiltroCatalogo>;
+
+/** Aviso de la ficha después de registrar o modificar (?aviso=registrado). Otro valor se ignora. */
+export const esquemaAvisoFicha = z.object({
+  aviso: z.enum(["registrado", "modificado"]).optional().catch(undefined),
+});
 export type EstadoFiltro = FiltroCatalogo["estado"];
 
 /** Condición de Prisma para el filtro de estado: `undefined` trae activos e inactivos. */

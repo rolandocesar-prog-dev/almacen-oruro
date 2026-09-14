@@ -5,6 +5,7 @@ import { EnlaceEditar } from "@/componentes/catalogos/encabezado-listado";
 import { InsigniaActivo } from "@/componentes/catalogos/insignia-estado";
 import { Aviso } from "@/componentes/ui/aviso";
 import { Dato } from "@/componentes/ui/dato";
+import { esquemaAvisoFicha } from "@/esquemas/comunes";
 import { idDeRuta } from "@/lib/parametros";
 import { requerirSesion } from "@/lib/sesion";
 import { obtenerCentroSalud } from "@/servicios/catalogos/centros-salud";
@@ -12,21 +13,21 @@ import { desactivarCentroSaludAccion, reactivarCentroSaludAccion } from "../acci
 
 export const metadata = { title: "Ficha de centro de salud · Almacén Regional Oruro" };
 
-const avisos: Record<string, string> = {
+const avisos = {
   registrado: "Centro de salud registrado.",
   modificado: "Datos actualizados.",
-};
+} as const;
 
 export default async function PaginaFichaCentroSalud({
   params,
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ aviso?: string }>;
+  searchParams: Promise<Record<string, string | string[]>>;
 }) {
   await requerirSesion();
   const id = idDeRuta((await params).id);
-  const { aviso } = await searchParams;
+  const { aviso } = esquemaAvisoFicha.parse(await searchParams);
   const centro = id ? await obtenerCentroSalud(id) : null;
   if (!centro) notFound();
 
@@ -35,7 +36,7 @@ export default async function PaginaFichaCentroSalud({
       <Link href="/centros-salud" className="text-sm text-marca underline">
         ← Volver al listado
       </Link>
-      {aviso && avisos[aviso] && <Aviso tipo="exito">{avisos[aviso]}</Aviso>}
+      {aviso && <Aviso tipo="exito">{avisos[aviso]}</Aviso>}
 
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="text-2xl font-semibold">{centro.nombre}</h1>

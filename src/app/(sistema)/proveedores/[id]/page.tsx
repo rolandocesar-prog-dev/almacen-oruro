@@ -7,6 +7,7 @@ import { Aviso } from "@/componentes/ui/aviso";
 import { Dato } from "@/componentes/ui/dato";
 import { Celda, Tabla } from "@/componentes/ui/tabla";
 import { esquemaFiltroAsociaciones } from "@/esquemas/catalogos/proveedor-producto";
+import { esquemaAvisoFicha } from "@/esquemas/comunes";
 import { formatearBolivianos } from "@/lib/dinero";
 import { idDeRuta } from "@/lib/parametros";
 import { requerirSesion } from "@/lib/sesion";
@@ -25,10 +26,10 @@ import { FiltroAsociaciones } from "./filtro-asociaciones";
 
 export const metadata = { title: "Ficha de proveedor · Almacén Regional Oruro" };
 
-const avisos: Record<string, string> = {
+const avisos = {
   registrado: "Proveedor registrado.",
   modificado: "Datos actualizados.",
-};
+} as const;
 
 export default async function PaginaFichaProveedor({
   params,
@@ -45,7 +46,8 @@ export default async function PaginaFichaProveedor({
   const proveedor = id ? await obtenerProveedor(id, filtro) : null;
   if (!proveedor) notFound();
 
-  const aviso = typeof parametros.aviso === "string" ? avisos[parametros.aviso] : undefined;
+  const { aviso: tipoAviso } = esquemaAvisoFicha.parse(parametros);
+  const aviso = tipoAviso ? avisos[tipoAviso] : undefined;
   const productosParaAgregar = proveedor.activo && filtro.asociaciones === "activas" ? await listarProductosParaSelector() : [];
 
   return (

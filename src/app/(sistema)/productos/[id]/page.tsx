@@ -7,6 +7,7 @@ import { Aviso } from "@/componentes/ui/aviso";
 import { Dato } from "@/componentes/ui/dato";
 import { Celda, Tabla } from "@/componentes/ui/tabla";
 import { formatearBolivianos } from "@/lib/dinero";
+import { esquemaAvisoFicha } from "@/esquemas/comunes";
 import { idDeRuta } from "@/lib/parametros";
 import { requerirSesion } from "@/lib/sesion";
 import { obtenerProducto } from "@/servicios/catalogos/productos";
@@ -14,21 +15,21 @@ import { desactivarProductoAccion, reactivarProductoAccion } from "../acciones";
 
 export const metadata = { title: "Ficha de producto · Almacén Regional Oruro" };
 
-const avisos: Record<string, string> = {
+const avisos = {
   registrado: "Producto registrado con stock 0.",
   modificado: "Datos actualizados.",
-};
+} as const;
 
 export default async function PaginaFichaProducto({
   params,
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ aviso?: string }>;
+  searchParams: Promise<Record<string, string | string[]>>;
 }) {
   await requerirSesion();
   const id = idDeRuta((await params).id);
-  const { aviso } = await searchParams;
+  const { aviso } = esquemaAvisoFicha.parse(await searchParams);
   const producto = id ? await obtenerProducto(id) : null;
   if (!producto) notFound();
 
@@ -44,7 +45,7 @@ export default async function PaginaFichaProducto({
       <Link href="/productos" className="text-sm text-marca underline">
         ← Volver al listado
       </Link>
-      {aviso && avisos[aviso] && <Aviso tipo="exito">{avisos[aviso]}</Aviso>}
+      {aviso && <Aviso tipo="exito">{avisos[aviso]}</Aviso>}
 
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="text-2xl font-semibold">
