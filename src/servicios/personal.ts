@@ -3,7 +3,7 @@
 import { Prisma } from "@/generado/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { ErrorDeNegocio } from "@/lib/errores";
-import { calcularHashContrasena } from "@/lib/contrasenas";
+import { calcularHashContrasena, compararContrasena } from "@/lib/contrasenas";
 import { recortarEspacios } from "@/lib/texto";
 import type { DatosPersonales, DatosRegistroPersonal, FiltroPersonal } from "@/esquemas/personal";
 
@@ -120,6 +120,45 @@ export async function reactivarPersonal(id: number): Promise<void> {
     throw new ErrorDeNegocio("La persona ya está activa");
   }
   await prisma.usuario.update({ where: { id }, data: { activo: true } });
+}
+
+/**
+ * Cambio de la propia contraseña indicando la actual (FR-019). También resuelve el cambio
+ * obligatorio: la "actual" es entonces la temporal o la inicial con la que acaba de ingresar (FR-021).
+ * La sesión en uso sigue vigente.
+ */
+export async function cambiarContrasenaPropia(idUsuario: number, actual: string, nueva: string): Promise<void> {
+  const usuario = await prisma.usuario.findUnique({ where: { id: idUsuario }, select: { contrasenaHash: true } });
+  if (!usuario || !(await compararContrasena(actual, usuario.contrasenaHash))) {
+    throw new ErrorDeNegocio("La contraseña actual no es correcta", "contrasenaActual");
+  }
+  if (nueva === actual) {
+    throw new ErrorDeNegocio("La contraseña nueva debe ser distinta de la actual", "contrasenaNueva");
+  }
+
+  await prisma.usuario.update({
+    where: { id: idUsuario },
+    data: { contrasenaHash: await calcularHashContrasena(nueva), debeCambiarContrasena: false },
+  });
+}
+
+/**
+ * Restablece la contraseña de OTRA persona con una temporal que escribe el encargado (FR-020).
+ * La temporal la conoce quien la escribió, por eso la persona debe cambiarla al ingresar, y sus
+ * sesiones abiertas se cierran para que nadie siga usando la cuenta con la contraseña anterior (RN-06).
+ */
+export async function restablecerContrasena(id: number, temporal: string, idUsuarioQueOpera: number): Promise<void> {
+  if (id === idUsuarioQueOpera) {
+    throw new ErrorDeNegocio("Para cambiar tu propia contraseña usa 'Cambiar mi contraseña'");
+  }
+  await obtenerExistente(id);
+
+  const hash = await calcularHashContrasena(temporal);
+  const ahora = new Date();
+  await prisma.$transaction([
+    prisma.usuario.update({ where: { id }, data: { contrasenaHash: hash, debeCambiarContrasena: true } }),
+    prisma.sesion.updateMany({ where: { usuarioId: id, fin: null }, data: { fin: ahora, motivoCierre: "RESTABLECIMIENTO" } }),
+  ]);
 }
 
 async function obtenerExistente(id: number) {

@@ -4,8 +4,9 @@ import { Aviso } from "@/componentes/ui/aviso";
 import { formatearFechaHora } from "@/lib/fechas";
 import { requerirSesion } from "@/lib/sesion";
 import { obtenerPersonal } from "@/servicios/personal";
-import { desactivarPersonalAccion, reactivarPersonalAccion } from "../acciones";
+import { desactivarPersonalAccion, reactivarPersonalAccion, restablecerContrasenaAccion } from "../acciones";
 import { CambioDeEstado } from "./cambio-de-estado";
+import { RestablecerContrasena } from "./restablecer-contrasena";
 
 export const metadata = { title: "Ficha de personal · Almacén Regional Oruro" };
 
@@ -75,6 +76,19 @@ export default async function PaginaFichaPersonal({
           reactivar={reactivarPersonalAccion.bind(null, persona.id)}
         />
       </div>
+
+      {/* Nadie restablece su propia contraseña: la cambia indicando la actual (Historia 5, escenario 6). */}
+      {persona.id === usuario.id ? (
+        <p className="text-sm">
+          Para cambiar tu contraseña usa{" "}
+          <Link href="/cambiar-contrasena" className="text-marca underline">
+            Cambiar mi contraseña
+          </Link>
+          .
+        </p>
+      ) : (
+        <RestablecerContrasena accion={restablecerContrasenaAccion.bind(null, persona.id)} />
+      )}
     </section>
   );
 }

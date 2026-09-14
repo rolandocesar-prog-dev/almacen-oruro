@@ -18,9 +18,10 @@ export async function ingresar(_estadoPrevio: ResultadoAccion | undefined, formD
   // 2. Aplicar la regla de negocio.
   let destino: string;
   try {
-    const { token } = await iniciarSesion(validacion.data.nombreUsuario, validacion.data.contrasena);
+    const { token, debeCambiarContrasena } = await iniciarSesion(validacion.data.nombreUsuario, validacion.data.contrasena);
     await escribirCookieSesion(token);
-    destino = "/";
+    // Con contraseña inicial o temporal, primero debe definir una nueva (FR-021).
+    destino = debeCambiarContrasena ? "/cambiar-contrasena" : "/";
   } catch (error) {
     return aResultadoDeError(error);
   }

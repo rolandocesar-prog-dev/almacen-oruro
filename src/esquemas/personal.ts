@@ -65,6 +65,29 @@ export const esquemaRegistroPersonal = esquemaDatosPersonales
     path: ["confirmacion"],
   });
 
+/** Cambiar la propia contraseña, también en el cambio obligatorio (FR-019, FR-021). */
+export const esquemaCambioContrasena = z
+  .object({
+    contrasenaActual: z.string().min(1, { error: "Escribe tu contraseña actual" }),
+    contrasenaNueva: reglaContrasenaNueva,
+    confirmacion: z.string(),
+  })
+  .refine((datos) => datos.contrasenaNueva === datos.confirmacion, {
+    error: "Las contraseñas no coinciden",
+    path: ["confirmacion"],
+  });
+
+/** Restablecer la contraseña de otra persona con una temporal que escribe el encargado (FR-020). */
+export const esquemaRestablecimiento = z
+  .object({
+    contrasenaTemporal: reglaContrasenaNueva,
+    confirmacion: z.string(),
+  })
+  .refine((datos) => datos.contrasenaTemporal === datos.confirmacion, {
+    error: "Las contraseñas no coinciden",
+    path: ["confirmacion"],
+  });
+
 /** Filtros del listado de personal. Un valor inválido en la URL toma el valor por defecto. */
 export const esquemaFiltroPersonal = z.object({
   q: z.string().trim().max(60, { error: "La búsqueda admite hasta 60 caracteres" }).optional(),

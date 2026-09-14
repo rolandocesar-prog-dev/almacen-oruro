@@ -3,10 +3,16 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { esquemaDatosPersonales, esquemaRegistroPersonal } from "@/esquemas/personal";
+import { esquemaDatosPersonales, esquemaRegistroPersonal, esquemaRestablecimiento } from "@/esquemas/personal";
 import { aResultadoDeError, aResultadoDeValidacion, type ResultadoAccion } from "@/lib/errores";
 import { requerirSesion } from "@/lib/sesion";
-import { desactivarPersonal, modificarPersonal, reactivarPersonal, registrarPersonal } from "@/servicios/personal";
+import {
+  desactivarPersonal,
+  modificarPersonal,
+  reactivarPersonal,
+  registrarPersonal,
+  restablecerContrasena,
+} from "@/servicios/personal";
 
 // Todas las acciones siguen el mismo orden (contracts/acciones-f001.md):
 // 1. requerirSesion  2. validar con Zod  3. servicio  4. errores  5. revalidar y redirigir
@@ -69,6 +75,33 @@ export async function desactivarPersonalAccion(id: number): Promise<ResultadoAcc
   revalidatePath("/personal");
   revalidatePath(`/personal/${id}`);
   return { ok: true, datos: undefined, mensaje: "Persona desactivada. Ya no puede ingresar y se cerraron sus sesiones abiertas." };
+}
+
+/** Restablecer la contraseña de otra persona con una temporal (Historia 5). */
+export async function restablecerContrasenaAccion(
+  id: number,
+  _estadoPrevio: ResultadoAccion | undefined,
+  formData: FormData,
+): Promise<ResultadoAccion> {
+  const { usuario } = await requerirSesion();
+
+  const validacion = esquemaRestablecimiento.safeParse(Object.fromEntries(formData));
+  if (!validacion.success) {
+    return aResultadoDeValidacion(z.flattenError(validacion.error).fieldErrors);
+  }
+
+  try {
+    await restablecerContrasena(id, validacion.data.contrasenaTemporal, usuario.id);
+  } catch (error) {
+    return aResultadoDeError(error);
+  }
+
+  revalidatePath(`/personal/${id}`);
+  return {
+    ok: true,
+    datos: undefined,
+    mensaje: "Contraseña restablecida. Se cerraron sus sesiones abiertas y deberá cambiarla al ingresar.",
+  };
 }
 
 /** Reactivar a una persona (Historia 4). */

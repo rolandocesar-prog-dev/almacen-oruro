@@ -49,8 +49,11 @@ const validarSesionDeLaSolicitud = cache(async () => {
 /**
  * Exige una sesión vigente. Va al inicio de TODA página y Server Action del sistema, salvo
  * `salir()` (FR-004). Sin sesión vigente, redirige al inicio de sesión.
+ *
+ * Si la persona tiene pendiente cambiar su contraseña (usuario inicial o restablecimiento), la
+ * lleva a /cambiar-contrasena, salvo en esa misma pantalla y en el layout (FR-021).
  */
-export async function requerirSesion(): Promise<SesionVigente> {
+export async function requerirSesion({ permitirCambioPendiente = false } = {}): Promise<SesionVigente> {
   const resultado = await validarSesionDeLaSolicitud();
   if (resultado.estado === "expirada") {
     // La página de ingreso muestra "Tu sesión expiró" (Historia 2, escenario 2).
@@ -58,6 +61,9 @@ export async function requerirSesion(): Promise<SesionVigente> {
   }
   if (resultado.estado !== "vigente") {
     redirect("/ingreso");
+  }
+  if (resultado.sesion.usuario.debeCambiarContrasena && !permitirCambioPendiente) {
+    redirect("/cambiar-contrasena");
   }
   return resultado.sesion;
 }

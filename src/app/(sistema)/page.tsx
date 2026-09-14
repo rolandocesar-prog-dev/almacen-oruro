@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Aviso } from "@/componentes/ui/aviso";
 import { requerirSesion } from "@/lib/sesion";
 
 export const metadata = { title: "Inicio · Almacén Regional Oruro" };
@@ -8,11 +9,13 @@ const modulos = [
   { ruta: "/sesiones", titulo: "Sesiones", descripcion: "Consultar quién ingresó y cuándo" },
 ] as const;
 
-export default async function PaginaInicio() {
+export default async function PaginaInicio({ searchParams }: { searchParams: Promise<{ aviso?: string }> }) {
   const { usuario } = await requerirSesion();
+  const { aviso } = await searchParams;
 
   return (
     <section className="flex flex-col gap-6">
+      {aviso === "contrasena" && <Aviso tipo="exito">Contraseña actualizada</Aviso>}
       <h1 className="text-2xl font-semibold">Bienvenido, {usuario.nombre}</h1>
       <ul className="grid gap-4 sm:grid-cols-2">
         {modulos.map((modulo) => (
