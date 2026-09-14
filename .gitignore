@@ -24,3 +24,6 @@ src/generado/
 Thumbs.db
 .vscode/
 .idea/
+
+# Scripts temporales de verificación local
+sesion-temporal.ts
