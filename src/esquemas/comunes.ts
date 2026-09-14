@@ -36,7 +36,7 @@ export function telefonoOpcional() {
  * Un campo vacío de un formulario llega como "". Se convierte en "sin valor" antes de pasar a número:
  * si no, Number("") daría 0 y un stock mínimo o un selector vacíos pasarían como válidos.
  */
-function vacioComoAusente(valor: unknown) {
+export function vacioComoAusente(valor: unknown) {
   return typeof valor === "string" && valor.trim() === "" ? undefined : valor;
 }
 

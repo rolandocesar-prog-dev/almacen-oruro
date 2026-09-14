@@ -38,7 +38,7 @@ export function useValidacion(
     startTransition(() => accion(datos));
   }
 
-  function alSalirDelCampo(evento: FocusEvent<HTMLInputElement>) {
+  function alSalirDelCampo(evento: FocusEvent<HTMLInputElement | HTMLSelectElement>) {
     const { form, name } = evento.currentTarget;
     if (!form) return;
     setErroresCliente((previos) => ({ ...previos, [name]: erroresDelFormulario(form)[name] }));
