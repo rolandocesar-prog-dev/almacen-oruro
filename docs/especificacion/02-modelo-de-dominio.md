@@ -77,7 +77,7 @@ erDiagram
 
 | Campo | Tipo | Reglas |
 |---|---|---|
-| codigo | texto(20) | obligatorio, **único**. Ej. `LIM-001` |
+| codigo | texto(20) | obligatorio, **único**; letras, dígitos y guion, se guarda en mayúsculas. Ej. `LIM-001` |
 | nombre | texto(80) | obligatorio, **único** sin distinguir mayúsculas ni espacios extra |
 | descripcion | texto(200) | opcional |
 | categoria_id | FK categoria | obligatorio, categoría activa |
@@ -111,7 +111,7 @@ erDiagram
 |---|---|---|
 | nombre | texto(60) | obligatorio |
 | apellido | texto(60) | obligatorio |
-| ci | texto(15) | obligatorio, **único** (evita duplicados) |
+| ci | texto(15) | obligatorio, **único** (evita duplicados); dígitos, con complemento opcional tras guion. Ej. `4567890-1B` |
 | servicio | texto(60) | obligatorio; área que representa (S-01) |
 | telefono | texto(20) | opcional |
 | centro_salud_id | FK centro_salud | obligatorio, centro activo |
@@ -216,6 +216,8 @@ erDiagram
 - **RN-13** No se puede dar de baja una categoría o unidad de medida con productos activos asociados, ni un centro de salud con representantes activos.
 - **RN-14** Los registros inactivos no aparecen en los selectores de documentos nuevos, pero sí en consultas, reportes e histórico.
 - **RN-15** `stock_actual` no se puede modificar desde el catálogo de productos.
+- **RN-16** La unidad de medida de un producto no se puede cambiar si el producto ya tiene movimientos de inventario: su stock y su histórico están expresados en esa unidad.
+- **RN-17** No se puede reactivar un registro cuyo registro padre está inactivo (producto con categoría o unidad inactiva; representante con centro de salud inactivo). Se reactiva primero el padre.
 
 ### Compras (RN-2x)
 - **RN-20** La compra se guarda completa (cabecera, detalle y movimientos de kardex) en **una transacción**, o no se guarda nada.
