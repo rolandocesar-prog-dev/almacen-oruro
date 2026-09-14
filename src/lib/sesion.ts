@@ -1,6 +1,9 @@
-// Cookie de sesión en el navegador (research R-03, R-15).
+// Cookie de sesión en el navegador y comprobación de sesión (research R-03, R-15).
 import "server-only";
+import { cache } from "react";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { validarSesion, type SesionVigente } from "@/servicios/acceso";
 
 export const NOMBRE_COOKIE = "sesion";
 
@@ -31,4 +34,32 @@ export async function leerTokenDeCookie(): Promise<string | undefined> {
 export async function borrarCookieSesion(): Promise<void> {
   const almacen = await cookies();
   almacen.delete(NOMBRE_COOKIE);
+}
+
+/**
+ * Valida la sesión de la solicitud actual. `cache()` hace que, aunque el layout, la página y sus
+ * componentes la pidan varias veces, la base se consulte una sola vez por solicitud.
+ */
+const validarSesionDeLaSolicitud = cache(async () => {
+  const token = await leerTokenDeCookie();
+  if (!token) return { estado: "inexistente" } as const;
+  return validarSesion(token);
+});
+
+/**
+ * Exige una sesión vigente. Va al inicio de TODA página y Server Action del sistema, salvo
+ * `salir()` (FR-004). Sin sesión vigente, redirige al inicio de sesión.
+ */
+export async function requerirSesion(): Promise<SesionVigente> {
+  const resultado = await validarSesionDeLaSolicitud();
+  if (resultado.estado !== "vigente") {
+    redirect("/ingreso");
+  }
+  return resultado.sesion;
+}
+
+/** Devuelve la sesión vigente o null, sin redirigir. Para la página de ingreso. */
+export async function obtenerSesionOpcional(): Promise<SesionVigente | null> {
+  const resultado = await validarSesionDeLaSolicitud();
+  return resultado.estado === "vigente" ? resultado.sesion : null;
 }

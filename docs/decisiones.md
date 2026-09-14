@@ -41,4 +41,5 @@ Decisiones tomadas durante la implementación que no estaban en el plan.
 |---|---|---|---|
 | I-01 | 13/09 | `.npmrc` con `legacy-peer-deps=true` | npm 10.9 se detiene con "Cannot read properties of null (reading 'edgesOut')" al resolver las dependencias opcionales de Vite que trae Vitest. Las dependencias de pares necesarias (React, TypeScript, ESLint) ya están declaradas en `package.json` |
 | I-02 | 13/09 | Los índices únicos parciales quedan en `schema.prisma` | La vista previa `partialIndexes` de Prisma 7.10 los generó correctamente en la migración inicial; no hizo falta moverlos a SQL |
+| I-04 | 13/09 | Un único hook `useValidacion` para todos los formularios, que llama a la Server Action desde `onSubmit` | React 19 vacía el formulario después de cada envío por `<form action>`: si el servidor rechazaba los datos, había que volver a escribirlos. Además, al salir de un campo solo se muestra el error de ese campo |
 | I-03 | 13/09 | Vulnerabilidades de `npm audit` aceptadas | Las 4 alertas están en dependencias de desarrollo de la CLI de Prisma (`deepmerge-ts`, `mysql2`); las dependencias de producción tienen 0 vulnerabilidades |
