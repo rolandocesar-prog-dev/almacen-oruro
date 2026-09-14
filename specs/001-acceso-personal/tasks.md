@@ -247,12 +247,12 @@ con los ingresos realizados (quickstart, paso 16).
 
 **Propósito**: verificar calidad, seguridad y documentación de F-001 antes de pasar a F-002.
 
-- [ ] T064 [P] Revisar con `grep` que ningún archivo de `src/` devuelve, registra en consola ni envía al cliente `contrasenaHash`, `tokenHash`, contraseñas o tokens (FR-014, SC-004), y que todas las páginas de `src/app/(sistema)/` y todas las funciones de sus `acciones.ts` llaman a `requerirSesion` como primera instrucción (FR-004), **excepto `salir()`** en `acciones-sesion.ts`, que es la excepción documentada en T038; corregir lo que falte
-- [ ] T065 [P] Revisar accesibilidad y pantallas chicas en `src/app/ingreso/`, `src/app/(sistema)/layout.tsx`, `personal/`, `cambiar-contrasena/` y `sesiones/`: todo campo con etiqueta, errores anunciados, navegación con teclado, tablas con desplazamiento horizontal a 400 px de ancho
-- [ ] T066 Ejecutar `npm run lint`, `npm run typecheck`, `npm test` y `npm run build` y corregir todos los errores y advertencias
+- [X] T064 [P] Revisar con `grep` que ningún archivo de `src/` devuelve, registra en consola ni envía al cliente `contrasenaHash`, `tokenHash`, contraseñas o tokens (FR-014, SC-004), y que todas las páginas de `src/app/(sistema)/` y todas las funciones de sus `acciones.ts` llaman a `requerirSesion` como primera instrucción (FR-004), **excepto `salir()`** en `acciones-sesion.ts`, que es la excepción documentada en T038; corregir lo que falte
+- [X] T065 [P] Revisar accesibilidad y pantallas chicas en `src/app/ingreso/`, `src/app/(sistema)/layout.tsx`, `personal/`, `cambiar-contrasena/` y `sesiones/`: todo campo con etiqueta, errores anunciados, navegación con teclado, tablas con desplazamiento horizontal a 400 px de ancho
+- [X] T066 Ejecutar `npm run lint`, `npm run typecheck`, `npm test` y `npm run build` y corregir todos los errores y advertencias
 - [ ] T067 Ejecutar el recorrido completo de `specs/001-acceso-personal/quickstart.md` (preparación, pruebas, 17 pasos, comprobación de expiración y de hashes), medir con cronómetro el ingreso (SC-001, menos de 30 s) y el registro de una persona (SC-002, menos de 2 min), y anotar en `quickstart.md` cualquier ajuste de comandos que haya hecho falta
-- [ ] T068 [P] Crear `docs/instalacion.md` con la primera versión de la guía para Raymond (requisitos, preparación, semilla, ingreso con `admin` y cambio de contraseña inicial), en español y sin asumir conocimientos de programación; se completará con F-002 a F-007 el 20/09
-- [ ] T069 [P] Actualizar `docs/decisiones.md` con las decisiones tomadas durante la implementación que no estaban en research.md (si las hubo) y marcar en `docs/especificacion/README.md` que F-001 está implementada
+- [X] T068 [P] Crear `docs/instalacion.md` con la primera versión de la guía para Raymond (requisitos, preparación, semilla, ingreso con `admin` y cambio de contraseña inicial), en español y sin asumir conocimientos de programación; se completará con F-002 a F-007 el 20/09
+- [X] T069 [P] Actualizar `docs/decisiones.md` con las decisiones tomadas durante la implementación que no estaban en research.md (si las hubo) y marcar en `docs/especificacion/README.md` que F-001 está implementada
 
 ---
 

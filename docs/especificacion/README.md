@@ -97,7 +97,7 @@ Las especificaciones de las 7 funcionalidades se escriben **juntas al inicio**, 
 |---|---|---|---|
 | Dom | 13/09 | Paquete de insumos (este) ✅, instalación ✅, `specify init` ✅, constitución ✅ | Proyecto inicializado |
 | Lun | 14/09 | `specify` + `clarify` de F-001 a F-007 ✅ (adelantado al 13/09); `plan` de F-001 (arquitectura y esquema completo de datos) | 7 especificaciones revisadas ✅, esquema Prisma |
-| Mar | 15/09 | Implementar F-001 y F-002 | Ingreso y catálogos funcionando |
+| Mar | 15/09 | Implementar F-001 ✅ (adelantado: `plan`, `tasks`, `analyze` e implementación el 13–14/09, 77 pruebas en verde) y F-002 | Ingreso y catálogos funcionando |
 | Mié | 16/09 | Implementar F-003 | Compras, kardex y existencias |
 | Jue | 17/09 | Implementar F-004 y F-005 | Ciclo completo compra → pedido → distribución |
 | Vie | 18/09 | Implementar F-006 y el generador de datos simulados de F-007 | Reportes y 36 meses de datos |

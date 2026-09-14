@@ -44,6 +44,14 @@ npx prisma db seed
 (esquema inicial y restricciones de negocio) y el mensaje de la semilla indicando que se creó el usuario
 `admin`.
 
+**Ajustes encontrados al implementar (13–14/09):**
+
+- `npm install` usa el `.npmrc` del proyecto (`legacy-peer-deps=true`): sin él, npm 10.9 se detiene con
+  "Cannot read properties of null (reading 'edgesOut')" (`docs/decisiones.md`, I-01).
+- Docker Desktop tiene que estar **abierto antes** de `docker compose up -d` y de `npm test`. Si la
+  computadora se suspende, puede cerrarse: `npm test` falla con `P1001: Can't reach database server`.
+- `docker compose up -d` crea la base de pruebas solo la **primera vez** que se crea el volumen.
+
 ## 3. Pruebas automatizadas
 
 ```bash
@@ -115,3 +123,13 @@ coincide con el valor de la cookie `sesion` del navegador (SC-004).
 
 F-001 está lista cuando las pruebas automatizadas están en verde y los 17 pasos del recorrido dan el
 resultado esperado.
+
+## 7. Estado de la validación (14/09/2026)
+
+| Parte | Estado | Cómo se verificó |
+|---|---|---|
+| Preparación (§2) | ✅ | Instalación, contenedor *healthy*, 2 migraciones (18 tablas, 27 CHECK), semilla idempotente |
+| Pruebas automatizadas (§3) | ✅ | 77 pruebas en verde (14 archivos), más `lint`, `typecheck` y `build` sin errores |
+| Pasos 1 y 2 | ✅ | En el navegador: redirección sin sesión y mensaje genérico |
+| Pasos 4 y 5 (desvío al cambio obligatorio), 10, 13 (botón oculto en la ficha propia), 16 y aviso de expiración | ✅ parcial | Páginas pedidas con una sesión de prueba creada en la base (sin escribir contraseñas en el navegador) |
+| Pasos 3, 6 a 9, 11, 12, 14, 15 y 17, y tiempos SC-001 y SC-002 | ⏳ Pendiente de recorrido manual | Requieren escribir contraseñas en el navegador; las reglas que comprueban ya están cubiertas por las pruebas de integración |
