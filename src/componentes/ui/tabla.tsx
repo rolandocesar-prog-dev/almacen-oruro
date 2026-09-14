@@ -9,7 +9,8 @@ export function Tabla({
 }: {
   encabezados: string[];
   children: React.ReactNode;
-  vacio?: string;
+  /** Mensaje cuando no hay filas; puede incluir un enlace, como "Limpiar búsqueda". */
+  vacio?: React.ReactNode;
 }) {
   return (
     <div className="overflow-x-auto rounded-md border border-borde bg-white">
