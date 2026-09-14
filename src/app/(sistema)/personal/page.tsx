@@ -1,13 +1,20 @@
 import Link from "next/link";
 import { Celda, Tabla } from "@/componentes/ui/tabla";
+import { esquemaFiltroPersonal, type FiltroPersonal } from "@/esquemas/personal";
 import { requerirSesion } from "@/lib/sesion";
 import { listarPersonal } from "@/servicios/personal";
+import { FiltrosPersonal } from "./filtros-personal";
 
 export const metadata = { title: "Personal · Almacén Regional Oruro" };
 
-export default async function PaginaPersonal() {
+export default async function PaginaPersonal({ searchParams }: { searchParams: Promise<Record<string, string | string[]>> }) {
   await requerirSesion();
-  const personas = await listarPersonal({ estado: "activos" });
+
+  // Mismo esquema que el formulario de filtros. Si la URL trae algo inválido, se usan los valores
+  // por defecto en lugar de romper la página (principio VI).
+  const validacion = esquemaFiltroPersonal.safeParse(await searchParams);
+  const filtro: FiltroPersonal = validacion.success ? validacion.data : { estado: "activos" };
+  const personas = await listarPersonal(filtro);
 
   return (
     <section className="flex flex-col gap-4">
@@ -18,9 +25,11 @@ export default async function PaginaPersonal() {
         </Link>
       </div>
 
+      <FiltrosPersonal valores={filtro} />
+
       <Tabla
         encabezados={["Nombre", "Cargo", "Nombre de usuario", "Estado", ""]}
-        vacio={personas.length === 0 ? "No hay personal para mostrar" : undefined}
+        vacio={personas.length === 0 ? "No hay personal para los filtros aplicados" : undefined}
       >
         {personas.map((persona) => (
           <tr key={persona.id}>

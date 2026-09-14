@@ -4,6 +4,8 @@ import { Aviso } from "@/componentes/ui/aviso";
 import { formatearFechaHora } from "@/lib/fechas";
 import { requerirSesion } from "@/lib/sesion";
 import { obtenerPersonal } from "@/servicios/personal";
+import { desactivarPersonalAccion, reactivarPersonalAccion } from "../acciones";
+import { CambioDeEstado } from "./cambio-de-estado";
 
 export const metadata = { title: "Ficha de personal · Almacén Regional Oruro" };
 
@@ -28,7 +30,7 @@ export default async function PaginaFichaPersonal({
   params: Promise<{ id: string }>;
   searchParams: Promise<{ aviso?: string }>;
 }) {
-  await requerirSesion();
+  const { usuario } = await requerirSesion();
   const { id } = await params;
   const { aviso } = await searchParams;
 
@@ -60,6 +62,19 @@ export default async function PaginaFichaPersonal({
         <Dato etiqueta="Dirección" valor={persona.direccion ?? "—"} />
         <Dato etiqueta="Registrado el" valor={formatearFechaHora(persona.creadoEn)} />
       </dl>
+
+      <div className="flex flex-wrap items-start gap-3">
+        <Link href={`/personal/${persona.id}/editar`} className="rounded-md border border-marca bg-white px-4 py-2 text-sm font-medium text-marca hover:bg-fondo">
+          Editar
+        </Link>
+        <CambioDeEstado
+          nombreCompleto={`${persona.nombre} ${persona.apellido}`}
+          activo={persona.activo}
+          esElMismoUsuario={persona.id === usuario.id}
+          desactivar={desactivarPersonalAccion.bind(null, persona.id)}
+          reactivar={reactivarPersonalAccion.bind(null, persona.id)}
+        />
+      </div>
     </section>
   );
 }

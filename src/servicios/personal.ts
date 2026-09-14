@@ -75,6 +75,61 @@ export async function registrarPersonal(datos: DatosRegistroPersonal): Promise<{
   }
 }
 
+/**
+ * Modifica los datos personales y el nombre de usuario (FR-015).
+ * Nunca toca la contraseña, el estado ni la marca de cambio pendiente: esos cambian solo con sus
+ * propias acciones.
+ */
+export async function modificarPersonal(id: number, datos: DatosPersonales): Promise<void> {
+  await obtenerExistente(id);
+  await verificarNombreUsuarioLibre(datos.nombreUsuario, id);
+
+  try {
+    await prisma.usuario.update({ where: { id }, data: prepararDatosPersonales(datos) });
+  } catch (error) {
+    if (esDuplicado(error)) throw new ErrorDeNegocio(mensajeDuplicado(datos.nombreUsuario), "nombreUsuario");
+    throw error;
+  }
+}
+
+/**
+ * Desactiva a una persona: ya no puede ingresar y se cierran sus sesiones abiertas (FR-008, FR-016).
+ * Nadie puede desactivarse a sí mismo: así siempre queda al menos un usuario activo (RN-04).
+ */
+export async function desactivarPersonal(id: number, idUsuarioQueOpera: number): Promise<void> {
+  if (id === idUsuarioQueOpera) {
+    throw new ErrorDeNegocio("No puedes desactivar tu propio usuario");
+  }
+  const persona = await obtenerExistente(id);
+  if (!persona.activo) {
+    throw new ErrorDeNegocio("La persona ya está inactiva");
+  }
+
+  // En una sola transacción: o se desactiva y se cierran sus sesiones, o no cambia nada.
+  const ahora = new Date();
+  await prisma.$transaction([
+    prisma.usuario.update({ where: { id }, data: { activo: false } }),
+    prisma.sesion.updateMany({ where: { usuarioId: id, fin: null }, data: { fin: ahora, motivoCierre: "DESACTIVACION" } }),
+  ]);
+}
+
+/** Reactiva a una persona. Conserva su contraseña y su marca de cambio pendiente (FR-016). */
+export async function reactivarPersonal(id: number): Promise<void> {
+  const persona = await obtenerExistente(id);
+  if (persona.activo) {
+    throw new ErrorDeNegocio("La persona ya está activa");
+  }
+  await prisma.usuario.update({ where: { id }, data: { activo: true } });
+}
+
+async function obtenerExistente(id: number) {
+  const persona = await prisma.usuario.findUnique({ where: { id }, select: { id: true, activo: true } });
+  if (!persona) {
+    throw new ErrorDeNegocio("No existe la persona indicada");
+  }
+  return persona;
+}
+
 /** Ficha de una persona, o null si no existe. */
 export function obtenerPersonal(id: number) {
   return prisma.usuario.findUnique({ where: { id }, select: camposPublicos });
