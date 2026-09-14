@@ -34,7 +34,7 @@ erDiagram
     usuario ||--o{ informe_ia : "genera"
 ```
 
-**17 tablas.** Frente al modelo 2022: `Personal` → `usuario`; `ProvProc` → `proveedor_producto`; `Realiza` → `distribucion_detalle`; nuevas: `unidad_medida`, `movimiento_inventario`, `informe_ia`. Ya **no hay tabla de roles** (D-10).
+**18 tablas.** Frente al modelo 2022: `Personal` → `usuario`; `ProvProc` → `proveedor_producto`; `Realiza` → `distribucion_detalle`; nuevas: `unidad_medida`, `movimiento_inventario`, `informe_ia`, `configuracion`. Ya **no hay tabla de roles** (D-10).
 
 **Campos comunes a todas las tablas:** `id` (entero autoincremental), `creado_en` (fecha y hora), `actualizado_en` (fecha y hora). Los catálogos agregan `activo` (booleano, por defecto verdadero).
 
@@ -201,6 +201,14 @@ erDiagram
 | usuario_id | FK usuario | |
 
 > El pronóstico **no se guarda**: se calcula al pedirlo, a partir del kardex (es determinista, así que siempre da el mismo resultado con los mismos datos).
+
+**configuracion** — una sola fila con datos de toda la base
+
+| Campo | Tipo | Reglas |
+|---|---|---|
+| modo_demostracion | booleano | falso al crear la base; el generador de datos simulados lo pone en verdadero. Si es verdadero, todas las pantallas y reportes muestran "Datos simulados con fines de demostración" (D-07) |
+| datos_simulados_en | fecha y hora, nulo | cuándo se ejecutó el generador |
+| semilla_simulacion | entero, nulo | semilla usada, para poder reproducir los datos |
 
 ---
 

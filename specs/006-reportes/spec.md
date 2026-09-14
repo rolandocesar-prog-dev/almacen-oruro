@@ -21,6 +21,14 @@ Por defecto, el rango de fechas es el mes en curso."
 RF 6 · Decisiones D-07 y D-12 · Prioridades de `00-decisiones-y-alcance.md` §5 (R-1 a R-3 son P2;
 R-4 y R-5 son P3).
 
+## Clarifications
+
+### Session 2026-09-13
+
+- Q: ¿Cómo sabe el sistema que tiene que mostrar la leyenda "Datos simulados con fines de
+  demostración"? → A: Por una marca única de toda la base: al ejecutar el generador de F-007, la
+  base queda como "de demostración" y la leyenda aparece en todas las pantallas y reportes.
+
 ## Escenarios de usuario y pruebas *(obligatorio)*
 
 **Actor único:** Encargado de almacén, con sesión iniciada (F-001). Los reportes solo consultan:
@@ -188,8 +196,9 @@ verifica el encabezado y la ausencia de menús.
    emisión y el nombre del usuario que lo emite.
 2. **Dado** un reporte que ocupa varias hojas, **cuando** se imprime, **entonces** los encabezados
    de las columnas se repiten en cada hoja y los totales aparecen al final.
-3. **Dados** datos generados por el simulador de F-007, **cuando** se genera o imprime cualquier
-   reporte, **entonces** aparece la leyenda "Datos simulados con fines de demostración" (D-07).
+3. **Dada** una base marcada como de demostración (porque se ejecutó el generador de F-007),
+   **cuando** se genera o imprime cualquier reporte, **entonces** aparece la leyenda "Datos
+   simulados con fines de demostración" (D-07); en una base sin esa marca, no aparece.
 
 ---
 
@@ -235,8 +244,9 @@ verifica el encabezado y la ausencia de menús.
   vista sin menús ni botones, con encabezado que incluye nombre del sistema, nombre del reporte,
   filtros aplicados, fecha y hora de emisión y usuario que lo emite; con encabezados de columna
   repetidos en cada hoja y totales al final.
-- **FR-007**: Si existen datos generados por el simulador (F-007), todo reporte en pantalla e
-  impreso DEBE mostrar la leyenda "Datos simulados con fines de demostración".
+- **FR-007**: Si la base está marcada como de demostración (la marca la pone el generador de F-007
+  y vale para toda la base, no por documento), todo reporte en pantalla e impreso DEBE mostrar la
+  leyenda "Datos simulados con fines de demostración".
 - **FR-008**: Los importes DEBEN mostrarse en bolivianos con 2 decimales y las cantidades como
   enteros con su unidad; los mensajes, en español.
 
@@ -283,6 +293,7 @@ Esta funcionalidad no crea datos nuevos: consulta los de F-001 a F-005.
 - **Movimiento de inventario** (F-003): fuente de R-4.
 - **Pedido y línea de pedido** (F-004): fuente de R-5.
 - **Usuario** (F-001): quien emite el reporte.
+- **Configuración** (la marca la pone F-007): indica si la base es de demostración.
 
 ## Criterios de éxito *(obligatorio)*
 

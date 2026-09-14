@@ -229,7 +229,7 @@ Exportar a Excel o PDF descargable (se imprime o guarda como PDF desde el navega
 - 1 centro de salud, 5 representantes, ~25 productos en ~6 categorías, 36 meses que terminan el mes anterior al actual.
 - Consumo base por producto, factor estacional mensual (más alto en junio–agosto), tendencia de +3 % anual y ruido aleatorio de ±15 % con **semilla fija** (reproducible).
 - Los pedidos, distribuciones y compras se generan **usando los mismos servicios del sistema**, para que el kardex quede coherente y respete todas las reglas.
-- El generador solo se ejecuta sobre una base vacía o de demostración, nunca sobre datos reales.
+- El generador solo se ejecuta sobre una base vacía o de demostración, nunca sobre datos reales. Al terminar, marca toda la base como de demostración (`configuracion.modo_demostracion`), lo que activa la leyenda en todas las pantallas y reportes (aclarado en F-006).
 
 ### Historias de usuario
 
