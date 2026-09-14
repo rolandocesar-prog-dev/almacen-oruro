@@ -52,6 +52,10 @@ const validarSesionDeLaSolicitud = cache(async () => {
  */
 export async function requerirSesion(): Promise<SesionVigente> {
   const resultado = await validarSesionDeLaSolicitud();
+  if (resultado.estado === "expirada") {
+    // La página de ingreso muestra "Tu sesión expiró" (Historia 2, escenario 2).
+    redirect("/ingreso?expirada=1");
+  }
   if (resultado.estado !== "vigente") {
     redirect("/ingreso");
   }

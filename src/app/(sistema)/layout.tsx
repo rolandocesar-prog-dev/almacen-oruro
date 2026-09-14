@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requerirSesion } from "@/lib/sesion";
+import { salir } from "./acciones-sesion";
 
 // Estructura común de las páginas del sistema: encabezado, usuario y menú.
 // La comprobación de sesión se repite también en cada página y acción: el layout no se vuelve a
@@ -18,6 +19,11 @@ export default async function LayoutSistema({ children }: { children: React.Reac
             <span>
               {usuario.nombre} {usuario.apellido}
             </span>
+            <form action={salir}>
+              <button type="submit" className="rounded-md border border-white px-3 py-1 hover:bg-white hover:text-marca">
+                Cerrar sesión
+              </button>
+            </form>
           </div>
         </div>
         <nav aria-label="Menú principal" className="bg-marca-oscuro">

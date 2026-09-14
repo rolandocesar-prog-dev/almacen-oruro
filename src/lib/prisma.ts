@@ -7,7 +7,14 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@/generado/prisma/client";
 
 function crearCliente() {
-  const adaptador = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+  const adaptador = new PrismaPg({
+    connectionString: process.env.DATABASE_URL,
+    // El adaptador envía las fechas en UTC pero sin indicar la zona, y PostgreSQL las interpreta en
+    // la zona de la conexión. Si el servidor está en America/La_Paz, quedarían guardadas 4 horas
+    // corridas y todo cálculo de fechas en SQL fallaría. Forzar UTC en la conexión lo evita,
+    // sin importar cómo esté configurado el PostgreSQL de cada computadora.
+    options: "-c TimeZone=UTC",
+  });
   return new PrismaClient({ adapter: adaptador });
 }
 
