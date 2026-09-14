@@ -3,7 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { ErrorDeNegocio } from "@/lib/errores";
 import { compararContrasena, HASH_FICTICIO } from "@/lib/contrasenas";
 import { normalizarTexto } from "@/lib/texto";
-import { sumarHoras } from "@/lib/fechas";
+import { inicioDelDiaEnLaPaz, inicioDelDiaSiguienteEnLaPaz, sumarHoras } from "@/lib/fechas";
+import type { MotivoCierreSesion } from "@/generado/prisma/client";
 import { calcularHashToken, DURACION_SESION_HORAS, generarToken } from "@/lib/token-sesion";
 
 // El mismo mensaje para cualquier falla: no revela si el usuario existe (FR-003, RN-01).
@@ -116,6 +117,75 @@ export async function cerrarSesion(token: string): Promise<void> {
     where: { tokenHash: calcularHashToken(token), fin: null },
     data: { fin: new Date(), motivoCierre: "USUARIO" },
   });
+}
+
+export const SESIONES_POR_PAGINA = 50;
+
+/** Cómo terminó una sesión, en palabras (Historia 6, escenario 1). */
+function describirCierre(motivo: MotivoCierreSesion | null): string {
+  switch (motivo) {
+    case null:
+      return "Abierta";
+    case "USUARIO":
+      return "Cerrada por el usuario";
+    case "EXPIRADA":
+      return "Expirada";
+    case "DESACTIVACION":
+    case "RESTABLECIMIENTO":
+      return "Cerrada por desactivación o restablecimiento";
+  }
+}
+
+/**
+ * Historial de sesiones, de la más reciente a la más antigua, de 50 en 50 (FR-022).
+ * Las fechas `desde` y `hasta` (AAAA-MM-DD) se interpretan en hora de La Paz.
+ */
+export async function listarSesiones({
+  usuarioId,
+  desde,
+  hasta,
+  pagina,
+}: {
+  usuarioId?: number;
+  desde: string;
+  hasta: string;
+  pagina: number;
+}) {
+  // Antes de mostrar la bitácora se cierran las sesiones abandonadas, para que figuren como expiradas.
+  await cerrarSesionesVencidas();
+
+  const where = {
+    usuarioId,
+    inicio: { gte: inicioDelDiaEnLaPaz(desde), lt: inicioDelDiaSiguienteEnLaPaz(hasta) },
+  };
+
+  const [total, sesiones] = await prisma.$transaction([
+    prisma.sesion.count({ where }),
+    prisma.sesion.findMany({
+      where,
+      orderBy: [{ inicio: "desc" }, { id: "desc" }],
+      skip: (pagina - 1) * SESIONES_POR_PAGINA,
+      take: SESIONES_POR_PAGINA,
+      select: {
+        id: true,
+        inicio: true,
+        fin: true,
+        motivoCierre: true,
+        usuario: { select: { nombre: true, apellido: true, nombreUsuario: true } },
+      },
+    }),
+  ]);
+
+  const filas = sesiones.map((sesion) => ({
+    id: sesion.id,
+    persona: `${sesion.usuario.nombre} ${sesion.usuario.apellido}`,
+    nombreUsuario: sesion.usuario.nombreUsuario,
+    inicio: sesion.inicio,
+    fin: sesion.fin,
+    estado: describirCierre(sesion.motivoCierre),
+  }));
+
+  return { filas, total };
 }
 
 /**
