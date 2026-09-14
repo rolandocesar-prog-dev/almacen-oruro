@@ -203,7 +203,7 @@ Exportar a Excel o PDF descargable (se imprime o guarda como PDF desde el navega
 
 ### Definición técnica que la especificación debe dejar explícita (se detalla en `/speckit-plan`)
 
-**Serie.** Consumo mensual por producto = −Σ cantidad de movimientos `SALIDA_DISTRIBUCION` y `ANULACION_DISTRIBUCION` del mes. Los meses sin movimientos valen 0.
+**Serie.** Consumo mensual por producto = −Σ cantidad de movimientos `SALIDA_DISTRIBUCION` y `ANULACION_DISTRIBUCION` cuya `fecha_documento` cae en el mes (RN-53). Como la anulación lleva la fecha de la distribución anulada, ningún mes queda con consumo negativo. Los meses sin movimientos valen 0.
 
 **Método principal.** Suavizado exponencial de Holt-Winters **aditivo** con estacionalidad de 12 meses. Parámetros α, β, γ ∈ {0,1; 0,2; … 0,9}, elegidos por búsqueda en rejilla minimizando el error sobre el período de validación. Método de respaldo si hay menos de 24 meses de datos: promedio móvil de 3 meses (y se indica en pantalla).
 

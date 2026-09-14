@@ -173,7 +173,8 @@ erDiagram
 | Campo | Tipo | Reglas |
 |---|---|---|
 | producto_id | FK producto | |
-| fecha | fecha y hora | momento del registro |
+| fecha_documento | fecha | fecha de la compra o distribución; en anulaciones, la del documento anulado (RN-53) |
+| registrado_en | fecha y hora | momento del registro; define el orden del kardex |
 | tipo | enum | `ENTRADA_COMPRA`, `SALIDA_DISTRIBUCION`, `ANULACION_COMPRA` (salida), `ANULACION_DISTRIBUCION` (entrada) |
 | cantidad | entero | **con signo**: positiva = entrada, negativa = salida |
 | saldo_resultante | entero ≥ 0 | stock del producto después del movimiento |
@@ -250,5 +251,6 @@ erDiagram
 
 ### Inventario (RN-5x)
 - **RN-50** `stock_actual` de un producto = suma de `cantidad` de todos sus movimientos. Se incluye una verificación automatizada de esta igualdad.
-- **RN-51** `saldo_resultante` de cada movimiento = saldo del movimiento anterior del producto + cantidad.
-- **RN-52** Un producto está **bajo mínimo** cuando `stock_actual ≤ stock_minimo`.
+- **RN-51** `saldo_resultante` de cada movimiento = saldo del movimiento anterior del producto, en orden de `registrado_en`, + cantidad. Ningún saldo ya registrado se recalcula.
+- **RN-52** Un producto **activo** está **bajo mínimo** cuando `stock_actual ≤ stock_minimo`. Los inactivos no se consideran bajo mínimo, porque no se van a reponer.
+- **RN-53** Toda consulta, reporte o cálculo por período (kardex filtrado, reportes, serie mensual del pronóstico) agrupa por `fecha_documento`. El saldo al inicio o al fin de un período es la suma de las cantidades con `fecha_documento` anterior al inicio o hasta el fin.

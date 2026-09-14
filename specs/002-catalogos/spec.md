@@ -312,7 +312,8 @@ par y que la asociación se puede desactivar.
   cuántas unidades tiene, y DEBE impedirlo si el producto tiene saldo pendiente (solicitado mayor
   que entregado) en algún pedido PENDIENTE o PARCIAL, indicando cuántos pedidos son (RN-13).
 - **FR-017**: El listado de productos DEBE mostrar código, nombre, categoría, unidad, stock actual,
-  stock mínimo, estado e indicador "Bajo mínimo" cuando stock actual ≤ stock mínimo (RN-52), y
+  stock mínimo, estado e indicador "Bajo mínimo" en los productos activos con stock actual ≤ stock
+  mínimo (RN-52), y
   permitir filtrar por categoría.
 
 **Proveedores**

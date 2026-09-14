@@ -24,6 +24,21 @@ RN-50 a RN-52 · `docs/especificacion/03-funcionalidades.md` §F-003 · Capítul
 RF 4 · Decisiones D-05 y D-16 · Constitución, principios III y IV · Defectos corregidos X-01,
 X-05, X-06, X-12 y X-14.
 
+## Clarifications
+
+### Session 2026-09-13
+
+- Q: Cuando una compra lleva una fecha de factura anterior a hoy, ¿en qué orden se arma el kardex y
+  qué fecha usa el pronóstico mensual? → A: Cada movimiento guarda dos fechas, la del documento y
+  el momento de registro. El kardex se ordena y calcula saldos por momento de registro; los
+  reportes por período y el pronóstico agrupan por fecha del documento. Las anulaciones llevan la
+  fecha del documento que anulan.
+- Q: ¿Hay un plazo para anular una compra? → A: No; cualquier compra REGISTRADA se puede anular
+  mientras el stock alcance, aunque cambie los totales de períodos pasados.
+- Q: En la consulta de existencias, ¿qué pasa con un producto inactivo que todavía tiene stock? →
+  A: Por defecto se muestran los activos y los inactivos con stock mayor que 0, marcados
+  "Inactivo"; los inactivos sin stock solo aparecen con el filtro.
+
 ## Escenarios de usuario y pruebas *(obligatorio)*
 
 **Actor único:** Encargado de almacén, con sesión iniciada (F-001). Usa los catálogos de F-002.
@@ -103,6 +118,10 @@ comprueba el resaltado y los filtros.
 4. **Dado** el filtro por categoría o una búsqueda por código o nombre, **cuando** se aplica,
    **entonces** solo aparecen los productos que cumplen.
 5. **Dado** un producto de la consulta, **cuando** se elige, **entonces** se abre su kardex.
+6. **Dados** un producto inactivo con 8 unidades y otro inactivo sin stock, **cuando** se abre la
+   consulta sin filtros, **entonces** aparece el primero marcado "Inactivo" y no el segundo; con el
+   filtro "Inactivos" o "Todos" aparecen ambos. Los productos inactivos no se marcan "Bajo mínimo"
+   ni cuentan en el total de productos bajo mínimo.
 
 ---
 
@@ -119,20 +138,30 @@ kardex y se comprueba que el saldo final coincide con el stock actual.
 
 **Escenarios de aceptación**:
 
-1. **Dado** un producto con movimientos, **cuando** se abre su kardex, **entonces** se listan en
-   orden cronológico con fecha y hora, tipo, documento de origen (Nº de factura y proveedor, o Nº
-   de vale y representante), entrada, salida y saldo resultante.
+1. **Dado** un producto con movimientos, **cuando** se abre su kardex, **entonces** se listan en el
+   orden en que se registraron, con fecha del documento, momento de registro, tipo, documento de
+   origen (Nº de factura y proveedor, o Nº de vale y representante), entrada, salida y saldo
+   resultante.
 2. **Dado** el kardex completo de un producto, **cuando** se compara el saldo del último movimiento
    con el stock actual, **entonces** son iguales (RN-50).
 3. **Dado** cualquier movimiento, **cuando** se compara su saldo con el del movimiento anterior más
    su cantidad, **entonces** son iguales (RN-51).
 4. **Dado** un rango de fechas, **cuando** se filtra el kardex, **entonces** se muestran solo los
-   movimientos del rango, con el saldo anterior al inicio del rango y el saldo al final.
+   movimientos cuya fecha del documento está en el rango, con el saldo anterior (suma de los
+   movimientos con fecha del documento previa al rango) y el saldo final (suma hasta el fin del
+   rango).
 5. **Dado** un movimiento, **cuando** se elige su documento de origen, **entonces** se abre el
    detalle de esa compra o distribución.
 6. **Dada** la verificación de consistencia del inventario, **cuando** se ejecuta, **entonces**
    informa, para todos los productos, si el stock actual es igual a la suma de sus movimientos, y
    lista los productos con diferencia (en operación normal, ninguno) (RN-50).
+7. **Dada** una distribución de un producto registrada ayer, **cuando** hoy se registra una compra
+   de ese producto con fecha de factura de hace 10 días y se abre el kardex, **entonces** la compra
+   aparece después de la distribución (orden de registro), con su fecha de documento de hace 10
+   días, y ningún saldo anterior se modifica.
+8. **Dada** la anulación hoy de una compra con fecha de factura del mes pasado, **cuando** se
+   registra, **entonces** el movimiento `ANULACION_COMPRA` lleva como fecha del documento la de la
+   compra anulada y como momento de registro el de hoy.
 
 ---
 
@@ -203,6 +232,9 @@ factura queda libre; se intenta anular una compra cuyo stock ya se distribuyó.
   el stock ya no alcanza, la anulación se rechaza.
 - **Factura con ceros a la izquierda:** `0001234` y `1234` se consideran números distintos, porque
   se comparan tal como están impresos en la factura.
+- **Anulación de una compra antigua:** se permite; los totales y saldos de los períodos de la fecha
+  de esa compra cambian en consultas y reportes posteriores, y el detalle de la compra muestra
+  cuándo, quién y por qué se anuló.
 - **Producto desactivado después de comprarlo:** la compra y su kardex lo siguen mostrando; la
   anulación de esa compra está permitida.
 - **Proveedor desactivado después de la compra:** la compra se sigue consultando y se puede anular.
@@ -210,6 +242,9 @@ factura queda libre; se intenta anular una compra cuyo stock ya se distribuyó.
 - **Precio con más de 2 decimales:** se rechaza indicando que el precio admite hasta 2 decimales.
 - **Sesión expirada al guardar:** no se guarda nada (F-001) y los datos escritos se pierden; el
   mensaje lo advierte.
+- **Documento con fecha anterior a otros ya registrados:** en el kardex aparece según su orden de
+  registro, por lo que las fechas del documento pueden verse desordenadas; los saldos de cada fila
+  no cambian, y el saldo anterior y final de un rango sí reflejan la fecha del documento.
 - **Producto sin movimientos:** su kardex muestra "Sin movimientos" y su stock es 0.
 
 ## Requisitos *(obligatorio)*
@@ -248,8 +283,8 @@ factura queda libre; se intenta anular una compra cuyo stock ya se distribuyó.
 
 **Anulación**
 
-- **FR-011**: El sistema DEBE permitir anular una compra REGISTRADA indicando un motivo
-  (obligatorio, hasta 200 caracteres) y registrar quién la anuló y cuándo.
+- **FR-011**: El sistema DEBE permitir anular una compra REGISTRADA, sin importar su antigüedad,
+  indicando un motivo (obligatorio, hasta 200 caracteres) y registrar quién la anuló y cuándo.
 - **FR-012**: Al anular, el sistema DEBE, en una sola operación indivisible: marcar la compra como
   ANULADA, registrar un movimiento `ANULACION_COMPRA` por línea con la cantidad en negativo y su
   saldo resultante, y restar la cantidad del stock actual de cada producto (RN-25).
@@ -264,21 +299,28 @@ factura queda libre; se intenta anular una compra cuyo stock ya se distribuyó.
   kardex registrado en la misma operación (constitución, principio III).
 - **FR-016**: El stock actual NUNCA DEBE quedar negativo, incluso con operaciones simultáneas sobre
   el mismo producto.
-- **FR-017**: Cada movimiento DEBE registrar producto, fecha y hora de registro, tipo, cantidad con
-  signo, saldo resultante, documento de origen y usuario; su saldo resultante DEBE ser igual al
-  saldo del movimiento anterior del mismo producto más su cantidad (RN-51).
-- **FR-018**: El sistema DEBE ofrecer la consulta de existencias con código, producto, categoría,
+- **FR-017**: Cada movimiento DEBE registrar producto, fecha del documento, momento de registro,
+  tipo, cantidad con signo, saldo resultante, documento de origen y usuario. Su saldo resultante
+  DEBE ser igual al saldo del movimiento anterior del mismo producto, en orden de registro, más su
+  cantidad (RN-51). Ningún saldo ya registrado se recalcula.- **FR-018**: El sistema DEBE ofrecer la consulta de existencias con código, producto, categoría,
   unidad, stock actual, stock mínimo e indicador "Bajo mínimo" (RN-52); con filtros por categoría,
-  "solo bajo mínimo" y búsqueda por código o nombre; mostrando por defecto los productos activos y
-  el conteo de productos bajo mínimo.
-- **FR-019**: El sistema DEBE ofrecer el kardex de un producto en orden cronológico, con fecha y
-  hora, tipo, documento de origen (enlazado a su detalle), entrada, salida y saldo; filtrable por
-  rango de fechas, mostrando el saldo anterior al rango y el saldo final.
+  "solo bajo mínimo", estado (activos e inactivos con stock, que es el valor por defecto;
+  inactivos; todos) y búsqueda por código o nombre; y el conteo de productos bajo mínimo. Los
+  inactivos se marcan "Inactivo" y no se consideran bajo mínimo.
+- **FR-019**: El sistema DEBE ofrecer el kardex de un producto en orden de registro, con fecha del
+  documento, momento de registro, tipo, documento de origen (enlazado a su detalle), entrada,
+  salida y saldo; filtrable por rango de fechas del documento, mostrando el saldo anterior (suma de
+  movimientos con fecha del documento previa al rango) y el saldo final (suma hasta el fin del
+  rango).
 - **FR-020**: El sistema DEBE ofrecer una verificación de consistencia, ejecutable a pedido, que
   compare para cada producto el stock actual con la suma de sus movimientos y liste los productos
   con diferencia (RN-50).
 - **FR-021**: Todos los mensajes de validación y error DEBEN estar en español e indicar qué está mal
   y cómo corregirlo. Los importes se muestran en bolivianos con 2 decimales.
+- **FR-022**: La fecha del documento de un movimiento DEBE ser la fecha de la compra (o de la
+  distribución, en F-005); en los movimientos de anulación, la fecha del documento anulado. Toda
+  consulta, reporte o cálculo por período (F-006, F-007) DEBE agrupar por la fecha del documento
+  (RN-53).
 
 ### Entidades clave
 
@@ -320,8 +362,10 @@ factura queda libre; se intenta anular una compra cuyo stock ya se distribuyó.
   aprobación, pagos ni cuentas por pagar.
 - **Moneda:** bolivianos; sin impuestos desglosados ni descuentos: el precio unitario es el que
   figura en la factura.
-- **Fechas:** la fecha de la compra es la de la factura y puede ser anterior a hoy; el momento de
-  registro lo pone el sistema. El kardex se ordena por el momento de registro.
+- **Fechas:** la fecha de la compra es la de la factura y puede ser anterior a hoy, sin límite
+  inferior; el momento de registro lo pone el sistema (FR-017, FR-022). El generador de F-007
+  registra los documentos en orden cronológico, así que en los datos simulados ambos órdenes
+  coinciden.
 - **Nº de factura:** solo dígitos, tal como figura impreso; no se valida contra ningún sistema
   tributario.
 - **Motivo de anulación:** texto libre obligatorio; no hay catálogo de motivos.
