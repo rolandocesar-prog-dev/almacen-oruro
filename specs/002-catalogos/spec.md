@@ -274,8 +274,10 @@ par y que la asociación se puede desactivar.
 - **FR-002**: El sistema NO DEBE ofrecer ninguna forma de borrar definitivamente un registro de
   catálogo; desactivar marca el registro como inactivo y reactivar lo vuelve a activar (RN-12).
 - **FR-003**: El sistema DEBE excluir los registros inactivos de todos los selectores usados para
-  crear o modificar registros y documentos, y DEBE seguir mostrándolos, marcados como inactivos, en
-  listados, consultas, reportes e histórico (RN-14).
+  crear o modificar registros y documentos. La única excepción es el valor que ya tiene el registro
+  que se edita: se muestra marcado "(inactivo)" para no perderlo, pero no se puede elegir para otro
+  registro. Y DEBE seguir mostrándolos, marcados como inactivos, en listados, consultas, reportes e
+  histórico (RN-14).
 - **FR-004**: El sistema DEBE verificar la unicidad de nombre de categoría, nombre de unidad de
   medida, código de producto, nombre de producto, NIT de proveedor, nombre de centro de salud, CI de
   representante y par proveedor–producto, comparando valores normalizados (RN-10) e incluyendo los
@@ -301,8 +303,8 @@ par y que la asociación se puede desactivar.
 
 **Productos**
 
-- **FR-012**: Un producto DEBE tener código (obligatorio, único, hasta 20 caracteres, solo letras,
-  dígitos y guion, guardado en mayúsculas), nombre (obligatorio, único, hasta 80), descripción
+- **FR-012**: Un producto DEBE tener código (obligatorio, único, hasta 20 caracteres, solo letras
+  A–Z sin Ñ ni tildes, dígitos y guion, guardado en mayúsculas), nombre (obligatorio, único, hasta 80), descripción
   (opcional, hasta 200), categoría activa, unidad de medida activa y stock mínimo (obligatorio,
   entero mayor o igual a 0).
 - **FR-013**: Todo producto nuevo DEBE empezar con stock actual 0.
@@ -404,6 +406,8 @@ par y que la asociación se puede desactivar.
   la simulación usan uno solo (D-11); no se agrega lógica específica para varios, como reportes por
   centro.
 - **Código de producto:** lo escribe el encargado; el sistema no lo genera.
+- **Letras del código:** solo A–Z, para que el código se escriba igual en cualquier teclado y se lea
+  sin ambigüedad en etiquetas impresas.
 - **Unicidad con inactivos (FR-004):** el valor queda reservado para que el histórico no muestre
   dos registros distintos con el mismo identificador; si la empresa o persona vuelve, se reactiva
   su registro.

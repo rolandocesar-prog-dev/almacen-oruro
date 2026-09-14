@@ -35,7 +35,7 @@ Convención: "texto obligatorio (n)" = se recortan los extremos, mínimo 1 y má
 
 | Campo | Esquema Zod | Servicio guarda | Base garantiza |
 |---|---|---|---|
-| codigo | recortado, en mayúsculas, `^[A-Z0-9-]{1,20}$` ("Usa hasta 20 caracteres: letras, dígitos y guion") | tal cual | `codigo` UNIQUE |
+| codigo | recortado, en mayúsculas, `^[A-Z0-9-]{1,20}$` ("Usa hasta 20 caracteres: letras sin Ñ ni tildes, dígitos y guion") | tal cual | `codigo` UNIQUE |
 | nombre | texto obligatorio (80) | `recortarEspacios` + normalizado | `nombre_normalizado` UNIQUE |
 | descripcion | texto opcional (200) | `recortarEspacios` o `null` | `varchar(200)` |
 | categoriaId | entero positivo, obligatorio ("Elige una categoría") | debe existir y estar activa | FK |
@@ -135,6 +135,9 @@ de este producto están expresados en '{unidad actual}'". Los demás campos sí 
 ---
 
 ## 4. Relaciones que usan otras funcionalidades
+
+Los selectores devuelven solo registros activos. En un formulario de **edición**, si el valor actual
+del registro está inactivo, se agrega marcado "(inactivo)" para no perderlo (FR-003).
 
 | Selector | Lo usan | Devuelve |
 |---|---|---|

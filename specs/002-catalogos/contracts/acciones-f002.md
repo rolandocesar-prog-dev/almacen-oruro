@@ -37,7 +37,7 @@ Todas bajo `src/app/(sistema)/`, protegidas con `requerirSesion()`.
 | `q` | todos | texto de hasta 60 caracteres | vacío |
 | `estado` | todos | `activos`, `inactivos`, `todos` | `activos` |
 | `categoria` | productos | id de categoría | todas |
-| `estado` (asociaciones) | ficha de proveedor, sección productos | `activas`, `inactivas` | `activas` |
+| `asociaciones` | ficha de proveedor, sección productos | `activas`, `inactivas` (`esquemaFiltroAsociaciones`) | `activas` |
 
 **Campos en los que busca `q`** (sin mayúsculas ni tildes, research C-01):
 
@@ -98,7 +98,7 @@ categorías; las demás cambian el esquema, el servicio y las rutas.
 | `listarRepresentantes` | `{ q?, estado }` | `{ id, nombreCompleto, ci, servicio, centroSalud, activo }[]` |
 | `obtener…(id)` | id | ficha completa o `null` |
 | `obtenerProducto(id)` | id | además `tieneMovimientos` (para bloquear la unidad en la edición) y `proveedores` activos que lo ofrecen con precio (FR-026) |
-| `obtenerProveedor(id, { estadoAsociaciones })` | id | además la lista de productos que ofrece |
+| `obtenerProveedor(id, { asociaciones })` | id | además la lista de productos que ofrece |
 | `listar…ParaSelector(idActual?)` | id opcional | `{ id, etiqueta, activo }[]` (data-model §4) |
 
-Todas ordenan por nombre en español (`localeCompare("es")`), salvo productos, que ordenan por código.
+Todas ordenan por nombre en español (`localeCompare("es")`), incluidos los productos (FR-007).
