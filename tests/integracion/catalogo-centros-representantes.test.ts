@@ -1,0 +1,174 @@
+// Historia 4 · Centro de salud y representantes (FR-009, FR-010, FR-022, RN-11, RN-13, RN-14, RN-17).
+import { beforeEach, describe, expect, it } from "vitest";
+import { prisma } from "@/lib/prisma";
+import { ErrorDeNegocio } from "@/lib/errores";
+import {
+  desactivarCentroSalud,
+  listarCentrosSalud,
+  listarCentrosSaludParaSelector,
+  modificarCentroSalud,
+  reactivarCentroSalud,
+  registrarCentroSalud,
+} from "@/servicios/catalogos/centros-salud";
+import {
+  desactivarRepresentante,
+  listarRepresentantes,
+  listarRepresentantesParaSelector,
+  modificarRepresentante,
+  reactivarRepresentante,
+  registrarRepresentante,
+} from "@/servicios/catalogos/representantes";
+import { vaciarTablas } from "../ayudantes/base-de-datos";
+import {
+  crearCentroSaludDePrueba,
+  crearPedidoConSaldo,
+  crearProductoDePrueba,
+  crearRepresentanteDePrueba,
+} from "../ayudantes/catalogos";
+
+async function errorDe(promesa: Promise<unknown>) {
+  const error = await promesa.catch((e: unknown) => e);
+  expect(error).toBeInstanceOf(ErrorDeNegocio);
+  return error as ErrorDeNegocio;
+}
+
+describe("centros de salud", () => {
+  beforeEach(vaciarTablas);
+
+  it("registra con nombre normalizado y rechaza el repetido, con enlace si está inactivo", async () => {
+    const { id } = await registrarCentroSalud({ nombre: " Hospital  San Juan de Dios " });
+    const guardado = await prisma.centroSalud.findUniqueOrThrow({ where: { id } });
+    expect(guardado.nombre).toBe("Hospital San Juan de Dios");
+    expect(guardado.nombreNormalizado).toBe("hospital san juan de dios");
+
+    const error = await errorDe(registrarCentroSalud({ nombre: "HOSPITAL SAN JUAN DE DIOS" }));
+    expect(error.message).toBe("Ya existe un centro de salud con el nombre 'Hospital San Juan de Dios'");
+    expect(error.enlace).toBeUndefined();
+
+    await prisma.centroSalud.update({ where: { id }, data: { activo: false } });
+    const errorInactivo = await errorDe(registrarCentroSalud({ nombre: "hospital san juan de dios" }));
+    expect(errorInactivo.message).toBe("Ya existe un centro de salud inactivo con el nombre 'Hospital San Juan de Dios'");
+    expect(errorInactivo.enlace).toEqual({ texto: "Ver y reactivar", ruta: `/centros-salud/${id}` });
+  });
+
+  it("al modificar rechaza el nombre de otro centro, pero no el propio", async () => {
+    const centro = await crearCentroSaludDePrueba({ nombre: "Centro Norte" });
+    await crearCentroSaludDePrueba({ nombre: "Centro Sur" });
+
+    expect((await errorDe(modificarCentroSalud(centro.id, { nombre: "centro sur" }))).message).toBe(
+      "Ya existe un centro de salud con el nombre 'Centro Sur'",
+    );
+    await expect(modificarCentroSalud(centro.id, { nombre: "Centro Norte", telefono: "5251234" })).resolves.toBeUndefined();
+  });
+
+  it("rechaza desactivar con representantes activos (RN-13)", async () => {
+    const centro = await crearCentroSaludDePrueba();
+    await crearRepresentanteDePrueba({ centroSaludId: centro.id });
+    expect((await errorDe(desactivarCentroSalud(centro.id))).message).toBe(
+      "No se puede desactivar: 1 representante activo pertenece a este centro",
+    );
+
+    await crearRepresentanteDePrueba({ centroSaludId: centro.id });
+    expect((await errorDe(desactivarCentroSalud(centro.id))).message).toBe(
+      "No se puede desactivar: 2 representantes activos pertenecen a este centro",
+    );
+
+    await prisma.representante.updateMany({ where: { centroSaludId: centro.id }, data: { activo: false } });
+    await desactivarCentroSalud(centro.id);
+    await reactivarCentroSalud(centro.id);
+    expect((await prisma.centroSalud.findUniqueOrThrow({ where: { id: centro.id } })).activo).toBe(true);
+  });
+
+  it("el selector solo ofrece centros activos y el listado cuenta representantes activos", async () => {
+    const activo = await crearCentroSaludDePrueba({ nombre: "Hospital General" });
+    await crearCentroSaludDePrueba({ nombre: "Posta cerrada", activo: false });
+    await crearRepresentanteDePrueba({ centroSaludId: activo.id });
+
+    expect(await listarCentrosSaludParaSelector()).toEqual([{ id: activo.id, etiqueta: "Hospital General", activo: true }]);
+    expect(await listarCentrosSalud({ estado: "activos" })).toEqual([
+      { id: activo.id, nombre: "Hospital General", telefono: null, activo: true, representantesActivos: 1 },
+    ]);
+  });
+});
+
+describe("representantes", () => {
+  beforeEach(vaciarTablas);
+
+  const datosBase = { nombre: "Ana", apellido: "Quispe", ci: "4567890", servicio: "Enfermería" };
+
+  it("registra y rechaza un CI repetido, con enlace si el existente está inactivo", async () => {
+    const centro = await crearCentroSaludDePrueba();
+    const { id } = await registrarRepresentante({ ...datosBase, centroSaludId: centro.id });
+
+    const error = await errorDe(registrarRepresentante({ ...datosBase, nombre: "Otra", centroSaludId: centro.id }));
+    expect(error.message).toBe("Ya existe un representante con el CI '4567890'");
+    expect(error.campo).toBe("ci");
+
+    await prisma.representante.update({ where: { id }, data: { activo: false } });
+    const errorInactivo = await errorDe(registrarRepresentante({ ...datosBase, centroSaludId: centro.id }));
+    expect(errorInactivo.message).toBe("Ya existe un representante inactivo con el CI '4567890'");
+    expect(errorInactivo.enlace).toEqual({ texto: "Ver y reactivar", ruta: `/representantes/${id}` });
+  });
+
+  it("rechaza registrar con un centro de salud inactivo (RN-14)", async () => {
+    const centro = await crearCentroSaludDePrueba({ nombre: "Posta cerrada", activo: false });
+    expect((await errorDe(registrarRepresentante({ ...datosBase, centroSaludId: centro.id }))).message).toBe(
+      "El centro de salud 'Posta cerrada' está inactivo: elige uno activo",
+    );
+  });
+
+  it("al modificar rechaza el CI de otro representante, pero no el propio", async () => {
+    const representante = await crearRepresentanteDePrueba({ ci: "111" });
+    await crearRepresentanteDePrueba({ ci: "222" });
+    const base = { ...datosBase, centroSaludId: representante.centroSaludId };
+
+    expect((await errorDe(modificarRepresentante(representante.id, { ...base, ci: "222" }))).message).toBe(
+      "Ya existe un representante con el CI '222'",
+    );
+    await expect(modificarRepresentante(representante.id, { ...base, ci: "111" })).resolves.toBeUndefined();
+  });
+
+  it("rechaza desactivar con pedidos PENDIENTE o PARCIAL y lo permite con ATENDIDO o ANULADO (RN-13)", async () => {
+    const representante = await crearRepresentanteDePrueba();
+    const producto = await crearProductoDePrueba();
+    await crearPedidoConSaldo({ representanteId: representante.id, productoId: producto.id });
+    await crearPedidoConSaldo({ representanteId: representante.id, productoId: producto.id });
+    await crearPedidoConSaldo({ representanteId: representante.id, productoId: producto.id, estado: "PARCIAL", entregada: 3 });
+
+    expect((await errorDe(desactivarRepresentante(representante.id))).message).toBe("No se puede desactivar: tiene 3 pedidos por atender");
+
+    const otro = await crearRepresentanteDePrueba();
+    await crearPedidoConSaldo({ representanteId: otro.id, productoId: producto.id, estado: "ATENDIDO", entregada: 10 });
+    await crearPedidoConSaldo({ representanteId: otro.id, productoId: producto.id, estado: "ANULADO" });
+    await expect(desactivarRepresentante(otro.id)).resolves.toBeUndefined();
+  });
+
+  it("rechaza reactivar si su centro de salud está inactivo (RN-17)", async () => {
+    const centro = await crearCentroSaludDePrueba({ nombre: "Hospital General" });
+    const representante = await crearRepresentanteDePrueba({ centroSaludId: centro.id, activo: false });
+    await prisma.centroSalud.update({ where: { id: centro.id }, data: { activo: false } });
+
+    expect((await errorDe(reactivarRepresentante(representante.id))).message).toBe("Primero reactiva el centro de salud 'Hospital General'");
+
+    await prisma.centroSalud.update({ where: { id: centro.id }, data: { activo: true } });
+    await reactivarRepresentante(representante.id);
+    expect((await prisma.representante.findUniqueOrThrow({ where: { id: representante.id } })).activo).toBe(true);
+  });
+
+  it("el selector solo ofrece activos como 'Apellido, Nombre · Servicio' y el listado ordena por apellido", async () => {
+    const centro = await crearCentroSaludDePrueba({ nombre: "Hospital General" });
+    const ana = await crearRepresentanteDePrueba({ nombre: "Ana", apellido: "Quispe", servicio: "Enfermería", centroSaludId: centro.id });
+    const luis = await crearRepresentanteDePrueba({ nombre: "Luis", apellido: "Álvarez", servicio: "Pediatría", centroSaludId: centro.id });
+    await crearRepresentanteDePrueba({ apellido: "Inactivo", activo: false, centroSaludId: centro.id });
+
+    expect(await listarRepresentantesParaSelector()).toEqual([
+      { id: luis.id, etiqueta: "Álvarez, Luis · Pediatría", activo: true },
+      { id: ana.id, etiqueta: "Quispe, Ana · Enfermería", activo: true },
+    ]);
+    expect((await listarRepresentantes({ estado: "activos" }))[0]).toMatchObject({
+      nombreCompleto: "Álvarez, Luis",
+      servicio: "Pediatría",
+      centroSalud: "Hospital General",
+    });
+  });
+});
