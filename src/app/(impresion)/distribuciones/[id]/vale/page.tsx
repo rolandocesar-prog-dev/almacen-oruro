@@ -4,7 +4,7 @@ import { formatearFecha } from "@/lib/fechas";
 import { idDeRuta } from "@/lib/parametros";
 import { requerirSesion } from "@/lib/sesion";
 import { obtenerDistribucion } from "@/servicios/distribuciones";
-import { BotonImprimir } from "./boton-imprimir";
+import { BotonImprimir } from "@/componentes/ui/boton-imprimir";
 
 export const metadata = { title: "Vale de distribución · Almacén Regional Oruro" };
 
