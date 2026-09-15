@@ -169,7 +169,7 @@ export async function reactivarProducto(id: number): Promise<void> {
 }
 
 /** RN-52: un producto activo está bajo mínimo si su stock no supera el mínimo. Se calcula, no se guarda. */
-function estaBajoMinimo(producto: { activo: boolean; stockActual: number; stockMinimo: number }) {
+export function estaBajoMinimo(producto: { activo: boolean; stockActual: number; stockMinimo: number }) {
   return producto.activo && producto.stockActual <= producto.stockMinimo;
 }
 

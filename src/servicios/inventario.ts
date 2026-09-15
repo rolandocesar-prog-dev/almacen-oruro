@@ -12,7 +12,11 @@
 // - Se bloquea ANTES de insertar filas que referencien al producto (líneas, movimientos): insertarlas
 //   toma un bloqueo FOR KEY SHARE sobre el producto que choca con FOR UPDATE.
 import { Prisma, type TipoMovimiento } from "@/generado/prisma/client";
+import type { FiltroExistencias } from "@/esquemas/inventario";
 import { ErrorDeNegocio } from "@/lib/errores";
+import { prisma } from "@/lib/prisma";
+import { coincideBusqueda, compararEnEspanol } from "@/lib/texto";
+import { estaBajoMinimo } from "./catalogos/productos";
 
 type Transaccion = Prisma.TransactionClient;
 
@@ -82,4 +86,49 @@ export async function registrarMovimiento(tx: Transaccion, movimiento: DatosMovi
   await tx.producto.update({ where: { id: movimiento.productoId }, data: { stockActual: saldoResultante } });
 
   return { saldoResultante };
+}
+
+/**
+ * Consulta de existencias (FR-018, research K-07): stock actual frente al mínimo.
+ * Primero los bajo mínimo, para ver de un vistazo qué hay que comprar (SC-007), y luego por nombre.
+ * Se filtra en memoria como los catálogos: son decenas de productos (research C-01).
+ */
+export async function listarExistencias({
+  q,
+  categoriaId,
+  estado,
+  soloBajoMinimo = false,
+}: {
+  q?: string;
+  categoriaId?: number;
+  estado: FiltroExistencias["estado"];
+  soloBajoMinimo?: boolean;
+}) {
+  const productos = await prisma.producto.findMany({
+    where: { categoriaId },
+    include: { categoria: { select: { nombre: true } }, unidadMedida: { select: { nombre: true, abreviatura: true } } },
+  });
+
+  const filas = productos
+    // Por defecto se ven los activos y también los inactivos que todavía tienen stock: ese stock existe
+    // en el almacén aunque el producto ya no se compre (aclaración del 13/09).
+    .filter((p) => (estado === "todos" ? true : estado === "inactivos" ? !p.activo : p.activo || p.stockActual > 0))
+    .filter((p) => coincideBusqueda(q, p.codigo, p.nombre))
+    .map((p) => ({
+      id: p.id,
+      codigo: p.codigo,
+      nombre: p.nombre,
+      categoria: p.categoria.nombre,
+      unidad: p.unidadMedida.nombre,
+      abreviatura: p.unidadMedida.abreviatura,
+      stockActual: p.stockActual,
+      stockMinimo: p.stockMinimo,
+      activo: p.activo,
+      // RN-52: solo un producto activo está bajo mínimo; uno inactivo no se va a reponer.
+      bajoMinimo: estaBajoMinimo(p),
+    }))
+    .filter((p) => !soloBajoMinimo || p.bajoMinimo)
+    .sort((a, b) => Number(b.bajoMinimo) - Number(a.bajoMinimo) || compararEnEspanol(a.nombre, b.nombre));
+
+  return { productos: filas, total: filas.length, bajoMinimo: filas.filter((p) => p.bajoMinimo).length };
 }
