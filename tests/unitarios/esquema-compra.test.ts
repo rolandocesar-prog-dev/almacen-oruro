@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { erroresPorRuta } from "@/lib/errores";
-import { hoyEnLaPaz } from "@/lib/fechas";
-import { esquemaCompra, esquemaVerificacionFactura } from "@/esquemas/compras";
+import { hoyEnLaPaz, inicioDelMesEnCurso } from "@/lib/fechas";
+import { esquemaAnulacion, esquemaCompra, esquemaFiltroCompras, esquemaVerificacionFactura } from "@/esquemas/compras";
 
 function manana() {
   const fecha = new Date(`${hoyEnLaPaz()}T12:00:00Z`);
@@ -85,6 +85,46 @@ describe("esquemaCompra (FR-001 a FR-003)", () => {
     const datos = esquemaCompra.parse({ ...datosValidos(), total: "1", lineas: [{ ...linea(), subtotal: "1" }] });
     expect(datos).not.toHaveProperty("total");
     expect(datos.lineas[0]).not.toHaveProperty("subtotal");
+  });
+});
+
+describe("esquemaFiltroCompras (FR-008)", () => {
+  it("por defecto muestra el mes en curso, todas las compras y la página 1", () => {
+    expect(esquemaFiltroCompras.parse({})).toEqual({
+      desde: inicioDelMesEnCurso(),
+      hasta: hoyEnLaPaz(),
+      proveedor: undefined,
+      estado: "todas",
+      factura: undefined,
+      pagina: 1,
+    });
+  });
+
+  it("lee los filtros y usa valores por defecto para los inválidos", () => {
+    expect(esquemaFiltroCompras.parse({ desde: "2026-08-01", hasta: "2026-08-31", proveedor: "2", estado: "anuladas", factura: " 12 ", pagina: "3" })).toEqual({
+      desde: "2026-08-01",
+      hasta: "2026-08-31",
+      proveedor: 2,
+      estado: "anuladas",
+      factura: "12",
+      pagina: 3,
+    });
+    expect(esquemaFiltroCompras.parse({ estado: "otro", proveedor: "x", pagina: "0" })).toMatchObject({ estado: "todas", proveedor: undefined, pagina: 1 });
+  });
+
+  it("rechaza letras en la factura y un rango invertido", () => {
+    expect(esquemaFiltroCompras.safeParse({ factura: "12a" }).error?.issues[0]?.message).toBe("El Nº de factura solo admite dígitos");
+    expect(esquemaFiltroCompras.safeParse({ desde: "2026-09-10", hasta: "2026-09-01" }).error?.issues[0]?.message).toBe(
+      "La fecha «desde» no puede ser posterior a «hasta»",
+    );
+  });
+});
+
+describe("esquemaAnulacion (FR-011)", () => {
+  it("exige el motivo, hasta 200 caracteres", () => {
+    expect(esquemaAnulacion.parse({ motivo: " Cantidades mal cargadas " })).toEqual({ motivo: "Cantidades mal cargadas" });
+    expect(esquemaAnulacion.safeParse({ motivo: "  " }).error?.issues[0]?.message).toBe("Escribe el motivo de la anulación");
+    expect(esquemaAnulacion.safeParse({ motivo: "a".repeat(201) }).error?.issues[0]?.message).toBe("El motivo admite hasta 200 caracteres");
   });
 });
 

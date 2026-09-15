@@ -3,7 +3,8 @@
 // y cualquier valor que llegue del formulario se descarta (RN-23, defecto X-14).
 import { z } from "zod";
 import { aCentavos } from "@/lib/dinero";
-import { fechaNoFutura, idObligatorio, montoPositivo, textoObligatorio, textoOpcional, vacioComoAusente } from "./comunes";
+import { hoyEnLaPaz, inicioDelMesEnCurso } from "@/lib/fechas";
+import { fechaDeFiltro, fechaNoFutura, idObligatorio, montoPositivo, textoObligatorio, textoOpcional, vacioComoAusente } from "./comunes";
 
 const MENSAJE_CANTIDAD = "La cantidad debe ser un número entero entre 1 y 1.000.000";
 const MENSAJE_FACTURA = "El Nº de factura solo admite dígitos, hasta 20";
@@ -70,6 +71,31 @@ export const esquemaVerificacionFactura = z.object({
   proveedorId: idObligatorio("Elige un proveedor"),
   nroFactura,
 });
+
+/**
+ * Filtros del listado de compras (FR-008, research K-09). Por defecto, el mes en curso hasta hoy.
+ * `factura` busca los números que empiezan con lo escrito.
+ */
+export const esquemaFiltroCompras = z
+  .object({
+    desde: fechaDeFiltro(inicioDelMesEnCurso),
+    hasta: fechaDeFiltro(hoyEnLaPaz),
+    proveedor: z.preprocess(vacioComoAusente, z.coerce.number().int().positive()).optional().catch(undefined),
+    estado: z.enum(["todas", "registradas", "anuladas"]).catch("todas"),
+    factura: z
+      .string()
+      .trim()
+      .regex(/^[0-9]{0,20}$/, { error: "El Nº de factura solo admite dígitos" })
+      .transform((valor) => (valor ? valor : undefined))
+      .optional(),
+    pagina: z.preprocess(vacioComoAusente, z.coerce.number().int().min(1).default(1)).catch(1),
+  })
+  .refine((filtro) => filtro.desde <= filtro.hasta, {
+    error: "La fecha «desde» no puede ser posterior a «hasta»",
+    path: ["hasta"],
+  });
+
+export type FiltroCompras = z.infer<typeof esquemaFiltroCompras>;
 
 /** Aviso de la ficha después de registrar (?aviso=registrada). Otro valor se ignora. */
 export const esquemaAvisoCompra = z.object({

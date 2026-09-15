@@ -121,6 +121,53 @@ export async function registrarCompra(datos: DatosCompra, usuarioId: number): Pr
   }
 }
 
+/** Las compras crecen sin límite (36 meses simulados): el listado se pagina (research K-09). */
+export const COMPRAS_POR_PAGINA = 50;
+
+/**
+ * Listado de compras (FR-008): filtros en la base por rango de fechas de la factura, proveedor, estado
+ * y Nº de factura que empieza con lo escrito; de la más reciente a la más antigua.
+ */
+export async function listarCompras(filtro: {
+  desde: string;
+  hasta: string;
+  proveedorId?: number;
+  estado: "todas" | "registradas" | "anuladas";
+  factura?: string;
+  pagina: number;
+}) {
+  const where: Prisma.CompraWhereInput = {
+    fecha: { gte: aFechaDocumento(filtro.desde), lte: aFechaDocumento(filtro.hasta) },
+    proveedorId: filtro.proveedorId,
+    estado: filtro.estado === "todas" ? undefined : filtro.estado === "registradas" ? "REGISTRADA" : "ANULADA",
+    nroFactura: filtro.factura ? { startsWith: filtro.factura } : undefined,
+  };
+
+  const [compras, total] = await Promise.all([
+    prisma.compra.findMany({
+      where,
+      orderBy: [{ fecha: "desc" }, { id: "desc" }],
+      skip: (filtro.pagina - 1) * COMPRAS_POR_PAGINA,
+      take: COMPRAS_POR_PAGINA,
+      include: { proveedor: { select: { razonSocial: true } }, _count: { select: { lineas: true } } },
+    }),
+    prisma.compra.count({ where }),
+  ]);
+
+  return {
+    total,
+    compras: compras.map((compra) => ({
+      id: compra.id,
+      fecha: textoDeFechaDocumento(compra.fecha),
+      nroFactura: compra.nroFactura,
+      proveedor: compra.proveedor.razonSocial,
+      items: compra._count.lineas,
+      total: compra.total.toFixed(2),
+      estado: compra.estado,
+    })),
+  };
+}
+
 /** Detalle completo de una compra, con los datos de registro y de anulación (FR-009), o null. */
 export async function obtenerCompra(id: number) {
   const compra = await prisma.compra.findUnique({
