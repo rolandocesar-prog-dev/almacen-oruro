@@ -9,7 +9,9 @@ import { formatearFecha, formatearFechaHora } from "@/lib/fechas";
 import { idDeRuta } from "@/lib/parametros";
 import { requerirSesion } from "@/lib/sesion";
 import { obtenerCompra } from "@/servicios/compras";
+import { anularCompraAccion } from "../acciones";
 import { InsigniaCompra } from "../insignia-compra";
+import { AnularCompra } from "./anular-compra";
 
 export const metadata = { title: "Detalle de compra · Almacén Regional Oruro" };
 
@@ -84,6 +86,11 @@ export default async function PaginaDetalleCompra({
           <Celda className="text-right font-semibold tabular-nums">{formatearBolivianos(compra.total)}</Celda>
         </tr>
       </Tabla>
+
+      {/* Solo una compra REGISTRADA se puede anular; una ANULADA ya no ofrece nada (RN-26). */}
+      {compra.estado === "REGISTRADA" && (
+        <AnularCompra accion={anularCompraAccion.bind(null, compra.id)} nroFactura={compra.nroFactura} cantidadProductos={compra.lineas.length} />
+      )}
     </section>
   );
 }

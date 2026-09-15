@@ -121,6 +121,66 @@ export async function registrarCompra(datos: DatosCompra, usuarioId: number): Pr
   }
 }
 
+/** "faltan 7 unidades de 'Lavandina 1 L' (stock actual 3, a revertir 10)" */
+function describirFaltante(nombre: string, stockActual: number, aRevertir: number) {
+  const falta = aRevertir - stockActual;
+  const cuanto = falta === 1 ? "falta 1 unidad" : `faltan ${falta} unidades`;
+  return `${cuanto} de '${nombre}' (stock actual ${stockActual}, a revertir ${aRevertir})`;
+}
+
+/**
+ * Anula una compra con motivo (FR-011 a FR-014, research K-02). Es completa o no ocurre:
+ *
+ * 1. Cambia el estado a ANULADA solo si sigue REGISTRADA. Esa actualización bloquea la fila de la
+ *    compra: si dos personas anulan a la vez, la segunda espera y luego ya no la encuentra REGISTRADA.
+ * 2. Bloquea todos los productos de la compra y calcula TODOS los faltantes. Si algún producto quedaría
+ *    con stock negativo porque ya se distribuyó, rechaza con un único mensaje que los nombra a todos
+ *    (RN-25) y la transacción se deshace: la compra sigue REGISTRADA.
+ * 3. Registra un ANULACION_COMPRA negativo por línea, con la fecha de la compra anulada (RN-53).
+ */
+export async function anularCompra(compraId: number, motivo: string, usuarioId: number): Promise<{ productoIds: number[] }> {
+  return prisma.$transaction(async (tx) => {
+    const cambio = await tx.compra.updateMany({
+      where: { id: compraId, estado: "REGISTRADA" },
+      data: { estado: "ANULADA", motivoAnulacion: motivo, anuladaEn: new Date(), anuladaPorId: usuarioId },
+    });
+    if (cambio.count === 0) {
+      const existe = await tx.compra.findUnique({ where: { id: compraId }, select: { id: true } });
+      // RN-26: una compra anulada no se vuelve a anular.
+      throw new ErrorDeNegocio(existe ? "La compra ya está anulada" : "No existe la compra indicada");
+    }
+
+    const compra = await tx.compra.findUniqueOrThrow({
+      where: { id: compraId },
+      select: { fecha: true, lineas: { select: { productoId: true, cantidad: true } } },
+    });
+    const lineas = [...compra.lineas].sort((a, b) => a.productoId - b.productoId);
+    const productos = await bloquearProductos(
+      tx,
+      lineas.map((linea) => linea.productoId),
+    );
+
+    const faltantes = lineas.flatMap((linea) => {
+      const producto = productos.get(linea.productoId)!;
+      return producto.stockActual < linea.cantidad ? [describirFaltante(producto.nombre, producto.stockActual, linea.cantidad)] : [];
+    });
+    if (faltantes.length > 0) throw new ErrorDeNegocio(`No se puede anular: ${faltantes.join("; ")}`);
+
+    for (const linea of lineas) {
+      await registrarMovimiento(tx, {
+        productoId: linea.productoId,
+        tipo: "ANULACION_COMPRA",
+        cantidad: -linea.cantidad,
+        fechaDocumento: compra.fecha,
+        compraId,
+        usuarioId,
+      });
+    }
+
+    return { productoIds: lineas.map((linea) => linea.productoId) };
+  }, OPCIONES_TRANSACCION);
+}
+
 /** Las compras crecen sin límite (36 meses simulados): el listado se pagina (research K-09). */
 export const COMPRAS_POR_PAGINA = 50;
 

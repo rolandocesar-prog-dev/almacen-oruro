@@ -2,10 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { esquemaCompra, esquemaVerificacionFactura } from "@/esquemas/compras";
+import { z } from "zod";
+import { esquemaAnulacion, esquemaCompra, esquemaVerificacionFactura } from "@/esquemas/compras";
 import { aResultadoDeError, aResultadoDeValidacion, erroresPorRuta, type ResultadoAccion } from "@/lib/errores";
 import { requerirSesion } from "@/lib/sesion";
-import { buscarFacturaVigente, registrarCompra } from "@/servicios/compras";
+import { anularCompra, buscarFacturaVigente, registrarCompra } from "@/servicios/compras";
 
 // Orden fijo de toda acción (contracts/acciones-f003.md):
 // 1. requerirSesion  2. validar con Zod  3. servicio  4. errores  5. revalidar y redirigir
@@ -31,6 +32,34 @@ export async function registrarCompraAccion(datos: unknown): Promise<ResultadoAc
   revalidatePath("/compras");
   revalidatePath("/existencias");
   redirect(`/compras/${id}?aviso=registrada`);
+}
+
+/**
+ * Anular una compra con motivo (Historia 5). El id se fija con .bind() en la ficha.
+ * Revalida también las existencias y el kardex de cada producto, porque su stock cambió.
+ */
+export async function anularCompraAccion(
+  compraId: number,
+  _estadoPrevio: ResultadoAccion | undefined,
+  formData: FormData,
+): Promise<ResultadoAccion> {
+  const { usuario } = await requerirSesion();
+
+  const validacion = esquemaAnulacion.safeParse(Object.fromEntries(formData));
+  if (!validacion.success) return aResultadoDeValidacion(z.flattenError(validacion.error).fieldErrors);
+
+  let productoIds: number[];
+  try {
+    ({ productoIds } = await anularCompra(compraId, validacion.data.motivo, usuario.id));
+  } catch (error) {
+    return aResultadoDeError(error);
+  }
+
+  revalidatePath("/compras");
+  revalidatePath(`/compras/${compraId}`);
+  revalidatePath("/existencias");
+  for (const productoId of productoIds) revalidatePath(`/kardex/${productoId}`);
+  return { ok: true, datos: undefined, mensaje: "Compra anulada. El stock de sus productos se revirtió." };
 }
 
 /**
