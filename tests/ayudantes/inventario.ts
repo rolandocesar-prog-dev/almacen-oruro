@@ -1,8 +1,10 @@
 // Documentos de prueba para el núcleo del stock (F-003, tareas T006 y T008).
 // Crean compras y distribuciones SIN movimientos, para que cada prueba registre sus movimientos con
-// registrarMovimiento, la única función que cambia el stock (principio III).
+// registrarMovimiento, la única función que cambia el stock (principio III). crearSalidaDePrueba, en
+// cambio, registra una distribución real con los servicios de F-004 y F-005 (research V-11 de F-005).
 import { prisma } from "@/lib/prisma";
-import { registrarMovimiento } from "@/servicios/inventario";
+import { registrarDistribucion } from "@/servicios/distribuciones";
+import { registrarPedido } from "@/servicios/pedidos";
 import { crearUsuarioDePrueba } from "./base-de-datos";
 import { crearProveedorDePrueba, crearRepresentanteDePrueba } from "./catalogos";
 
@@ -76,20 +78,23 @@ export async function crearDistribucionSinMovimientosDePrueba({
 }
 
 /**
- * Salida por distribución de `cantidad` unidades, con su movimiento SALIDA_DISTRIBUCION registrado por
- * registrarMovimiento, como lo hará F-005. Si no hay stock suficiente, lanza el error de stock.
+ * Salida por distribución de `cantidad` unidades con una distribución REAL (F-005, research V-11): un pedido
+ * de una línea registrado con registrarPedido y atendido con registrarDistribucion, que registra el
+ * SALIDA_DISTRIBUCION con registrarMovimiento (principio III). Si no hay stock suficiente, lanza el error de
+ * cantidad excedida y no guarda nada. El producto debe estar activo.
  */
 export async function crearSalidaDePrueba({ productoId, cantidad, fecha = "2026-09-02" }: { productoId: number; cantidad: number; fecha?: string }) {
-  const { distribucion, representante, usuario } = await crearDistribucionSinMovimientosDePrueba({ productoId, cantidad, fecha });
-  await prisma.$transaction((tx) =>
-    registrarMovimiento(tx, {
-      productoId,
-      tipo: "SALIDA_DISTRIBUCION",
-      cantidad: -cantidad,
-      fechaDocumento: distribucion.fecha,
-      distribucionId: distribucion.id,
-      usuarioId: usuario.id,
-    }),
+  const { usuario } = await crearUsuarioDePrueba();
+  const representante = await crearRepresentanteDePrueba();
+  const pedido = await registrarPedido(
+    { representanteId: representante.id, fecha, observacion: undefined, lineas: [{ productoId, cantidadSolicitada: cantidad }] },
+    usuario.id,
   );
+  const linea = await prisma.pedidoDetalle.findFirstOrThrow({ where: { pedidoId: pedido.id } });
+  const { id } = await registrarDistribucion(
+    { pedidoId: pedido.id, nroVale: String(950000 + siguiente()), fecha, observacion: undefined, lineas: [{ pedidoDetalleId: linea.id, cantidad }] },
+    usuario.id,
+  );
+  const distribucion = await prisma.distribucion.findUniqueOrThrow({ where: { id } });
   return { distribucion, representante };
 }
