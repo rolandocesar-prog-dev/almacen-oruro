@@ -58,6 +58,38 @@ export function idObligatorio(mensaje: string) {
 }
 
 /**
+ * Cantidad de una línea de documento (compra o pedido): entero de 1 a 1 000 000, con un único mensaje.
+ * El tope evita que el stock desborde su columna entera (F-003, casos borde) y el pedido usa el mismo
+ * (F-004, FR-001). Un campo vacío se rechaza con ese mismo mensaje.
+ */
+export function cantidadEntera(mensaje: string) {
+  return z.preprocess(
+    vacioComoAusente,
+    z.coerce.number({ error: mensaje }).int({ error: mensaje }).min(1, { error: mensaje }).max(1_000_000, { error: mensaje }),
+  );
+}
+
+/**
+ * RN-22 (compras) y RN-40 (pedidos): un producto no se repite en un documento. Se marca la línea
+ * repetida indicando la primera, para que se sepa cuál corregir sin buscar en la tabla.
+ */
+export function marcarProductosRepetidos(lineas: { productoId: number }[], contexto: z.RefinementCtx) {
+  const primeraLineaDe = new Map<number, number>();
+  lineas.forEach((linea, indice) => {
+    const anterior = primeraLineaDe.get(linea.productoId);
+    if (anterior === undefined) {
+      primeraLineaDe.set(linea.productoId, indice);
+      return;
+    }
+    contexto.addIssue({
+      code: "custom",
+      path: ["lineas", indice, "productoId"],
+      message: `Línea ${indice + 1}: el producto ya está en la línea ${anterior + 1}; modifica su cantidad`,
+    });
+  });
+}
+
+/**
  * ¿El texto (ya con punto decimal) es un monto mayor que 0 con hasta 2 decimales y hasta 10 dígitos
  * enteros? Es el máximo que admite una columna decimal(12,2) de la base.
  */

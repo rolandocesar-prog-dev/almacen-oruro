@@ -5,6 +5,7 @@ import { salir } from "./acciones-sesion";
 const menu = [
   { ruta: "/", texto: "Inicio" },
   { ruta: "/compras", texto: "Compras" },
+  { ruta: "/pedidos", texto: "Pedidos" },
   { ruta: "/existencias", texto: "Existencias" },
   { ruta: "/personal", texto: "Personal" },
   { ruta: "/sesiones", texto: "Sesiones" },

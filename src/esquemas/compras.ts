@@ -4,7 +4,17 @@
 import { z } from "zod";
 import { aCentavos } from "@/lib/dinero";
 import { hoyEnLaPaz, inicioDelMesEnCurso } from "@/lib/fechas";
-import { fechaDeFiltro, fechaNoFutura, idObligatorio, montoPositivo, textoObligatorio, textoOpcional, vacioComoAusente } from "./comunes";
+import {
+  cantidadEntera,
+  fechaDeFiltro,
+  fechaNoFutura,
+  idObligatorio,
+  marcarProductosRepetidos,
+  montoPositivo,
+  textoObligatorio,
+  textoOpcional,
+  vacioComoAusente,
+} from "./comunes";
 
 const MENSAJE_CANTIDAD = "La cantidad debe ser un número entero entre 1 y 1.000.000";
 const MENSAJE_FACTURA = "El Nº de factura solo admite dígitos, hasta 20";
@@ -22,14 +32,7 @@ const nroFactura = z
 export const esquemaLineaCompra = z.object({
   productoId: idObligatorio("Elige un producto"),
   // El tope de 1 000 000 evita que el stock desborde su columna entera (spec, casos borde).
-  cantidad: z.preprocess(
-    vacioComoAusente,
-    z.coerce
-      .number({ error: MENSAJE_CANTIDAD })
-      .int({ error: MENSAJE_CANTIDAD })
-      .min(1, { error: MENSAJE_CANTIDAD })
-      .max(1_000_000, { error: MENSAJE_CANTIDAD }),
-  ),
+  cantidad: cantidadEntera(MENSAJE_CANTIDAD),
   precioUnitario: montoPositivo("Escribe un precio mayor que 0 con hasta 2 decimales"),
 });
 
@@ -42,21 +45,8 @@ export const esquemaCompra = z
     lineas: z.array(esquemaLineaCompra).min(1, { error: "Agrega al menos un producto" }),
   })
   .superRefine((compra, contexto) => {
-    // RN-22: un producto no se repite. Se indica la línea repetida y la primera, para que se sepa
-    // cuál corregir sin buscar en la tabla.
-    const primeraLineaDe = new Map<number, number>();
-    compra.lineas.forEach((linea, indice) => {
-      const anterior = primeraLineaDe.get(linea.productoId);
-      if (anterior === undefined) {
-        primeraLineaDe.set(linea.productoId, indice);
-        return;
-      }
-      contexto.addIssue({
-        code: "custom",
-        path: ["lineas", indice, "productoId"],
-        message: `Línea ${indice + 1}: el producto ya está en la línea ${anterior + 1}; modifica su cantidad`,
-      });
-    });
+    // RN-22: un producto no se repite en la compra.
+    marcarProductosRepetidos(compra.lineas, contexto);
 
     // El total se controla en centavos enteros, sin coma flotante. El servidor lo vuelve a calcular
     // con Prisma.Decimal al guardar.

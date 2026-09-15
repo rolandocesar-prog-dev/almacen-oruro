@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useTransition, type FormEvent } from "react";
+import { mensajesPorLinea } from "@/componentes/formularios/errores-de-lineas";
 import { Aviso } from "@/componentes/ui/aviso";
 import { Boton } from "@/componentes/ui/boton";
 import type { OpcionSelector } from "@/componentes/ui/selector";
@@ -24,15 +25,6 @@ function subtotalCentavos(linea: Linea): number | null {
   const centavos = aCentavos(linea.precioUnitario);
   if (centavos === null || !/^\d{1,7}$/.test(linea.cantidad.trim())) return null;
   return Number(linea.cantidad) * centavos;
-}
-
-/** Mensajes de las líneas con su número, para leerlos en el aviso sin buscar en la tabla (FR-007). */
-function mensajesGenerales(errores: Errores): string[] {
-  return Object.entries(errores).flatMap(([ruta, mensajes = []]) => {
-    const linea = /^lineas\.(\d+)\./.exec(ruta);
-    if (!linea) return ruta === "lineas" ? mensajes : [];
-    return mensajes.map((mensaje) => (mensaje.startsWith("Línea") ? mensaje : `Línea ${Number(linea[1]) + 1}: ${mensaje.charAt(0).toLowerCase()}${mensaje.slice(1)}`));
-  });
 }
 
 const claseCampo = (error?: string[]) => `w-full min-w-0 rounded-md border bg-white px-3 py-2 text-base ${error?.length ? "border-error" : "border-borde"}`;
@@ -125,7 +117,8 @@ export function FormularioCompra({ proveedores, productos, hoy }: { proveedores:
   const erroresServidor = resultado?.ok === false ? (resultado.errores ?? {}) : {};
   const errores: Errores = { ...erroresServidor };
   for (const [ruta, mensajes] of Object.entries(erroresCliente)) if (mensajes) errores[ruta] = mensajes;
-  const generales = mensajesGenerales(errores);
+  // Mensajes de las líneas con su número, para leerlos en el aviso sin buscar en la tabla (FR-007).
+  const generales = mensajesPorLinea(errores);
 
   const subtotales = lineas.map(subtotalCentavos);
   const totalCentavos = subtotales.every((subtotal) => subtotal !== null) ? subtotales.reduce<number>((suma, s) => suma + (s ?? 0), 0) : null;
