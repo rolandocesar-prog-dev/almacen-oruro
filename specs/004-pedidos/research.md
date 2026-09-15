@@ -79,11 +79,13 @@ control optimista por versión (requiere columna nueva y reintentos).
 
 ## P-04 · Edición: sincronizar las líneas
 
-**Decisión**: `editarPedido(id, datos, usuarioId)`, dentro de una transacción:
+**Decisión**: `editarPedido(id, datos)`, dentro de una transacción (la especificación no pide registrar
+quién editó):
 
 1. `bloquearPedido`; si no está `PENDIENTE`, se rechaza con el mensaje de su estado (data-model §3).
 2. Verificaciones: representante activo o el mismo que ya tenía; productos activos o los que ya estaban
-   en el pedido (FR-003 de F-002).
+   en el pedido (FR-006 y caso borde "Pedido por atender con un representante o producto inactivo";
+   FR-003 de F-002).
 3. Actualiza la cabecera (representante, fecha, observación).
 4. Compara las líneas actuales con las nuevas por producto:
    - producto que sigue → actualiza `cantidadSolicitada`;
@@ -121,6 +123,12 @@ forma atómica (FR-004). No bloquea productos ni toca el stock (FR-003).
 **Nota de concurrencia**: insertar las líneas toma `FOR KEY SHARE` sobre cada producto; una compra o
 distribución que tenga ese producto bloqueado hace esperar al pedido unos milisegundos, sin ciclo
 posible porque el pedido nuevo no bloquea nada que ellas esperen.
+
+**Baja simultánea aceptada**: como la verificación de "activo" se hace antes del `create` y las bajas de
+F-002 no bloquean la fila del representante ni del producto, una baja guardada en el mismo instante que un
+registro podría dejar un pedido PENDIENTE con un representante o producto inactivo. Se acepta: hay un solo
+tipo de usuario y decenas de pedidos por mes, y esa situación ya es válida según la especificación (caso
+borde "Pedido por atender con un representante o producto inactivo").
 
 ---
 

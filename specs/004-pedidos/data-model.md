@@ -129,6 +129,6 @@ según el estado (research P-08).
 | Funcionalidad | Qué usa de F-004 |
 |---|---|
 | F-002 | RN-13 ya cuenta pedidos PENDIENTE y PARCIAL para impedir desactivar representantes y productos; la ficha del representante enlaza a sus pedidos |
-| F-005 | `bloquearPedido` (primero el pedido, después los productos), `recalcularEstadoPedido`, `listarPedidosPorAtender` para elegir el pedido y la regla de fecha de distribución ≥ fecha del pedido |
+| F-005 | `bloquearPedido` (primero el pedido, después los productos), `recalcularEstadoPedido`, `listarPedidos({ estado: "por-atender" })` para elegir el pedido (o una variante propia que defina F-005) y la regla de fecha de distribución ≥ fecha del pedido |
 | F-006 | Reporte de pedidos con entregado y saldo anulado |
 | F-007 | Informe de distribuciones |

@@ -4,7 +4,7 @@
 
 **Creada**: 2026-09-13
 
-**Estado**: Borrador
+**Estado**: Aprobada
 
 **Entrada**: Descripción del usuario: "Registro de los pedidos de productos de limpieza que hacen
 los representantes del centro de salud. El encargado registra el pedido eligiendo un representante
@@ -30,6 +30,17 @@ Decisiones D-10 y D-16 · Supuestos S-01 y S-04 · Defectos corregidos X-07, X-0
 - Q: Cuando se anula un pedido PARCIAL, ¿su estado final es ANULADO o uno distinto? → A: ANULADO,
   igual que un pedido PENDIENTE anulado; el detalle y los reportes distinguen lo entregado y el
   saldo anulado.
+
+### Session 2026-09-15
+
+- Precisión (plan): el número de pedido lo asigna el sistema de forma correlativa; puede saltarse si un
+  registro falla, pero nunca se repite ni cambia (ver Supuestos).
+- Precisión (plan): la cantidad solicitada tiene el mismo tope de 1 000 000 que las compras (FR-001).
+- Precisión (plan): una línea que figura en distribuciones anuladas no se puede quitar al editar (caso
+  borde "Pedido que volvió a PENDIENTE").
+- Precisión (análisis): un pedido por atender puede tener un representante o un producto inactivo si
+  se desactivó mientras el pedido estaba ATENDIDO o mientras esa línea estaba completa; al editarlo se
+  conserva ese valor, pero no se puede elegir otro inactivo (FR-003 de F-002).
 
 ## Escenarios de usuario y pruebas *(obligatorio)*
 
@@ -206,9 +217,12 @@ cantidades y stock; se intenta anular uno ATENDIDO.
   pedido, la anulación se rechaza porque el pedido ya está ATENDIDO; si la anulación se guarda
   primero, la distribución se rechaza porque el pedido ya está ANULADO.
 - **Representante o producto con pedidos por atender:** no se pueden desactivar mientras tengan
-  pedidos PENDIENTE o PARCIAL (F-002, RN-13); por eso ningún pedido por atender tiene un
-  representante ni un producto inactivo. Si el representante deja su cargo, el encargado completa
-  o anula sus pedidos antes de darlo de baja.
+  pedidos PENDIENTE o PARCIAL con saldo (F-002, RN-13). Si el representante deja su cargo, el
+  encargado completa o anula sus pedidos antes de darlo de baja.
+- **Pedido por atender con un representante o producto inactivo:** puede ocurrir si se desactivó
+  mientras el pedido estaba ATENDIDO (o mientras esa línea estaba completa) y después se anuló una
+  distribución. El pedido se muestra con el valor marcado "(inactivo)"; al editarlo se puede conservar
+  ese representante o ese producto, pero no elegir otro inactivo (FR-003 de F-002).
 - **Quitar una línea al editar:** solo se permite en pedidos PENDIENTE, así que ninguna línea con
   entregas se puede quitar.
 - **Pedido que volvió a PENDIENTE:** si todas sus distribuciones se anularon, el pedido se puede editar,
@@ -241,7 +255,8 @@ cantidades y stock; se intenta anular uno ATENDIDO.
   sin impedir solicitar una cantidad mayor.
 - **FR-006**: El sistema DEBE permitir editar un pedido solo mientras está PENDIENTE (RN-42),
   verificándolo al guardar: representante, fecha, observación, agregar o quitar líneas y cambiar
-  cantidades, con las mismas reglas del registro.
+  cantidades, con las mismas reglas del registro, salvo que se puede conservar el representante o un
+  producto que ya tenía el pedido aunque se hayan desactivado (FR-003 de F-002).
 - **FR-007**: El sistema DEBE registrar qué usuario registró el pedido y cuándo.
 
 **Estado**
@@ -258,8 +273,9 @@ cantidades y stock; se intenta anular uno ATENDIDO.
   hasta 200 caracteres), registrando quién lo anuló y cuándo (RN-43).
 - **FR-011**: Al anular, el sistema DEBE dejar el pedido en estado ANULADO (tenga o no entregas),
   conservar lo entregado de cada línea y considerar anulado el saldo pendiente; NO DEBE modificar
-  stock ni generar movimientos. Toda vista o reporte que muestre pedidos ANULADOS DEBE poder
-  mostrar sus unidades entregadas y su saldo anulado.
+  stock ni generar movimientos. El detalle del pedido y los reportes (F-006) DEBEN mostrar, para
+  los pedidos ANULADOS, sus unidades entregadas y su saldo anulado; en el listado basta el
+  porcentaje atendido.
 - **FR-012**: El sistema DEBE impedir anular un pedido ATENDIDO o ANULADO, y registrar
   distribuciones para un pedido ANULADO.
 

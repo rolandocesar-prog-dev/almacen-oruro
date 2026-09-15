@@ -116,13 +116,15 @@ tests/
 | 1 · Diseño | [data-model.md](data-model.md): sin cambios de esquema | ✅ |
 | 1 · Contratos | [contracts/acciones-f004.md](contracts/acciones-f004.md) | ✅ |
 | 1 · Validación | [quickstart.md](quickstart.md) | ✅ |
-| 2 · Tareas | `tasks.md` | Pendiente: `/speckit-tasks` |
+| 2 · Tareas | [tasks.md](tasks.md): 35 tareas, revisadas con `/speckit-analyze` | ✅ |
 
 ## Cambios que este plan introduce en otros documentos y código existente
 
 - **Esquema de base de datos:** ninguno.
 - `specs/004-pedidos/spec.md`: supuesto del número de pedido (puede saltar, nunca se repite), tope de
-  cantidad de 1 000 000 en FR-001 y caso borde de la línea con distribuciones anuladas.
+  cantidad de 1 000 000 en FR-001 y caso borde de la línea con distribuciones anuladas; después del
+  análisis, caso borde del pedido por atender con representante o producto inactivo (excepción en
+  FR-006) y alcance de FR-011 (detalle y reportes).
 - `src/esquemas/compras.ts` y `formulario-compra.tsx`: usan las piezas extraídas, con las mismas reglas
   y mensajes (sus pruebas deben seguir en verde).
 - `docs/trabajo-futuro.md`: los fuera de alcance de la especificación.
