@@ -74,6 +74,27 @@ Detalle completo en [`specs/003-compras-inventario/research.md`](../specs/003-co
 
 ---
 
+## Pedidos (plan de F-004, 15/09/2026)
+
+Detalle completo en [`specs/004-pedidos/research.md`](../specs/004-pedidos/research.md).
+
+| # | Fecha | Decisión | Fundamento | Alternativas descartadas |
+|---|---|---|---|---|
+| P-01 | 15/09 | El Nº de pedido es el `id` que asigna la secuencia de PostgreSQL; puede saltar, nunca se repite ni cambia | El esquema ya tiene un entero único; no hay talonario físico de pedidos | Columna `numero` con `MAX + 1`, tabla de contadores |
+| P-02 | 15/09 | Estado en una función pura `calcularEstadoPedido` (PENDIENTE, PARCIAL, ATENDIDO) y `recalcularEstadoPedido`, que no toca un ANULADO y usará F-005 | La tabla de estados de la especificación en pocas líneas, probada sin base de datos; SC-007 | Calcular al consultar, trigger |
+| P-03 | 15/09 | `bloquearPedido` (`SELECT … FOR UPDATE`) como primera operación de editar, anular y distribuir; orden del sistema: primero el pedido, después los productos | Una sola regla resuelve los casos simultáneos: quien llega segundo ve el estado que dejó el primero | Actualización condicional, control optimista por versión |
+| P-04 | 15/09 | Editar sincroniza las líneas por producto y no quita una línea con distribuciones anuladas | Borrar y recrear rompería las referencias de `distribucion_detalle` en pedidos que volvieron a PENDIENTE | Borrar y recrear, líneas inactivas |
+| P-05 | 15/09 | Registro: verificaciones antes y un `create` anidado atómico, sin bloquear productos; se acepta la baja simultánea de un representante o producto | Registrar un pedido no mueve stock; un solo tipo de usuario y decenas de pedidos por mes | Transacción con bloqueo de productos |
+| P-06 | 15/09 | Anular cambia solo la cabecera; lo entregado se conserva y el saldo anulado se calcula al mostrar | Sin columnas nuevas; la CHECK `pedido_anulacion_coherente` ya respalda los datos | Guardar el saldo anulado |
+| P-07 | 15/09 | Listado por defecto "por atender", del más antiguo al más reciente, 50 por página, % atendido redondeado hacia abajo | Vista diaria de lo que falta; 199 de 200 nunca muestra 100 % | Filtrar en memoria, redondeo normal |
+| P-08 | 15/09 | Acciones según el estado en `accionesSegunEstado`; "Pendiente" pasa a "Saldo anulado" en un ANULADO | Una tabla en un solo lugar; el servidor vuelve a verificar cada acción | Decidir en cada página |
+| P-09 | 15/09 | Formulario con el patrón de compras y stock actual informativo; `cantidadEntera`, `marcarProductosRepetidos` y `mensajesPorLinea` pasan a módulos compartidos | Las reglas de cantidad y de producto repetido se escriben una sola vez | Componente genérico de documento con líneas |
+| P-10 | 15/09 | Fecha del pedido como la de compras: `fechaNoFutura` y `aFechaDocumento` | Mismo criterio de K-06 | — |
+| P-11 | 15/09 | Rutas `/pedidos`, `/pedidos/nuevo`, `/pedidos/[id]` y `/pedidos/[id]/editar`; "Ver sus pedidos" en la ficha del representante | Nombres reservados en F-001 | — |
+| P-12 | 15/09 | Pruebas con entregas simuladas que bloquean el pedido y recalculan como lo hará F-005, y concurrencia real con `Promise.allSettled` | Principio IX: las transiciones de estado del pedido son reglas críticas y F-005 todavía no existe | Esperar a F-005 para probar los estados |
+
+---
+
 ## Implementación
 
 Decisiones tomadas durante la implementación que no estaban en el plan.
@@ -102,3 +123,10 @@ Decisiones tomadas durante la implementación que no estaban en el plan.
 | I-20 | 15/09 | Cada línea del formulario de compra es un `<fieldset>` con leyenda "Línea n" y etiquetas visibles (Producto, Cantidad, Precio unitario) | Da el mismo contexto que etiquetas ocultas "Producto de la línea n", se lee mejor en pantallas chicas y el aviso general repite los errores con su número de línea |
 | I-21 | 15/09 | `crearMovimientoDePrueba` de F-002 registra una compra real con `registrarCompra` | Ninguna prueba escribe el stock por fuera de la función central; las pruebas de catálogos siguieron en verde |
 | I-22 | 15/09 | El recorrido de F-003 usó el mismo método que I-15 | Mismo criterio: sin contraseñas en el navegador y sin datos en la base de desarrollo |
+| I-23 | 15/09 | Antes de implementar F-004, el análisis corrigió la especificación: un pedido por atender puede tener un representante o producto inactivo (desactivado mientras estaba ATENDIDO o con esa línea completa); al editarlo se conserva ese valor, pero no se elige otro inactivo (FR-006) | La especificación afirmaba lo contrario y el plan ya permitía conservarlo; se corrigió primero `spec.md`, como manda la constitución |
+| I-24 | 15/09 | La entrega simulada de las pruebas rechaza una cantidad positiva en un pedido ANULADO o ATENDIDO y acepta descontar en cualquier estado | Imita lo que hará F-005 (FR-012, RN-35); sin eso, la prueba de anulación simultánea habría aceptado entregar a un pedido anulado |
+| I-25 | 15/09 | `listarProductosParaPedido(idsActuales)` suma a los activos los productos que el pedido ya tiene, marcados "(inactivo)" | La edición debe poder mostrar y conservar esos productos (FR-006), igual que `listarRepresentantesParaSelector(idActual)` |
+| I-26 | 15/09 | `bloquearPedido` lee el estado con `estado::text` | El tipo enumerado de PostgreSQL llega siempre como texto, sin depender de cómo lo convierta el adaptador |
+| I-27 | 15/09 | La prueba de invariantes de pedidos busca escrituras (`producto.update`, `movimientoInventario`, `registrarMovimiento`, `$executeRaw`), no la palabra `stockActual` | El servicio de pedidos lee el stock para mostrarlo en el formulario (FR-005) |
+| I-28 | 15/09 | Las distribuciones del detalle del pedido usan la insignia de compras (Registrada / Anulada) | Compras y distribuciones comparten el mismo estado de documento |
+| I-29 | 15/09 | El recorrido de F-004 usó el mismo método que I-15, con las entregas simuladas en el script de carga | Mismo criterio: sin contraseñas en el navegador y sin datos en la base de desarrollo; PARCIAL, ATENDIDO y ANULADO con entregas se vieron en pantalla antes de F-005 |

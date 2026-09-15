@@ -117,6 +117,20 @@ Nada se borra: un registro que ya no se usa se **desactiva** desde su ficha y se
 - **Existencias → Verificar consistencia** comprueba que el stock de cada producto sea igual a la
   suma de sus movimientos.
 
+**7. Registrar pedidos**
+
+- **Pedidos → Registrar pedido**: representante, fecha y una línea por producto con la cantidad que
+  pide. Junto a cada producto se ve su stock actual como información: se puede pedir más de lo que
+  hay. **Registrar un pedido no mueve el stock**; el stock sale al distribuir.
+- El estado lo calcula el sistema según lo entregado: **Pendiente** (nada entregado), **Parcial**
+  (algo entregado) o **Atendido** (todo entregado). **Pedidos** muestra por defecto los que tienen
+  algo por entregar, del más antiguo al más reciente, con el porcentaje atendido.
+- Un pedido se **edita solo mientras está pendiente**: se cambian representante, fecha, observación y
+  productos, y conserva su número.
+- Si ya no se necesita, desde su detalle se **anula** indicando el motivo, mientras esté pendiente o
+  parcial. Lo que ya se entregó se conserva y lo que faltaba queda como saldo anulado.
+- Desde la ficha de un representante, **Ver sus pedidos** abre todos sus pedidos.
+
 Para detener el sistema, presionar `Ctrl + C` en la ventana de PowerShell. La base de datos sigue
 guardada: la próxima vez basta con abrir Docker Desktop, ejecutar `docker compose up -d` y `npm start`.
 

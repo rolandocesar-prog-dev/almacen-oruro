@@ -48,3 +48,16 @@ Con la aplicación en marcha (`npm run dev`) y una sesión iniciada.
 
 Los escenarios con entregas (H2 · E4, H3 · E2 a E4, H4 · E2 y E3, H5 · E2 y E3) se prueban con entregas
 simuladas en las pruebas de integración y se recorren en pantalla cuando exista F-005.
+
+## 4. Estado de la validación (15/09/2026)
+
+| Qué | Estado | Cómo se verificó |
+|---|---|---|
+| Pruebas automatizadas (§2) | ✅ | 365 pruebas en verde en 51 archivos (289 de F-001 a F-003 y 76 de F-004), más `lint`, `typecheck` y `build` sin errores. Incluyen concurrencia real con el pedido bloqueado: dos entregas simultáneas sobre la misma línea, edición contra entrega y anulación contra la entrega que completa el pedido |
+| Pasos 1, 3, 5, 6, 7, 8 (resultado) y 10 | ✅ | Páginas pedidas con una sesión de prueba contra la base de pruebas, con datos cargados por los esquemas y servicios reales (método de `docs/decisiones.md`, I-15): representante y producto inactivos fuera del formulario; ficha "Pedido Nº 1" Pendiente con unidad BID5, Editar, Distribuir y Anular pedido, y el stock de Lavandina sigue en 4 en su kardex; listado por defecto con 3 pedidos del más antiguo al más reciente y "40 %"; filtros por estado, representante y fechas, aviso de rango invertido y mensaje vacío; PARCIAL sin Editar, ATENDIDO sin acciones; edición con "Pedido actualizado.", mismo número y líneas nuevas; un PARCIAL en `/editar` muestra "solo se editan pedidos pendientes"; "Ver sus pedidos" desde la ficha del representante; ids inexistentes → 404; sin sesión → `/ingreso` |
+| Paso 9 (resultado) y escenarios con entregas | ✅ en pantalla con entregas simuladas | Pedido ANULADO desde PARCIAL con "Saldo anulado", motivo, "Anulado por", la distribución anulada Nº 000451 enlazada y sin acciones; las entregas se simularon en el script con `bloquearPedido` y `recalcularEstadoPedido`, como en las pruebas |
+| Pasos 2, 4 y 9 (escribir en el formulario): stock informativo al elegir el producto, errores por línea, anulación sin motivo | ✅ por pruebas · ⏳ en pantalla | Cada regla y mensaje está comprobado en las pruebas unitarias e integración, y la página entrega el stock de cada producto al formulario; falta verlos en el navegador con una sesión real, porque exigen escribir en el formulario |
+| T032 (375 px, accesibilidad) | ✅ revisión de código · ⏳ visual | Cada línea en un `<fieldset>` "Línea n" con etiquetas visibles, stock informativo asociado con `aria-describedby` al selector, errores con `aria-describedby`, tablas con desplazamiento propio e insignias de estado con texto; falta mirarlo en un teléfono |
+| SC-004 (pedidos por atender en menos de 30 s) | ✅ parte del sistema · ⏳ persona | `/pedidos` respondió en unos 225 ms mostrando por defecto solo lo que falta entregar, con % atendido |
+| SC-001 (pedido de 5 productos en menos de 2 min) | ⏳ | Se mide en el recorrido manual con Raymond |
+| Distribuir y anular distribuciones en pantalla | ⏳ F-005 | El enlace "Distribuir" apunta a `/distribuciones/nueva?pedido={id}`, que responde 404 hasta F-005 |

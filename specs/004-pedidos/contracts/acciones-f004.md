@@ -56,7 +56,8 @@ existe acción para borrar pedidos ni para elegir su estado.
 | `anularPedido(id, motivo, usuarioId)` | id, texto, id | `void` | |
 | `obtenerPedido(id)` | id | detalle con líneas, derivados, distribuciones y acciones permitidas, o `null` | |
 | `listarPedidos(filtro)` | data-model §4 | `{ pedidos, total }` | con `porcentajeAtendido` |
-| `listarProductosParaPedido()` | — | `{ id, etiqueta, stockActual, abreviatura }[]` activos | FR-005 |
+| `listarProductosParaPedido(idsActuales?)` | ids que el pedido ya tiene (al editar) | `{ id, etiqueta, stockActual, abreviatura }[]` activos, más los actuales marcados "(inactivo)" | FR-005, FR-006 (I-25) |
+| `accionesSegunEstado(estado)` | estado del pedido | `{ editar, anular, distribuir }` | FR-015 |
 | `PEDIDOS_POR_PAGINA` | — | `50` | |
 
 ---
