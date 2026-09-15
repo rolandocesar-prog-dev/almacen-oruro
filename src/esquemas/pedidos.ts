@@ -9,6 +9,7 @@ import {
   fechaOpcionalDeFiltro,
   idObligatorio,
   marcarProductosRepetidos,
+  textoObligatorio,
   textoOpcional,
   vacioComoAusente,
 } from "./comunes";
@@ -58,3 +59,8 @@ export const esquemaFiltroPedidos = z
   });
 
 export type FiltroPedidos = z.infer<typeof esquemaFiltroPedidos>;
+
+/** Anular un pedido exige el motivo (RN-43, FR-010). */
+export const esquemaAnulacionPedido = z.object({
+  motivo: textoObligatorio("el motivo de la anulación", "El motivo", 200),
+});

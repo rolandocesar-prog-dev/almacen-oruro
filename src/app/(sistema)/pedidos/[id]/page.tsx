@@ -9,7 +9,9 @@ import { idDeRuta } from "@/lib/parametros";
 import { requerirSesion } from "@/lib/sesion";
 import { obtenerPedido } from "@/servicios/pedidos";
 import { InsigniaCompra } from "../../compras/insignia-compra";
+import { anularPedidoAccion } from "../acciones";
 import { InsigniaPedido } from "../insignia-pedido";
+import { AnularPedido } from "./anular-pedido";
 
 export const metadata = { title: "Detalle de pedido · Almacén Regional Oruro" };
 
@@ -133,6 +135,9 @@ export default async function PaginaDetallePedido({
           ))}
         </Tabla>
       )}
+
+      {/* RN-43: solo se anula lo que todavía tiene algo por entregar (PENDIENTE o PARCIAL). */}
+      {acciones.anular && <AnularPedido accion={anularPedidoAccion.bind(null, pedido.id)} pedidoId={pedido.id} />}
     </section>
   );
 }

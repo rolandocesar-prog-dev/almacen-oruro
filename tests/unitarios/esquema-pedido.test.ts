@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { esquemaFiltroPedidos, esquemaPedido } from "@/esquemas/pedidos";
+import { esquemaAnulacionPedido, esquemaFiltroPedidos, esquemaPedido } from "@/esquemas/pedidos";
 import { erroresPorRuta } from "@/lib/errores";
 import { hoyEnLaPaz } from "@/lib/fechas";
 
@@ -100,5 +100,21 @@ describe("esquemaFiltroPedidos (FR-013)", () => {
     const resultado = esquemaFiltroPedidos.safeParse({ desde: "2026-09-10", hasta: "2026-09-01" });
     expect(resultado.success).toBe(false);
     expect(resultado.error?.issues[0]?.message).toBe("La fecha «desde» no puede ser posterior a «hasta»");
+  });
+});
+
+describe("esquemaAnulacionPedido (FR-010)", () => {
+  it("exige el motivo", () => {
+    const resultado = esquemaAnulacionPedido.safeParse({ motivo: "   " });
+    expect(resultado.error?.issues.map((problema) => problema.message)).toEqual(["Escribe el motivo de la anulación"]);
+  });
+
+  it("limita el motivo a 200 caracteres", () => {
+    const resultado = esquemaAnulacionPedido.safeParse({ motivo: "x".repeat(201) });
+    expect(resultado.error?.issues.map((problema) => problema.message)).toEqual(["El motivo admite hasta 200 caracteres"]);
+  });
+
+  it("acepta un motivo y recorta los extremos", () => {
+    expect(esquemaAnulacionPedido.parse({ motivo: "  Ya no lo necesitan " })).toEqual({ motivo: "Ya no lo necesitan" });
   });
 });

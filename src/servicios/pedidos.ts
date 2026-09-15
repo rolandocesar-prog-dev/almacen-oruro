@@ -387,3 +387,26 @@ export async function editarPedido(id: number, datos: DatosPedido): Promise<void
     }
   }, OPCIONES_TRANSACCION);
 }
+
+/**
+ * Anula un pedido PENDIENTE o PARCIAL con motivo (FR-010 a FR-012, RN-43; research P-06). El pedido se
+ * bloquea primero: si una distribución que lo completa se guarda a la vez, quien llega segundo ve el
+ * estado que dejó el otro (spec, caso borde de la anulación simultánea).
+ *
+ * Las líneas NO cambian: lo entregado se conserva y lo que faltaba queda como saldo anulado, que se calcula
+ * al mostrar (solicitada − entregada). No toca el stock ni el kardex: lo entregado ya salió del almacén
+ * con sus distribuciones.
+ */
+export async function anularPedido(id: number, motivo: string, usuarioId: number): Promise<void> {
+  await prisma.$transaction(async (tx) => {
+    const bloqueado = await bloquearPedido(tx, id);
+    if (!bloqueado) throw new ErrorDeNegocio("No existe el pedido indicado");
+    if (bloqueado.estado === "ATENDIDO") throw new ErrorDeNegocio("El pedido ya está atendido y no se puede anular");
+    if (bloqueado.estado === "ANULADO") throw new ErrorDeNegocio("El pedido ya está anulado");
+
+    await tx.pedido.update({
+      where: { id },
+      data: { estado: "ANULADO", motivoAnulacion: motivo, anuladaEn: new Date(), anuladaPorId: usuarioId },
+    });
+  }, OPCIONES_TRANSACCION);
+}

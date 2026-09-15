@@ -2,10 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { esquemaPedido } from "@/esquemas/pedidos";
+import { z } from "zod";
+import { esquemaAnulacionPedido, esquemaPedido } from "@/esquemas/pedidos";
 import { aResultadoDeError, aResultadoDeValidacion, erroresPorRuta, type ResultadoAccion } from "@/lib/errores";
 import { requerirSesion } from "@/lib/sesion";
-import { editarPedido, registrarPedido } from "@/servicios/pedidos";
+import { anularPedido, editarPedido, registrarPedido } from "@/servicios/pedidos";
 
 // Orden fijo de toda acción (contracts/acciones-f004.md):
 // 1. requerirSesion  2. validar con Zod  3. servicio  4. errores  5. revalidar y redirigir
@@ -52,4 +53,29 @@ export async function editarPedidoAccion(pedidoId: number, datos: unknown): Prom
   revalidatePath("/pedidos");
   revalidatePath(`/pedidos/${pedidoId}`);
   redirect(`/pedidos/${pedidoId}?aviso=modificado`);
+}
+
+/**
+ * Anular un pedido con motivo (Historia 5). El id se fija con .bind() en la ficha. No revalida existencias
+ * ni kardex: anular un pedido no mueve el stock (FR-011).
+ */
+export async function anularPedidoAccion(
+  pedidoId: number,
+  _estadoPrevio: ResultadoAccion | undefined,
+  formData: FormData,
+): Promise<ResultadoAccion> {
+  const { usuario } = await requerirSesion();
+
+  const validacion = esquemaAnulacionPedido.safeParse(Object.fromEntries(formData));
+  if (!validacion.success) return aResultadoDeValidacion(z.flattenError(validacion.error).fieldErrors);
+
+  try {
+    await anularPedido(pedidoId, validacion.data.motivo, usuario.id);
+  } catch (error) {
+    return aResultadoDeError(error);
+  }
+
+  revalidatePath("/pedidos");
+  revalidatePath(`/pedidos/${pedidoId}`);
+  return { ok: true, datos: undefined, mensaje: "Pedido anulado. Lo entregado se conserva y el saldo pendiente quedó anulado." };
 }
