@@ -4,6 +4,7 @@
 import { Prisma } from "@/generado/prisma/client";
 import type { DatosCompra } from "@/esquemas/compras";
 import { ErrorDeNegocio } from "@/lib/errores";
+import { aFechaDocumento, textoDeFechaDocumento } from "@/lib/fechas";
 import { esErrorDeDuplicado, prisma } from "@/lib/prisma";
 import { bloquearProductos, registrarMovimiento } from "./inventario";
 
@@ -17,15 +18,6 @@ const TOTAL_MAXIMO = new Prisma.Decimal("9999999999.99");
  */
 const OPCIONES_TRANSACCION = { maxWait: 10_000, timeout: 10_000 };
 
-/** "2026-09-10" → fecha para la columna date, a medianoche UTC para que no se corra un día (research K-06). */
-function aFechaDocumento(fecha: string): Date {
-  return new Date(`${fecha}T00:00:00Z`);
-}
-
-/** Fecha de una columna date como texto "AAAA-MM-DD". */
-export function textoDeFecha(fecha: Date): string {
-  return fecha.toISOString().slice(0, 10);
-}
 
 /** Compra REGISTRADA del proveedor con ese Nº de factura, si existe (RN-21, RN-26). */
 export function buscarFacturaVigente(proveedorId: number, nroFactura: string) {
@@ -148,7 +140,7 @@ export async function obtenerCompra(id: number) {
   return {
     id: compra.id,
     nroFactura: compra.nroFactura,
-    fecha: textoDeFecha(compra.fecha),
+    fecha: textoDeFechaDocumento(compra.fecha),
     observacion: compra.observacion,
     total: compra.total.toFixed(2),
     estado: compra.estado,

@@ -14,6 +14,7 @@
 import { Prisma, type TipoMovimiento } from "@/generado/prisma/client";
 import type { FiltroExistencias } from "@/esquemas/inventario";
 import { ErrorDeNegocio } from "@/lib/errores";
+import { aFechaDocumento, textoDeFechaDocumento } from "@/lib/fechas";
 import { prisma } from "@/lib/prisma";
 import { coincideBusqueda, compararEnEspanol } from "@/lib/texto";
 import { estaBajoMinimo } from "./catalogos/productos";
@@ -131,4 +132,103 @@ export async function listarExistencias({
     .sort((a, b) => Number(b.bajoMinimo) - Number(a.bajoMinimo) || compararEnEspanol(a.nombre, b.nombre));
 
   return { productos: filas, total: filas.length, bajoMinimo: filas.filter((p) => p.bajoMinimo).length };
+}
+
+/** Suma de las cantidades de los movimientos de un producto que cumplen la condición de fecha. */
+async function sumaDeMovimientos(productoId: number, fechaDocumento?: Prisma.DateTimeFilter) {
+  const resultado = await prisma.movimientoInventario.aggregate({ where: { productoId, fechaDocumento }, _sum: { cantidad: true } });
+  return resultado._sum.cantidad ?? 0;
+}
+
+/**
+ * Kardex de un producto (FR-019, research K-08): todos los movimientos que explican su stock.
+ *
+ * - Se listan en orden de registro (id), el mismo en que se calcularon los saldos (RN-51).
+ * - Con rango, se filtran por fecha del documento y se agregan el saldo anterior (suma antes de
+ *   `desde`) y el saldo final (suma hasta `hasta`), que es como se cuentan los períodos (RN-53).
+ * - Sin rango, el saldo anterior es 0 y el final es el stock actual.
+ */
+export async function obtenerKardex(productoId: number, { desde, hasta }: { desde?: string; hasta?: string }) {
+  const producto = await prisma.producto.findUnique({
+    where: { id: productoId },
+    select: { id: true, codigo: true, nombre: true, stockActual: true, activo: true, unidadMedida: { select: { nombre: true, abreviatura: true } } },
+  });
+  if (!producto) return null;
+
+  const rango = desde || hasta ? { gte: desde ? aFechaDocumento(desde) : undefined, lte: hasta ? aFechaDocumento(hasta) : undefined } : undefined;
+
+  const [movimientos, saldoAnterior, saldoFinal] = await Promise.all([
+    prisma.movimientoInventario.findMany({
+      where: { productoId, fechaDocumento: rango },
+      orderBy: { id: "asc" },
+      include: {
+        compra: { select: { id: true, nroFactura: true, proveedor: { select: { razonSocial: true } } } },
+        distribucion: {
+          select: { id: true, nroVale: true, pedido: { select: { representante: { select: { nombre: true, apellido: true } } } } },
+        },
+      },
+    }),
+    desde ? sumaDeMovimientos(productoId, { lt: aFechaDocumento(desde) }) : 0,
+    hasta ? sumaDeMovimientos(productoId, { lte: aFechaDocumento(hasta) }) : sumaDeMovimientos(productoId),
+  ]);
+
+  return {
+    producto,
+    saldoAnterior,
+    saldoFinal,
+    movimientos: movimientos.map((movimiento) => ({
+      id: movimiento.id,
+      fechaDocumento: textoDeFechaDocumento(movimiento.fechaDocumento),
+      registradoEn: movimiento.registradoEn,
+      tipo: movimiento.tipo,
+      cantidad: movimiento.cantidad,
+      entrada: movimiento.cantidad > 0 ? movimiento.cantidad : null,
+      salida: movimiento.cantidad < 0 ? -movimiento.cantidad : null,
+      saldoResultante: movimiento.saldoResultante,
+      documento: movimiento.compra
+        ? { ruta: `/compras/${movimiento.compra.id}`, texto: `Factura ${movimiento.compra.nroFactura} · ${movimiento.compra.proveedor.razonSocial}` }
+        : movimiento.distribucion
+          ? {
+              ruta: `/distribuciones/${movimiento.distribucion.id}`,
+              texto: `Vale ${movimiento.distribucion.nroVale} · ${movimiento.distribucion.pedido.representante.apellido}, ${movimiento.distribucion.pedido.representante.nombre}`,
+            }
+          : null,
+    })),
+  };
+}
+
+/**
+ * Verificación de consistencia del inventario (FR-020, RN-50): para cada producto, ¿su stock actual es
+ * igual a la suma de sus movimientos? En operación normal no hay diferencias: se ofrece para
+ * demostrarlo en cualquier momento.
+ *
+ * Las dos lecturas van en una transacción REPEATABLE READ para que vean el mismo instante: si alguien
+ * registra una compra justo entre las dos, no aparece una diferencia que no existe.
+ */
+export async function verificarConsistenciaInventario() {
+  const [productos, sumas] = await prisma.$transaction(
+    [
+      prisma.producto.findMany({ select: { id: true, codigo: true, nombre: true, stockActual: true }, orderBy: { id: "asc" } }),
+      prisma.movimientoInventario.groupBy({ by: ["productoId"], _sum: { cantidad: true }, orderBy: { productoId: "asc" } }),
+    ],
+    { isolationLevel: "RepeatableRead" },
+  );
+
+  const sumaPorProducto = new Map(sumas.map((suma) => [suma.productoId, suma._sum?.cantidad ?? 0]));
+  const diferencias = productos
+    .map((producto) => {
+      // Un producto sin movimientos suma 0.
+      const sumaMovimientos = sumaPorProducto.get(producto.id) ?? 0;
+      return {
+        productoId: producto.id,
+        codigo: producto.codigo,
+        nombre: producto.nombre,
+        stockActual: producto.stockActual,
+        sumaMovimientos,
+        diferencia: producto.stockActual - sumaMovimientos,
+      };
+    })
+    .filter((fila) => fila.diferencia !== 0);
+
+  return { revisados: productos.length, diferencias, verificadoEn: new Date() };
 }

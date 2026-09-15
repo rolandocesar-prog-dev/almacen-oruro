@@ -68,6 +68,10 @@ export default async function PaginaFichaProducto({
 
       <div className="flex flex-wrap items-start gap-3">
         <EnlaceEditar ruta={`/productos/${producto.id}/editar`} />
+        {/* El kardex explica de dónde sale cada unidad del stock (F-003, Historia 3). */}
+        <Link href={`/kardex/${producto.id}`} className="rounded-md border border-marca bg-white px-4 py-2 text-sm font-medium text-marca hover:bg-fondo">
+          Ver kardex
+        </Link>
         <CambioDeEstado
           activo={producto.activo}
           confirmacionDesactivar={confirmacion}

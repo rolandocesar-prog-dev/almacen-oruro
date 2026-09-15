@@ -55,6 +55,19 @@ export function esFechaValida(texto: string): boolean {
 }
 
 /**
+ * Fecha de un documento ("AAAA-MM-DD") para una columna `date` de la base. Se crea a medianoche UTC:
+ * la columna no guarda hora y así la fecha no se corre un día al convertirla (research K-06 de F-003).
+ */
+export function aFechaDocumento(fecha: string): Date {
+  return new Date(`${fecha}T00:00:00Z`);
+}
+
+/** Fecha leída de una columna `date` como texto "AAAA-MM-DD". */
+export function textoDeFechaDocumento(fecha: Date): string {
+  return fecha.toISOString().slice(0, 10);
+}
+
+/**
  * Fecha de un documento para mostrar: "2026-09-10" → "10/09/2026". Se arma con el texto, sin pasar por
  * zonas horarias, porque una fecha de documento no tiene hora (research K-06 de F-003).
  */
