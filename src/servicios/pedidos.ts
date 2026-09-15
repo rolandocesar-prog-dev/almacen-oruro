@@ -158,13 +158,36 @@ export async function listarProductosParaPedido(idsActuales: number[] = []) {
     });
 }
 
-/** Detalle de un pedido con sus líneas (FR-014), o null si no existe. */
+/**
+ * Acciones que ofrece el pedido según su estado (FR-015, research P-08). Se deciden en un solo lugar y el
+ * servidor vuelve a verificar la regla en cada acción, con el pedido bloqueado.
+ *
+ * | Estado             | Editar | Anular | Distribuir |
+ * |--------------------|--------|--------|------------|
+ * | PENDIENTE          | sí     | sí     | sí         |
+ * | PARCIAL            | —      | sí     | sí         |
+ * | ATENDIDO, ANULADO  | —      | —      | —          |
+ */
+export function accionesSegunEstado(estado: EstadoPedido) {
+  const porAtender = estado === "PENDIENTE" || estado === "PARCIAL";
+  return {
+    // RN-42: solo se edita lo que todavía no tiene entregas.
+    editar: estado === "PENDIENTE",
+    // RN-43: se anula lo que tiene algo por entregar; lo entregado se conserva.
+    anular: porAtender,
+    distribuir: porAtender,
+  };
+}
+
+/** Detalle de un pedido con líneas, datos de anulación, distribuciones y acciones (FR-014), o null. */
 export async function obtenerPedido(id: number) {
   const pedido = await prisma.pedido.findUnique({
     where: { id },
     include: {
       representante: { select: { id: true, nombre: true, apellido: true, servicio: true, activo: true, centroSalud: { select: { nombre: true } } } },
       usuario: { select: { nombre: true, apellido: true } },
+      anuladaPor: { select: { nombre: true, apellido: true } },
+      distribuciones: { orderBy: { id: "asc" }, select: { id: true, nroVale: true, fecha: true, estado: true } },
       lineas: {
         orderBy: { id: "asc" },
         include: { producto: { select: { id: true, codigo: true, nombre: true, activo: true, unidadMedida: { select: { abreviatura: true } } } } },
@@ -188,6 +211,16 @@ export async function obtenerPedido(id: number) {
     },
     registradoPor: `${pedido.usuario.nombre} ${pedido.usuario.apellido}`,
     registradoEn: pedido.creadoEn,
+    motivoAnulacion: pedido.motivoAnulacion,
+    anuladoPor: pedido.anuladaPor ? `${pedido.anuladaPor.nombre} ${pedido.anuladaPor.apellido}` : null,
+    anuladoEn: pedido.anuladaEn,
+    acciones: accionesSegunEstado(pedido.estado),
+    distribuciones: pedido.distribuciones.map((distribucion) => ({
+      id: distribucion.id,
+      nroVale: distribucion.nroVale,
+      fecha: textoDeFechaDocumento(distribucion.fecha),
+      estado: distribucion.estado,
+    })),
     lineas: pedido.lineas.map((linea) => ({
       id: linea.id,
       productoId: linea.producto.id,
@@ -199,6 +232,8 @@ export async function obtenerPedido(id: number) {
       entregada: linea.cantidadEntregada,
       // Lo que falta entregar de la línea: se calcula al mostrar, no se guarda (data-model §2).
       pendiente: linea.cantidadSolicitada - linea.cantidadEntregada,
+      // FR-011: al anular, lo que faltaba entregar queda como saldo anulado; las cantidades no cambian.
+      saldoAnulado: pedido.estado === "ANULADO" ? linea.cantidadSolicitada - linea.cantidadEntregada : null,
     })),
   };
 }
