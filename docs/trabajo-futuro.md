@@ -44,10 +44,6 @@ Alcance general fuera de la entrega: ver
 - Vale generado por el sistema o numeración que reinicie cada año, si Raymond lo confirma (Q-04).
 - PDF del vale generado en el servidor (hoy se imprime desde el navegador).
 
-## Otras funcionalidades
-
-Se completa a medida que se implementan F-002 a F-007.
-
 ## F-006 · Reportes
 
 - Exportar a Excel o a un PDF descargable propio (hoy se imprime o se guarda como PDF desde el navegador).
@@ -55,3 +51,8 @@ Se completa a medida que se implementan F-002 a F-007.
 - Reportes programados o enviados por correo.
 - Reportes por centro de salud, cuando haya más de uno.
 - Existencias "a una fecha pasada" (hoy se obtienen producto por producto con el kardex).
+
+## Otras funcionalidades
+
+Se completa a medida que se implementan F-002 a F-007.
+
