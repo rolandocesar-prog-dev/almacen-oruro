@@ -65,9 +65,13 @@ export const esquemaAvisoDistribucion = z.object({
   aviso: z.enum(["registrada"]).optional().catch(undefined),
 });
 
-/** Pedido elegido para distribuir (?pedido=15). Un valor inválido se trata como "sin elegir". */
+/**
+ * Pedido elegido para distribuir (?pedido=15) o página de la lista para elegirlo. Un valor inválido se trata
+ * como "sin elegir" o como la primera página.
+ */
 export const esquemaPedidoParaDistribuir = z.object({
   pedido: z.preprocess(vacioComoAusente, z.coerce.number().int().positive()).optional().catch(undefined),
+  pagina: z.preprocess(vacioComoAusente, z.coerce.number().int().min(1).default(1)).catch(1),
 });
 
 export type DatosDistribucion = z.infer<typeof esquemaDistribucion>;
