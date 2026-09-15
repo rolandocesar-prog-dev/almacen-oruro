@@ -34,6 +34,16 @@ principios III y IV · Defectos corregidos X-02, X-03, X-08 y X-09.
   distribución? → A: Sí; se repone el stock, se descuenta lo entregado y el pedido sigue ANULADO,
   con más saldo anulado.
 
+### Session 2026-09-15
+
+- Precisión (plan): un pedido por atender puede tener un representante o un producto inactivo (F-004,
+  I-23); se distribuye igual, con el valor marcado "(inactivo)" (caso borde).
+- Precisión (plan): el mensaje de cantidad excedida es único para ambos motivos e indica producto,
+  máximo, pendiente y stock ("Lavandina 1 L: puedes entregar como máximo 5 (pendiente 5, stock 20)");
+  si varias líneas se exceden, se informan todas juntas.
+- Precisión (plan): en la vista de impresión del vale, los controles "Imprimir" y "Volver" están en
+  pantalla pero no salen en la hoja impresa; la vista no tiene el menú del sistema.
+
 ## Escenarios de usuario y pruebas *(obligatorio)*
 
 **Actor único:** Encargado de almacén, con sesión iniciada (F-001). Atiende pedidos registrados en
@@ -219,8 +229,11 @@ contenido.
   rechaza (F-003, RN-25); por eso una distribución nunca queda sin respaldo de stock.
 - **Vale con ceros a la izquierda:** `0500` y `500` son números distintos, porque se comparan tal
   como están impresos.
-- **Pedido con representante inactivo:** no puede ocurrir mientras el pedido esté por atender
-  (F-004, RN-13).
+- **Pedido por atender con representante o producto inactivo:** puede ocurrir si se desactivaron
+  mientras el pedido estaba ATENDIDO (o con esa línea completa) y después se anuló una distribución
+  (F-004, caso borde; decisión I-23). El pedido ya fue aceptado, así que se puede distribuir: el
+  formulario muestra el valor marcado "(inactivo)" y la línea admite cantidad como cualquier otra.
+  Si ya no corresponde entregarlo, el encargado anula el pedido.
 - **Anulación de una distribución antigua:** se permite, sin plazo, igual que en compras; los totales
   de su período cambian en consultas y reportes posteriores.
 - **Sesión expirada al guardar:** no se guarda nada (F-001).
