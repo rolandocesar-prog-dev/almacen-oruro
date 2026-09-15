@@ -119,7 +119,7 @@ tests/
 | 1 · Diseño | [data-model.md](data-model.md): sin cambios de esquema | ✅ |
 | 1 · Contratos | [contracts/acciones-f006.md](contracts/acciones-f006.md) | ✅ |
 | 1 · Validación | [quickstart.md](quickstart.md) | ✅ |
-| 2 · Tareas | `tasks.md` | Pendiente: `/speckit-tasks` |
+| 2 · Tareas | [tasks.md](tasks.md): 34 tareas | ✅ |
 
 ## Cambios que este plan introduce en otros documentos y código existente
 
