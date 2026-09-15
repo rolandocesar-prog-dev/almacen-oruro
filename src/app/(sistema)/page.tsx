@@ -7,6 +7,7 @@ export const metadata = { title: "Inicio · Almacén Regional Oruro" };
 const modulos = [
   { ruta: "/compras", titulo: "Compras", descripcion: "Registrar compras con factura y anularlas" },
   { ruta: "/pedidos", titulo: "Pedidos", descripcion: "Registrar los pedidos de los representantes y ver qué falta entregar" },
+  { ruta: "/distribuciones", titulo: "Distribuciones", descripcion: "Entregar productos para atender los pedidos y anular entregas mal registradas" },
   { ruta: "/existencias", titulo: "Existencias", descripcion: "Stock actual, bajo mínimo y kardex de cada producto" },
   { ruta: "/productos", titulo: "Productos", descripcion: "Código, categoría, unidad, stock actual y stock mínimo" },
   { ruta: "/categorias", titulo: "Categorías", descripcion: "Grupos para ordenar los productos" },

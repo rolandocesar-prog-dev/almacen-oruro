@@ -6,6 +6,7 @@ const menu = [
   { ruta: "/", texto: "Inicio" },
   { ruta: "/compras", texto: "Compras" },
   { ruta: "/pedidos", texto: "Pedidos" },
+  { ruta: "/distribuciones", texto: "Distribuciones" },
   { ruta: "/existencias", texto: "Existencias" },
   { ruta: "/personal", texto: "Personal" },
   { ruta: "/sesiones", texto: "Sesiones" },

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { EncabezadoListado } from "@/componentes/catalogos/encabezado-listado";
 import { Aviso } from "@/componentes/ui/aviso";
 import { Paginacion } from "@/componentes/ui/paginacion";
+import { InsigniaDocumento } from "@/componentes/ui/insignia-documento";
 import { Celda, Tabla } from "@/componentes/ui/tabla";
 import { esquemaFiltroCompras, type FiltroCompras } from "@/esquemas/compras";
 import { formatearBolivianos } from "@/lib/dinero";
@@ -10,7 +11,6 @@ import { requerirSesion } from "@/lib/sesion";
 import { listarProveedores } from "@/servicios/catalogos/proveedores";
 import { COMPRAS_POR_PAGINA, listarCompras } from "@/servicios/compras";
 import { FiltrosCompras } from "./filtros-compras";
-import { InsigniaCompra } from "./insignia-compra";
 
 export const metadata = { title: "Compras · Almacén Regional Oruro" };
 
@@ -65,7 +65,7 @@ export default async function PaginaCompras({ searchParams }: { searchParams: Pr
             <Celda className="text-right tabular-nums">{compra.items}</Celda>
             <Celda className="text-right tabular-nums">{formatearBolivianos(compra.total)}</Celda>
             <Celda>
-              <InsigniaCompra estado={compra.estado} />
+              <InsigniaDocumento estado={compra.estado} />
             </Celda>
             <Celda>
               <Link href={`/compras/${compra.id}`} className="text-marca underline">

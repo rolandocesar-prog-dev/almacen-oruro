@@ -2,13 +2,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Aviso } from "@/componentes/ui/aviso";
 import { Dato } from "@/componentes/ui/dato";
+import { InsigniaDocumento } from "@/componentes/ui/insignia-documento";
 import { Celda, Tabla } from "@/componentes/ui/tabla";
 import { esquemaAvisoFicha } from "@/esquemas/comunes";
 import { formatearFecha, formatearFechaHora } from "@/lib/fechas";
 import { idDeRuta } from "@/lib/parametros";
 import { requerirSesion } from "@/lib/sesion";
 import { obtenerPedido } from "@/servicios/pedidos";
-import { InsigniaCompra } from "../../compras/insignia-compra";
 import { anularPedidoAccion } from "../acciones";
 import { InsigniaPedido } from "../insignia-pedido";
 import { AnularPedido } from "./anular-pedido";
@@ -124,7 +124,7 @@ export default async function PaginaDetallePedido({
               <Celda>{distribucion.nroVale}</Celda>
               <Celda>{formatearFecha(distribucion.fecha)}</Celda>
               <Celda>
-                <InsigniaCompra estado={distribucion.estado} />
+                <InsigniaDocumento estado={distribucion.estado} />
               </Celda>
               <Celda>
                 <Link href={`/distribuciones/${distribucion.id}`} className="text-marca underline">

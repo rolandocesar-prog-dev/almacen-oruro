@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Aviso } from "@/componentes/ui/aviso";
 import { Dato } from "@/componentes/ui/dato";
+import { InsigniaDocumento } from "@/componentes/ui/insignia-documento";
 import { Celda, Tabla } from "@/componentes/ui/tabla";
 import { esquemaAvisoCompra } from "@/esquemas/compras";
 import { formatearBolivianos } from "@/lib/dinero";
@@ -10,7 +11,6 @@ import { idDeRuta } from "@/lib/parametros";
 import { requerirSesion } from "@/lib/sesion";
 import { obtenerCompra } from "@/servicios/compras";
 import { anularCompraAccion } from "../acciones";
-import { InsigniaCompra } from "../insignia-compra";
 import { AnularCompra } from "./anular-compra";
 
 export const metadata = { title: "Detalle de compra · Almacén Regional Oruro" };
@@ -37,7 +37,7 @@ export default async function PaginaDetalleCompra({
 
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="text-2xl font-semibold">Factura {compra.nroFactura}</h1>
-        <InsigniaCompra estado={compra.estado} />
+        <InsigniaDocumento estado={compra.estado} />
       </div>
 
       <dl className="grid gap-4 rounded-lg border border-borde bg-white p-6 sm:grid-cols-2">
