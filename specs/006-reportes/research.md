@@ -44,10 +44,13 @@ sobre las filas mostradas, y siempre con los documentos vigentes (FR-003):
 | Reporte | Totales | Cómo |
 |---|---|---|
 | R-1 | total gastado y Nº de compras | `compra.aggregate({ _sum: { total }, _count: true, where: { …rango, estado: "REGISTRADA" } })` |
-| R-2 | cantidad por producto | `distribucionDetalle.groupBy({ by: ["pedidoDetalleId"] })` no sirve (agrupa por línea de pedido): se agrupa por producto en memoria sobre las líneas vigentes del rango, que son decenas por mes |
+| R-2 | cantidad por producto | `distribucionDetalle.groupBy({ by: ["pedidoDetalleId"], _sum: { cantidad } })` de las líneas vigentes del rango, y después una consulta de esas líneas de pedido para sumar por producto: se recorren decenas de líneas de pedido, no las miles de líneas entregadas de un año |
 | R-3 | Nº de productos bajo mínimo | contando el indicador `bajoMinimo` de `listarExistencias` |
 | R-4 | saldo inicial y final | los que ya calcula `obtenerKardex` (RN-53) |
 | R-5 | Nº de pedidos por estado | `pedido.groupBy({ by: ["estado"], _count: true, where: { …rango } })` |
+
+Si el rango no tiene ningún documento, los totales valen **0** (`"0.00"` en el gasto): `aggregate` devuelve
+`null` en `_sum` y cada reporte lo convierte, para cumplir la regla común de "resultado vacío".
 
 **Fundamento**: "los totales cuentan solo los vigentes" queda escrito una vez por reporte y no depende de
 lo que se muestre en pantalla (SC-001, SC-003). Los agregados los hace PostgreSQL con los índices que ya

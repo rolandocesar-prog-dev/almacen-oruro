@@ -4,7 +4,7 @@
 
 **Creada**: 2026-09-13
 
-**Estado**: Borrador
+**Estado**: Aprobada
 
 **Entrada**: Descripción del usuario: "Reportes para consultar e imprimir la información del
 almacén. Cada reporte tiene filtros básicos, muestra totales y se puede imprimir con un formato
@@ -28,6 +28,14 @@ R-4 y R-5 son P3).
 - Q: ¿Cómo sabe el sistema que tiene que mostrar la leyenda "Datos simulados con fines de
   demostración"? → A: Por una marca única de toda la base: al ejecutar el generador de F-007, la
   base queda como "de demostración" y la leyenda aparece en todas las pantallas y reportes.
+
+### Session 2026-09-15
+
+- Precisión (análisis): el rango de fechas siempre existe; vacío o inválido toma el mes en curso con
+  un aviso, y solo "desde" posterior a "hasta" se rechaza (Historia 1 · E4, FR-002).
+- Precisión (análisis): en la vista de impresión, los controles "Imprimir" y "Volver" están en
+  pantalla pero no salen en la hoja; la hoja no tiene menú ni botones (FR-006, igual que el vale de
+  F-005).
 
 ## Escenarios de usuario y pruebas *(obligatorio)*
 
@@ -67,8 +75,9 @@ genera el reporte con distintos filtros y se compara el total con la suma manual
    400,00 con 3 compras (el total coincide con la suma de las compras vigentes del período).
 3. **Dado** el filtro por proveedor, **cuando** se aplica, **entonces** solo aparecen sus compras y
    los totales corresponden a ese proveedor.
-4. **Dado** un rango sin fecha de inicio o de fin, **cuando** se intenta generar, **entonces** se
-   rechaza indicando que el rango de fechas es obligatorio.
+4. **Dado** un rango vacío o con una fecha inválida en la dirección, **cuando** se abre el reporte,
+   **entonces** se usa el mes en curso y la página lo avisa; **dada** una fecha "desde" posterior a
+   "hasta", se rechaza con su mensaje y se muestra el mes en curso.
 
 ---
 
@@ -231,9 +240,9 @@ verifica el encabezado y la ausencia de menús.
 - **FR-001**: El sistema DEBE ofrecer cinco reportes: compras (R-1), distribuciones (R-2),
   existencias (R-3), kardex (R-4) y pedidos (R-5), con los filtros, columnas y totales de la tabla
   D-12.
-- **FR-002**: Los reportes con rango de fechas DEBEN exigir fecha desde y hasta, con valor por
-  defecto del primer día del mes en curso a hoy, validar que desde no sea posterior a hasta, y
-  filtrar por la fecha del documento (RN-53).
+- **FR-002**: Los reportes con rango de fechas DEBEN trabajar siempre con un rango: si falta o es
+  inválido, toman el primer día del mes en curso hasta hoy y lo avisan; DEBEN rechazar que desde sea
+  posterior a hasta, y filtrar por la fecha del documento (RN-53).
 - **FR-003**: Los reportes de documentos (R-1, R-2, R-5) DEBEN excluir los anulados por defecto y
   ofrecer la opción de incluirlos, marcados como ANULADO; los totales DEBEN contar solo los
   documentos vigentes en todos los casos.
@@ -241,7 +250,8 @@ verifica el encabezado y la ausencia de menús.
   los registros inactivos.
 - **FR-005**: El sistema NO DEBE modificar ningún dato al generar o imprimir un reporte.
 - **FR-006**: Todo reporte DEBE poder imprimirse (o guardarse como PDF desde el navegador) con una
-  vista sin menús ni botones, con encabezado que incluye nombre del sistema, nombre del reporte,
+  hoja sin menús ni botones —los controles "Imprimir" y "Volver" se ven en pantalla pero no se
+  imprimen—, con encabezado que incluye nombre del sistema, nombre del reporte,
   filtros aplicados, fecha y hora de emisión y usuario que lo emite; con encabezados de columna
   repetidos en cada hoja y totales al final.
 - **FR-007**: Si la base está marcada como de demostración (la marca la pone el generador de F-007

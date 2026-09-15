@@ -22,6 +22,9 @@
 | `incluirAnulados` | `z.literal("si").optional()` → booleano | `false` | — |
 | `pagina` | entero ≥ 1 con `.catch(1)` | 1 | — |
 
+Sin filas en el rango, los totales de cada reporte valen 0 (`"0.00"` en el gasto de R-1) y la tabla muestra
+"Sin resultados para los filtros aplicados" (regla común de la especificación).
+
 Las fechas filtran por la **fecha del documento**, no por el momento de registro (RN-53, FR-002). Un valor
 inválido en la URL toma el valor por defecto y la página avisa "Se muestra el mes en curso".
 
@@ -36,7 +39,7 @@ inválido en la URL toma el valor por defecto y la página avisa "Se muestra el 
 | Filtros | rango (obligatorio), `proveedor` (id opcional, incluye inactivos), `incluirAnulados` |
 | Fila | fecha, Nº de factura, proveedor, ítems (`_count` de líneas), total (Bs, 2 decimales), estado |
 | Orden | `fecha` e `id` ascendentes |
-| Totales | `totalGastado` (suma de `compra.total` de las REGISTRADAS del rango) y `compras` (cuántas son) |
+| Totales | `totalGastado` (suma de `compra.total` de las REGISTRADAS del rango, como texto con `toFixed(2)`; `"0.00"` si no hay ninguna) y `compras` (cuántas son) |
 | Fuente | `compra` con `proveedor` y `_count.lineas`; agregado aparte para los totales (research E-02) |
 
 ### R-2 · Distribuciones (FR-010)
@@ -46,7 +49,7 @@ inválido en la URL toma el valor por defecto y la página avisa "Se muestra el 
 | Filtros | rango (obligatorio), `representante`, `producto`, `incluirAnulados` |
 | Fila | fecha, Nº de vale, representante ("Apellido, Nombre"), servicio, código y producto, unidad, cantidad, estado |
 | Orden | `distribucion.fecha`, `distribucion.id` y `distribucion_detalle.id` ascendentes |
-| Totales | por producto: `{ codigo, nombre, unidad, cantidad }`, solo de líneas de distribuciones REGISTRADAS del rango, ordenados por nombre |
+| Totales | por producto: `{ codigo, nombre, unidad, cantidad }`, solo de líneas de distribuciones REGISTRADAS del rango, ordenados por nombre; se agrupan en la base por línea de pedido y se suman por producto (research E-02) |
 | Fuente | `distribucion_detalle` con su distribución (y el pedido, para el representante) y el producto de la línea del pedido (X-08) |
 
 ### R-3 · Existencias (FR-011)
