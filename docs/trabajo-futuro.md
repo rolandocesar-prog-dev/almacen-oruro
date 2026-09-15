@@ -30,6 +30,12 @@ Alcance general fuera de la entrega: ver
   (`specs/003-compras-inventario/research.md`, K-08).
 - Mostrar en pantalla la verificación encadenada de saldos (RN-51); hoy la demuestran las pruebas.
 
+## F-004 · Pedidos
+
+- Registro del pedido por el propio representante.
+- Aprobación, prioridad o urgencia de pedidos.
+- Pedidos recurrentes y reserva de stock para pedidos.
+
 ## Otras funcionalidades
 
 Se completa a medida que se implementan F-002 a F-007.

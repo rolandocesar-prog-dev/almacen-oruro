@@ -211,6 +211,10 @@ cantidades y stock; se intenta anular uno ATENDIDO.
   o anula sus pedidos antes de darlo de baja.
 - **Quitar una línea al editar:** solo se permite en pedidos PENDIENTE, así que ninguna línea con
   entregas se puede quitar.
+- **Pedido que volvió a PENDIENTE:** si todas sus distribuciones se anularon, el pedido se puede editar,
+  pero una línea que figura en esas distribuciones anuladas no se puede quitar, porque el historial de
+  la distribución la sigue mostrando. Se rechaza indicando el producto; su cantidad sí se puede
+  cambiar.
 - **Pedido con muchas líneas:** no hay un límite de productos por pedido; el catálogo simulado
   tiene unos 25.
 - **Fecha del pedido y de la distribución:** una distribución no puede tener fecha anterior a la
@@ -225,7 +229,8 @@ cantidades y stock; se intenta anular uno ATENDIDO.
 
 - **FR-001**: El sistema DEBE permitir registrar un pedido con representante activo (obligatorio),
   fecha (obligatoria, no futura), observación (opcional, hasta 200 caracteres) y una o más líneas
-  con producto activo y cantidad solicitada (entero mayor que 0), sin repetir productos (RN-40).
+  con producto activo y cantidad solicitada (entero mayor que 0 y hasta 1 000 000, el mismo tope de
+  las compras), sin repetir productos (RN-40).
 - **FR-002**: El sistema DEBE asignar a cada pedido un número correlativo único, que no cambia al
   editarlo ni al anularlo.
 - **FR-003**: Registrar o editar un pedido NO DEBE modificar el stock de ningún producto ni generar
@@ -306,7 +311,8 @@ cantidades y stock; se intenta anular uno ATENDIDO.
 - **Representante (S-01):** responsable de un servicio o área del centro de salud; el pedido muestra
   su servicio.
 - **Número de pedido:** lo asigna el sistema de forma correlativa; no hay un talonario físico de
-  pedidos (a diferencia del vale de distribución).
+  pedidos (a diferencia del vale de distribución). Puede saltarse un número si un registro falla
+  después de reservarlo, pero un número nunca se repite ni cambia.
 - **Cantidades (S-03):** enteras, en la unidad de presentación del producto.
 - **Stock y pedido:** el pedido registra la necesidad; que haya o no stock se resuelve al
   distribuir.
