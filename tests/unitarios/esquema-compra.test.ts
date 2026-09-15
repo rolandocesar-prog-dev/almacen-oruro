@@ -1,0 +1,97 @@
+import { describe, expect, it } from "vitest";
+import { erroresPorRuta } from "@/lib/errores";
+import { hoyEnLaPaz } from "@/lib/fechas";
+import { esquemaCompra, esquemaVerificacionFactura } from "@/esquemas/compras";
+
+function manana() {
+  const fecha = new Date(`${hoyEnLaPaz()}T12:00:00Z`);
+  fecha.setUTCDate(fecha.getUTCDate() + 1);
+  return fecha.toISOString().slice(0, 10);
+}
+
+const linea = (cambios: Record<string, unknown> = {}) => ({ productoId: "1", cantidad: "10", precioUnitario: "12,50", ...cambios });
+
+const datosValidos = () => ({
+  proveedorId: "3",
+  nroFactura: " 1234 ",
+  fecha: hoyEnLaPaz(),
+  observacion: "",
+  lineas: [linea(), linea({ productoId: "2", cantidad: "4", precioUnitario: "30" })],
+});
+
+function erroresDe(datos: Record<string, unknown>) {
+  const resultado = esquemaCompra.safeParse(datos);
+  return resultado.success ? {} : erroresPorRuta(resultado.error);
+}
+
+describe("esquemaCompra (FR-001 a FR-003)", () => {
+  it("acepta una compra válida y normaliza factura, observación y precios", () => {
+    const datos = esquemaCompra.parse(datosValidos());
+    expect(datos).toEqual({
+      proveedorId: 3,
+      nroFactura: "1234",
+      fecha: hoyEnLaPaz(),
+      observacion: undefined,
+      lineas: [
+        { productoId: 1, cantidad: 10, precioUnitario: "12.50" },
+        { productoId: 2, cantidad: 4, precioUnitario: "30" },
+      ],
+    });
+  });
+
+  it("valida el Nº de factura", () => {
+    expect(erroresDe({ ...datosValidos(), nroFactura: "" }).nroFactura).toEqual(["Escribe el Nº de factura"]);
+    for (const nroFactura of ["12-34", "ABC", "1".repeat(21)]) {
+      expect(erroresDe({ ...datosValidos(), nroFactura }).nroFactura).toEqual(["El Nº de factura solo admite dígitos, hasta 20"]);
+    }
+  });
+
+  it("rechaza una fecha futura y una observación larga", () => {
+    expect(erroresDe({ ...datosValidos(), fecha: manana() }).fecha).toEqual(["La fecha de la compra no puede ser futura"]);
+    expect(erroresDe({ ...datosValidos(), observacion: "a".repeat(201) }).observacion).toEqual(["La observación admite hasta 200 caracteres"]);
+  });
+
+  it("exige al menos una línea y proveedor", () => {
+    expect(erroresDe({ ...datosValidos(), lineas: [] }).lineas).toEqual(["Agrega al menos un producto"]);
+    expect(erroresDe({ ...datosValidos(), proveedorId: "" }).proveedorId).toEqual(["Elige un proveedor"]);
+  });
+
+  it.each(["0", "2.5", "", "1000001"])("rechaza la cantidad '%s' indicando la línea", (cantidad) => {
+    const errores = erroresDe({ ...datosValidos(), lineas: [linea(), linea({ productoId: "2", cantidad })] });
+    expect(errores["lineas.1.cantidad"]).toEqual(["La cantidad debe ser un número entero entre 1 y 1.000.000"]);
+  });
+
+  it.each(["0", "12,505", ""])("rechaza el precio '%s'", (precioUnitario) => {
+    expect(erroresDe({ ...datosValidos(), lineas: [linea({ precioUnitario })] })["lineas.0.precioUnitario"]).toEqual([
+      "Escribe un precio mayor que 0 con hasta 2 decimales",
+    ]);
+  });
+
+  it("exige el producto de cada línea", () => {
+    expect(erroresDe({ ...datosValidos(), lineas: [linea({ productoId: "" })] })["lineas.0.productoId"]).toEqual(["Elige un producto"]);
+  });
+
+  it("rechaza un producto repetido indicando las dos líneas (RN-22)", () => {
+    const errores = erroresDe({ ...datosValidos(), lineas: [linea(), linea({ productoId: "2" }), linea()] });
+    expect(errores["lineas.2.productoId"]).toEqual(["Línea 3: el producto ya está en la línea 1; modifica su cantidad"]);
+  });
+
+  it("rechaza un total mayor que 9 999 999 999,99", () => {
+    const errores = erroresDe({ ...datosValidos(), lineas: [linea({ cantidad: "1000000", precioUnitario: "10000,01" })] });
+    expect(errores.lineas).toEqual(["El total de la compra no puede superar Bs 9.999.999.999,99"]);
+  });
+
+  it("descarta subtotal y total enviados: los calcula el servidor (RN-23)", () => {
+    const datos = esquemaCompra.parse({ ...datosValidos(), total: "1", lineas: [{ ...linea(), subtotal: "1" }] });
+    expect(datos).not.toHaveProperty("total");
+    expect(datos.lineas[0]).not.toHaveProperty("subtotal");
+  });
+});
+
+describe("esquemaVerificacionFactura", () => {
+  it("exige proveedor y factura con dígitos", () => {
+    expect(esquemaVerificacionFactura.safeParse({ proveedorId: 1, nroFactura: "1234" }).success).toBe(true);
+    expect(esquemaVerificacionFactura.safeParse({ proveedorId: "", nroFactura: "1234" }).success).toBe(false);
+    expect(esquemaVerificacionFactura.safeParse({ proveedorId: 1, nroFactura: "12a" }).success).toBe(false);
+  });
+});

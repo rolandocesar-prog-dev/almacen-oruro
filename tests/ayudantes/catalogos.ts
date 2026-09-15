@@ -5,6 +5,7 @@
 import { prisma } from "@/lib/prisma";
 import { normalizarTexto } from "@/lib/texto";
 import type { EstadoPedido } from "@/generado/prisma/client";
+import { registrarCompra } from "@/servicios/compras";
 import { crearUsuarioDePrueba } from "./base-de-datos";
 
 let contador = 0;
@@ -118,38 +119,20 @@ export async function crearPedidoConSaldo({
 }
 
 /**
- * Compra REGISTRADA mínima (1 unidad a Bs 10) con su movimiento ENTRADA_COMPRA de +1.
- * Actualiza el stock como lo hará el servicio de inventario de F-003: el saldo del movimiento y el
- * stock del producto quedan iguales (principio III).
+ * Compra REGISTRADA real de 1 unidad a Bs 10, registrada con registrarCompra: deja su movimiento
+ * ENTRADA_COMPRA y suma 1 al stock sin escribir el stock a mano (principio III). El producto debe
+ * estar activo.
  */
 export async function crearMovimientoDePrueba(productoId: number) {
   const { usuario } = await crearUsuarioDePrueba();
   const proveedor = await crearProveedorDePrueba();
-  const producto = await prisma.producto.findUniqueOrThrow({ where: { id: productoId } });
-  const saldo = producto.stockActual + 1;
-
-  return prisma.$transaction(async (tx) => {
-    const compra = await tx.compra.create({
-      data: {
-        proveedorId: proveedor.id,
-        nroFactura: String(siguiente()),
-        fecha: new Date("2026-09-01"),
-        total: 10,
-        usuarioId: usuario.id,
-        lineas: { create: [{ productoId, cantidad: 1, precioUnitario: 10, subtotal: 10 }] },
-      },
-    });
-    await tx.producto.update({ where: { id: productoId }, data: { stockActual: saldo } });
-    return tx.movimientoInventario.create({
-      data: {
-        productoId,
-        fechaDocumento: compra.fecha,
-        tipo: "ENTRADA_COMPRA",
-        cantidad: 1,
-        saldoResultante: saldo,
-        compraId: compra.id,
-        usuarioId: usuario.id,
-      },
-    });
-  });
+  return registrarCompra(
+    {
+      proveedorId: proveedor.id,
+      nroFactura: String(700000 + siguiente()),
+      fecha: "2026-09-01",
+      lineas: [{ productoId, cantidad: 1, precioUnitario: "10.00" }],
+    },
+    usuario.id,
+  );
 }

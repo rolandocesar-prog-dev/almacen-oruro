@@ -54,6 +54,15 @@ export function esFechaValida(texto: string): boolean {
   return !Number.isNaN(fecha.getTime()) && fecha.toISOString().startsWith(texto);
 }
 
+/**
+ * Fecha de un documento para mostrar: "2026-09-10" → "10/09/2026". Se arma con el texto, sin pasar por
+ * zonas horarias, porque una fecha de documento no tiene hora (research K-06 de F-003).
+ */
+export function formatearFecha(fecha: string): string {
+  const [anio, mes, dia] = fecha.split("-");
+  return `${dia}/${mes}/${anio}`;
+}
+
 const formatoFechaHora = new Intl.DateTimeFormat("es-BO", {
   timeZone: ZONA_HORARIA,
   day: "2-digit",
