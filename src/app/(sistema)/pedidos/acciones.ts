@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { esquemaPedido } from "@/esquemas/pedidos";
 import { aResultadoDeError, aResultadoDeValidacion, erroresPorRuta, type ResultadoAccion } from "@/lib/errores";
 import { requerirSesion } from "@/lib/sesion";
-import { registrarPedido } from "@/servicios/pedidos";
+import { editarPedido, registrarPedido } from "@/servicios/pedidos";
 
 // Orden fijo de toda acción (contracts/acciones-f004.md):
 // 1. requerirSesion  2. validar con Zod  3. servicio  4. errores  5. revalidar y redirigir
@@ -31,4 +31,25 @@ export async function registrarPedidoAccion(datos: unknown): Promise<ResultadoAc
 
   revalidatePath("/pedidos");
   redirect(`/pedidos/${id}?aviso=registrado`);
+}
+
+/**
+ * Editar un pedido PENDIENTE (Historia 4). El id se fija con .bind() en la página de edición. El servicio
+ * vuelve a verificar el estado con el pedido bloqueado: si mientras tanto se distribuyó, se rechaza (RN-42).
+ */
+export async function editarPedidoAccion(pedidoId: number, datos: unknown): Promise<ResultadoAccion> {
+  await requerirSesion();
+
+  const validacion = esquemaPedido.safeParse(datos);
+  if (!validacion.success) return aResultadoDeValidacion(erroresPorRuta(validacion.error));
+
+  try {
+    await editarPedido(pedidoId, validacion.data);
+  } catch (error) {
+    return aResultadoDeError(error);
+  }
+
+  revalidatePath("/pedidos");
+  revalidatePath(`/pedidos/${pedidoId}`);
+  redirect(`/pedidos/${pedidoId}?aviso=modificado`);
 }

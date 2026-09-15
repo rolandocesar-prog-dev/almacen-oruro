@@ -316,3 +316,74 @@ export async function listarPedidos(filtro: {
     }),
   };
 }
+
+/**
+ * Edita un pedido que todavía no tiene entregas (FR-006, RN-42; research P-04). En una transacción:
+ *
+ * 1. Bloquea el pedido y mira su estado: si una distribución se guardó mientras se editaba, el pedido ya
+ *    no está PENDIENTE y la edición se rechaza (Historia 4 · E3).
+ * 2. Verifica representante y productos, aceptando los que el pedido ya tenía (FR-006).
+ * 3. Actualiza la cabecera y sincroniza las líneas por producto: cambia la cantidad de las que siguen,
+ *    crea las nuevas y borra las que ya no están.
+ *
+ * Se sincroniza en lugar de borrar y volver a crear todas las líneas porque un pedido que volvió a
+ * PENDIENTE puede tener distribuciones anuladas que apuntan a sus líneas: esas referencias deben seguir
+ * intactas. Borrar una línea que nadie referencia es correcto: el pedido no es un documento inmutable
+ * (principio IV habla de compras y distribuciones) y la especificación permite editarlo en PENDIENTE.
+ * No toca el stock ni el kardex (FR-003). La firma no lleva usuario: la especificación no pide registrar
+ * quién editó.
+ */
+export async function editarPedido(id: number, datos: DatosPedido): Promise<void> {
+  await prisma.$transaction(async (tx) => {
+    const bloqueado = await bloquearPedido(tx, id);
+    if (!bloqueado) throw new ErrorDeNegocio("No existe el pedido indicado");
+    if (bloqueado.estado === "ANULADO") throw new ErrorDeNegocio("El pedido está anulado y no se puede editar");
+    if (bloqueado.estado !== "PENDIENTE") throw new ErrorDeNegocio("El pedido ya tiene entregas y no se puede editar");
+
+    const actual = await tx.pedido.findUniqueOrThrow({
+      where: { id },
+      select: {
+        representanteId: true,
+        lineas: { select: { id: true, productoId: true, cantidadSolicitada: true, producto: { select: { nombre: true } }, _count: { select: { entregas: true } } } },
+      },
+    });
+    await verificarRepresentanteYProductos(tx, datos, {
+      representanteId: actual.representanteId,
+      productoIds: actual.lineas.map((linea) => linea.productoId),
+    });
+
+    const cantidadNueva = new Map(datos.lineas.map((linea) => [linea.productoId, linea.cantidadSolicitada]));
+    const aQuitar = actual.lineas.filter((linea) => !cantidadNueva.has(linea.productoId));
+
+    // Un pedido PENDIENTE no tiene entregas vigentes, así que una línea con distribuciones solo puede
+    // tenerlas anuladas; el historial de esas distribuciones la sigue mostrando (spec, caso borde).
+    const conHistorial = aQuitar.find((linea) => linea._count.entregas > 0);
+    if (conHistorial) {
+      throw new ErrorDeNegocio(
+        `No se puede quitar '${conHistorial.producto.nombre}': figura en distribuciones anuladas del pedido. Puedes cambiar su cantidad`,
+      );
+    }
+
+    await tx.pedido.update({
+      where: { id },
+      data: { representanteId: datos.representanteId, fecha: aFechaDocumento(datos.fecha), observacion: datos.observacion ?? null },
+    });
+
+    if (aQuitar.length > 0) await tx.pedidoDetalle.deleteMany({ where: { id: { in: aQuitar.map((linea) => linea.id) } } });
+
+    for (const linea of actual.lineas) {
+      const cantidad = cantidadNueva.get(linea.productoId);
+      if (cantidad !== undefined && cantidad !== linea.cantidadSolicitada) {
+        await tx.pedidoDetalle.update({ where: { id: linea.id }, data: { cantidadSolicitada: cantidad } });
+      }
+    }
+
+    const productosActuales = new Set(actual.lineas.map((linea) => linea.productoId));
+    const nuevas = datos.lineas.filter((linea) => !productosActuales.has(linea.productoId));
+    if (nuevas.length > 0) {
+      await tx.pedidoDetalle.createMany({
+        data: nuevas.map((linea) => ({ pedidoId: id, productoId: linea.productoId, cantidadSolicitada: linea.cantidadSolicitada })),
+      });
+    }
+  }, OPCIONES_TRANSACCION);
+}
