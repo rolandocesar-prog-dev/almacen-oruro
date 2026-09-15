@@ -131,6 +131,21 @@ Nada se borra: un registro que ya no se usa se **desactiva** desde su ficha y se
   parcial. Lo que ya se entregó se conserva y lo que faltaba queda como saldo anulado.
 - Desde la ficha de un representante, **Ver sus pedidos** abre todos sus pedidos.
 
+**8. Registrar distribuciones**
+
+- **Distribuciones → Registrar distribución** muestra los pedidos pendientes y parciales; se elige uno
+  (o se entra desde **Distribuir** en la ficha del pedido).
+- Por cada producto se ve lo pedido, lo entregado, lo pendiente, el stock y el **máximo que se puede
+  entregar**. Las líneas completas o sin stock no admiten cantidad. Se escribe el **Nº de vale** del
+  talonario (el sistema avisa si ya está registrado), la fecha y la cantidad que se entrega; no hace
+  falta entregar todo de una vez.
+- Al guardar, el **stock baja** y el kardex registra la salida; el pedido suma lo entregado y cambia a
+  parcial o atendido.
+- Una distribución **no se edita**. Si tiene un error, desde su detalle se **anula** con motivo: el stock
+  se repone, lo entregado del pedido se descuenta y el vale queda libre para registrarla bien.
+- **Imprimir vale** abre una hoja limpia con los productos y espacios para las firmas de quien entrega y
+  quien recibe.
+
 Para detener el sistema, presionar `Ctrl + C` en la ventana de PowerShell. La base de datos sigue
 guardada: la próxima vez basta con abrir Docker Desktop, ejecutar `docker compose up -d` y `npm start`.
 

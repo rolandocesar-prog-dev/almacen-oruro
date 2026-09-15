@@ -95,6 +95,27 @@ Detalle completo en [`specs/004-pedidos/research.md`](../specs/004-pedidos/resea
 
 ---
 
+## Distribución (plan de F-005, 15/09/2026)
+
+Detalle completo en [`specs/005-distribucion/research.md`](../specs/005-distribucion/research.md).
+
+| # | Fecha | Decisión | Fundamento | Alternativas descartadas |
+|---|---|---|---|---|
+| V-01 | 15/09 | Registro en una transacción: vale verificado antes; después bloquear el pedido, verificar estado, fecha y pertenencia, bloquear los productos, verificar todas las cantidades contra pendiente y stock, crear la distribución, un `SALIDA_DISTRIBUCION` por línea, sumar lo entregado y recalcular el estado | Una sola regla de concurrencia en todo el sistema (primero el pedido, después los productos); corrige el stock negativo de 2022 (X-03) | Verificar fuera de la transacción, `SERIALIZABLE` con reintentos, bloquear las líneas del pedido |
+| V-02 | 15/09 | Formulario con una fila por línea del pedido ("Completa", "Sin stock" o "Máximo n") que envía una entrada por fila aunque esté vacía | El encargado ve qué falta y qué puede entregar; los errores caen en su fila | Agregar líneas eligiendo productos, enviar solo las filas con cantidad |
+| V-03 | 15/09 | Esquema común para vale, fecha, cantidades, al menos una línea y líneas no repetidas; el servicio verifica fecha del pedido, pertenencia y máximo con datos bloqueados, con un único mensaje por todas las líneas excedidas | El esquema no conoce el pedido ni el stock; corregir todo de una vez | Pendiente y stock del cliente como autoridad, fallar en la primera línea |
+| V-04 | 15/09 | Vale único: aviso al salir del campo con una Server Action de solo lectura; decide el índice único parcial y el P2002 se traduce al mismo mensaje | Mismo patrón que la factura (K-05) | Verificar en cada tecla, tabla de vales bloqueada |
+| V-05 | 15/09 | `/distribuciones/nueva` lista los pedidos por atender con `listarPedidos` de F-004; con `?pedido` muestra el formulario | Una sola definición de "por atender"; los ATENDIDOS y ANULADOS nunca aparecen | Selector desplegable de pedidos |
+| V-06 | 15/09 | Anulación: bloquear el pedido, `updateMany` solo si sigue REGISTRADA, bloquear productos, `ANULACION_DISTRIBUCION` positivo con la fecha de la distribución, restar lo entregado y recalcular | Mismo orden que el registro; la anulación doble revierte una sola vez | Bloquear la distribución antes que el pedido, borrarla |
+| V-07 | 15/09 | Listado filtrado en la base (mes en curso, representante del pedido, producto, estado, vale que empieza con), 50 por página, unidades con `groupBy` | Mismo patrón que compras (K-09) | Filtrar en memoria, SQL crudo |
+| V-08 | 15/09 | Ficha sin editar ni borrar: solo "Imprimir vale" y la anulación con motivo si está REGISTRADA | D-16 en pantalla | — |
+| V-09 | 15/09 | Vale para imprimir en el grupo de rutas `(impresion)`, sin menú, con controles `print:hidden` | Vista limpia en la URL reservada, sin dependencias nuevas | PDF en el servidor, ocultar el menú solo al imprimir |
+| V-10 | 15/09 | Rutas `/distribuciones`, `/distribuciones/nueva`, `/distribuciones/[id]` y `/distribuciones/[id]/vale`; Distribuciones en el menú después de Pedidos | Nombres reservados en F-001; los enlaces del kardex y del pedido empiezan a funcionar | — |
+| V-11 | 15/09 | `crearSalidaDePrueba` registra una distribución real; `simularEntregaDePrueba` de F-004 se conserva | Ninguna prueba escribe el stock por fuera de la función central | Mantener salidas sin distribución real |
+| V-12 | 15/09 | Pruebas de registro, rechazos, entregas sucesivas, anulación, concurrencia real e invariantes SC-005 y SC-006 | Principio IX: stock, duplicados y anulaciones son reglas críticas | Simular la concurrencia |
+
+---
+
 ## Implementación
 
 Decisiones tomadas durante la implementación que no estaban en el plan.
@@ -130,3 +151,9 @@ Decisiones tomadas durante la implementación que no estaban en el plan.
 | I-27 | 15/09 | La prueba de invariantes de pedidos busca escrituras (`producto.update`, `movimientoInventario`, `registrarMovimiento`, `$executeRaw`), no la palabra `stockActual` | El servicio de pedidos lee el stock para mostrarlo en el formulario (FR-005) |
 | I-28 | 15/09 | Las distribuciones del detalle del pedido usan la insignia de compras (Registrada / Anulada) | Compras y distribuciones comparten el mismo estado de documento |
 | I-29 | 15/09 | El recorrido de F-004 usó el mismo método que I-15, con las entregas simuladas en el script de carga | Mismo criterio: sin contraseñas en el navegador y sin datos en la base de desarrollo; PARCIAL, ATENDIDO y ANULADO con entregas se vieron en pantalla antes de F-005 |
+| I-30 | 15/09 | Antes de implementar F-005, el análisis corrigió la especificación: la fecha futura tiene su propio mensaje, una línea del pedido no se repite en la distribución y la ficha del pedido muestra las unidades de cada distribución (SC-008); también el caso borde del pedido por atender con valores inactivos, para coincidir con I-23 | Sin la regla de línea repetida, la base rechazaba el envío con un error genérico; se corrigió primero `spec.md`, como manda la constitución |
+| I-31 | 15/09 | La insignia Registrada / Anulada pasó a `src/componentes/ui/insignia-documento.tsx` y la usan compras, la ficha del pedido y distribuciones | La ficha del pedido la importaba desde la carpeta de compras (I-28); un componente compartido se explica mejor |
+| I-32 | 15/09 | El formulario de distribución deriva su tipo de datos con `import type` de `obtenerPedidoParaDistribuir` | Un solo lugar define la forma del pedido para distribuir; la importación de solo tipos no lleva código del servidor al navegador |
+| I-33 | 15/09 | El grupo de rutas `(impresion)` convive con `(sistema)/distribuciones/[id]` sin cambios: `npm run build` lista `/distribuciones/[id]/vale` | No hizo falta el plan B de V-09 |
+| I-34 | 15/09 | Las pruebas de concurrencia de F-005 se ejecutaron tres veces seguidas antes de cerrar | Un resultado de concurrencia puede depender del orden; repetirlas descarta un verde por azar |
+| I-35 | 15/09 | El recorrido de F-005 usó el mismo método que I-15 e I-29, con la distribución anulada y la registrada de nuevo cargadas por el script con los servicios reales | Mismo criterio: sin contraseñas en el navegador y sin datos en la base de desarrollo |

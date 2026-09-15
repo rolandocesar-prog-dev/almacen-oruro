@@ -40,7 +40,7 @@ producto, porque cambian stock y pedido. No existe acción para editar ni borrar
 | Función | Parámetros | Devuelve | Notas |
 |---|---|---|---|
 | `situacionDeLinea(pendiente, stock)` | enteros | `{ situacion: "completa" \| "sin-stock" \| "entregable", maximoEntregable }` | pura (data-model §2) |
-| `obtenerPedidoParaDistribuir(pedidoId)` | id | pedido con representante, fecha, estado y líneas con situación, o `null` | FR-002 |
+| `obtenerPedidoParaDistribuir(pedidoId)` | id | pedido con representante, fecha, estado y líneas con situación, o `null` | FR-002; el formulario deriva su tipo con `import type` (I-32) |
 | `buscarValeVigente(nroVale)` | texto | `{ id } \| null` | RN-31 |
 | `registrarDistribucion(datos, usuarioId)` | `DatosDistribucion`, id de sesión | `{ id, pedidoId, productoIds }` | research V-01 |
 | `anularDistribucion(id, motivo, usuarioId)` | id, texto, id | `{ pedidoId, productoIds }` | research V-06 |
