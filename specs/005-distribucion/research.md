@@ -86,7 +86,10 @@ filas); "Entregar todo lo posible" automático (no está en la especificación).
   20 ("El Nº de vale solo admite dígitos, hasta 20"), **sin** quitar ceros a la izquierda; `fecha` con
   `fechaNoFutura("La fecha de la distribución no puede ser futura")`; `observacion` opcional hasta 200;
   cada línea con `pedidoDetalleId` y `cantidad` vacía o entera de 1 a 1 000 000; en el conjunto, al menos
-  una línea con cantidad ("Entrega al menos un producto: escribe la cantidad en una línea").
+  una línea con cantidad ("Entrega al menos un producto: escribe la cantidad en una línea") y ninguna
+  línea del pedido repetida ("Línea {n}: esa línea del pedido ya está en la línea {m}"). Sin esta regla, dos
+  entradas de la misma línea podrían pasar cada una el máximo y la base las rechazaría con un error
+  genérico.
 - En el servicio, con el pedido y los productos bloqueados:
   - fecha ≥ fecha del pedido: "La fecha de la distribución debe estar entre el {dd/mm/aaaa del pedido} y
     hoy" (campo `fecha`);

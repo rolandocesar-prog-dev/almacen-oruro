@@ -115,7 +115,7 @@ sin el menú del sistema (research V-09).
 | 1 · Diseño | [data-model.md](data-model.md): sin cambios de esquema | ✅ |
 | 1 · Contratos | [contracts/acciones-f005.md](contracts/acciones-f005.md) | ✅ |
 | 1 · Validación | [quickstart.md](quickstart.md) | ✅ |
-| 2 · Tareas | [tasks.md](tasks.md): 33 tareas | ✅ |
+| 2 · Tareas | [tasks.md](tasks.md): 34 tareas, revisadas con `/speckit-analyze` | ✅ |
 
 ## Cambios que este plan introduce en otros documentos y código existente
 

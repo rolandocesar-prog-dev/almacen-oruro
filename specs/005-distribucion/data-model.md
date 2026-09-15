@@ -30,9 +30,9 @@ la línea del pedido (X-08).
 |---|---|---|---|
 | pedidoId | `idObligatorio("Elige un pedido")` | existe; PENDIENTE o PARCIAL (§3) | FK |
 | nroVale | texto, solo dígitos, 1 a 20 ("El Nº de vale solo admite dígitos, hasta 20"); ceros a la izquierda se conservan | no está en otra distribución REGISTRADA ("El vale {n} ya está registrado", con enlace) | CHECK dígitos · índice único parcial |
-| fecha | `fechaNoFutura("La fecha de la distribución no puede ser futura")` | ≥ fecha del pedido ("La fecha de la distribución debe estar entre el {dd/mm/aaaa} y hoy") | `date` |
+| fecha | `fechaNoFutura("La fecha de la distribución no puede ser futura")` (Historia 1 · E8, fecha futura) | ≥ fecha del pedido ("La fecha de la distribución debe estar entre el {dd/mm/aaaa} y hoy", Historia 1 · E8, fecha anterior) | `date` |
 | observacion | `textoOpcional("La observación", 200)` | recortada o `null` | `varchar(200)` |
-| lineas | una entrada por fila del formulario; al menos una con cantidad ("Entrega al menos un producto: escribe la cantidad en una línea") | se ignoran las vacías (RN-33) | — |
+| lineas | una entrada por fila del formulario; al menos una con cantidad ("Entrega al menos un producto: escribe la cantidad en una línea"); sin líneas del pedido repetidas ("Línea {n}: esa línea del pedido ya está en la línea {m}", en `lineas.{i}.pedidoDetalleId`) | se ignoran las vacías (RN-33) | única `(distribucion_id, pedido_detalle_id)` |
 | estado, usuario, representante, montos | **no existen en el esquema**: REGISTRADA al guardar, usuario de la sesión, representante del pedido | — | CHECK de anulación coherente |
 
 ### Línea

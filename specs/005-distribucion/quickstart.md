@@ -12,7 +12,8 @@ F-005 **no agrega migraciones**. Para el recorrido hacen falta:
   (compras de F-003);
 - un pedido PENDIENTE de un representante con Lavandina 10, Jabón 5 y Trapeador 2 (F-004), con fecha
   anterior a hoy;
-- un segundo pedido PENDIENTE con Jabón 3.
+- un segundo pedido PENDIENTE con Jabón 3, atendido en parte por una distribución REGISTRADA con el vale
+  450 (Jabón 1).
 
 ## 2. Pruebas automatizadas
 
@@ -42,12 +43,12 @@ Con la aplicación en marcha (`npm run dev`) y una sesión iniciada.
 |---|---|---|---|
 | 1 | **Distribuciones → Registrar distribución** | Solo pedidos PENDIENTE y PARCIAL, con % atendido | H2 · E4 |
 | 2 | Elegir el primer pedido | Representante y servicio; Lavandina "Máximo 6", Jabón "Máximo 5", Trapeador "Sin stock" sin campo | H1 · E1, E10 |
-| 3 | Escribir un vale ya registrado y salir del campo | "El vale … ya está registrado" con enlace | H1 · E5 |
+| 3 | Escribir el vale 450 y salir del campo | "El vale 450 ya está registrado" con enlace | H1 · E5 |
 | 4 | Lavandina 7 y guardar | "Lavandina 1 L: puedes entregar como máximo 6 (pendiente 10, stock 6)"; lo escrito se conserva | H1 · E3, FR-009 |
 | 5 | Jabón 8 y guardar | "Jabón líquido: puedes entregar como máximo 5 (pendiente 5, stock 20)" | H1 · E4 |
-| 6 | Fecha anterior al pedido; luego sin cantidades | Rango de fechas permitido; "Entrega al menos un producto…" | H1 · E7, E8 |
+| 6 | Fecha anterior al pedido; fecha de mañana; luego sin cantidades | Rango de fechas permitido; "La fecha de la distribución no puede ser futura"; "Entrega al menos un producto…" | H1 · E7, E8 |
 | 7 | Vale 500, Lavandina 6 y Jabón 5; guardar | Ficha de la distribución; pedido PARCIAL con Lavandina pendiente 4 y Trapeador pendiente 2; stock de Lavandina 0 y su kardex con "Salida por distribución" −6 | H1 · E2, E6 |
-| 8 | **Distribuciones** | La del paso 7 en el mes en curso con 11 unidades; filtros por representante, producto, estado y vale | H3 · E1, E2 |
+| 8 | **Distribuciones** | La del paso 7 en el mes en curso con 11 unidades; filtros por representante, producto, estado y vale; en la ficha del pedido, la distribución con sus 11 unidades | H3 · E1, E2, SC-008 |
 | 9 | Abrir su detalle | Pedido enlazado, representante del pedido, líneas; sin editar ni borrar; "Imprimir vale" y "Anular distribución" | H3 · E3, E4 |
 | 10 | **Imprimir vale** | Vista sin menú con centro de salud, vale, pedido, productos y firmas; la vista previa de impresión no muestra botones | H5 · E1 |
 | 11 | Anular sin motivo y luego con motivo | "Escribe el motivo de la anulación"; después ANULADA, stock de Lavandina 6, pedido PENDIENTE, kardex con "Anulación de distribución" +6 | H4 · E1, E2, E5 |

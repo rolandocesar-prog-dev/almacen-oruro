@@ -4,7 +4,7 @@
 
 **Creada**: 2026-09-13
 
-**Estado**: Borrador
+**Estado**: Aprobada
 
 **Entrada**: Descripción del usuario: "Distribución de productos de limpieza para atender los
 pedidos. El encargado elige un pedido pendiente o parcial; el sistema muestra el representante y,
@@ -43,6 +43,11 @@ principios III y IV · Defectos corregidos X-02, X-03, X-08 y X-09.
   si varias líneas se exceden, se informan todas juntas.
 - Precisión (plan): en la vista de impresión del vale, los controles "Imprimir" y "Volver" están en
   pantalla pero no salen en la hoja impresa; la vista no tiene el menú del sistema.
+- Precisión (análisis): la fecha futura se rechaza con su propio mensaje, y la anterior al pedido con el
+  rango permitido (Historia 1 · E8); una misma línea del pedido no puede repetirse en la distribución
+  (FR-003).
+- Precisión (análisis): el detalle del pedido muestra las unidades de cada distribución, para explicar
+  de dónde sale lo entregado (SC-008).
 
 ## Escenarios de usuario y pruebas *(obligatorio)*
 
@@ -94,8 +99,9 @@ stock, superar lo pendiente y repetir un vale.
    (RN-33).
 7. **Dada** una distribución en la que todas las cantidades están vacías o en 0, **cuando** se
    intenta guardar, **entonces** se rechaza indicando que se debe entregar al menos un producto.
-8. **Dada** una fecha anterior a la fecha del pedido, o posterior a hoy, **cuando** se intenta
-   guardar, **entonces** se rechaza indicando el rango de fechas permitido.
+8. **Dada** una fecha anterior a la fecha del pedido, **cuando** se intenta guardar, **entonces** se
+   rechaza indicando el rango de fechas permitido (desde la fecha del pedido hasta hoy); **dada** una
+   fecha posterior a hoy, se rechaza indicando que la fecha de la distribución no puede ser futura.
 9. **Dada** una distribución con una línea válida y otra que supera el stock, **cuando** se intenta
    guardar, **entonces** no se guarda ni la cabecera, ni ninguna línea, ni ningún movimiento, ni
    cambia lo entregado del pedido (RN-30).
@@ -252,8 +258,8 @@ contenido.
   no admiten cantidad.
 - **FR-003**: Cada línea de la distribución DEBE corresponder a un producto del pedido, con cantidad
   entera mayor que 0, menor o igual a lo pendiente de esa línea y menor o igual al stock actual del
-  producto (RN-32). Las líneas sin cantidad no se incluyen, y la distribución DEBE tener al menos
-  una línea (RN-33).
+  producto (RN-32). Las líneas sin cantidad no se incluyen, una misma línea del pedido no se repite,
+  y la distribución DEBE tener al menos una línea (RN-33).
 - **FR-004**: El sistema DEBE impedir registrar una distribución con un Nº de vale que ya tiene otra
   distribución REGISTRADA de cualquier fecha y representante (RN-31), avisándolo al escribir el número y verificándolo de nuevo al
   guardar.
