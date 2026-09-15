@@ -24,7 +24,7 @@ npm test
 | `erroresPorRuta`: "lineas.1.cantidad" | unitaria | FR-007 |
 | Registrar compra de 3 productos: stock, 3 `ENTRADA_COMPRA`, saldos, total calculado aunque lleguen otros valores | integración | FR-003, FR-005, SC-005 |
 | Factura duplicada del mismo proveedor rechazada sin cambiar stock; de otro proveedor aceptada; libre tras anular | integración | FR-004, SC-003 |
-| Falla a mitad de la transacción (producto inexistente en la última línea): no queda cabecera, línea ni movimiento | integración | FR-005, SC-004 |
+| Falla a mitad de la transacción, después del primer movimiento (stock del segundo producto forzado al máximo de la columna): no queda cabecera, línea ni movimiento | integración | FR-005, SC-004 |
 | Proveedor o producto inactivos rechazados | integración | RN-14 |
 | Anular: `ANULACION_COMPRA` con cantidad negativa y fecha del documento anulado; stock vuelve al valor previo | integración | FR-012, FR-022 |
 | Anular con stock insuficiente en una de varias líneas: nada cambia y el mensaje lista cada faltante | integración | FR-013, RN-25 |
