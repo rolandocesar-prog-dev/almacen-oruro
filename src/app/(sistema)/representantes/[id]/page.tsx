@@ -63,6 +63,13 @@ export default async function PaginaFichaRepresentante({
 
       <div className="flex flex-wrap items-start gap-3">
         <EnlaceEditar ruta={`/representantes/${representante.id}/editar`} />
+        {/* Todos sus pedidos, también los atendidos y anulados (F-004, research P-11). */}
+        <Link
+          href={`/pedidos?representante=${representante.id}&estado=todos`}
+          className="rounded-md border border-marca bg-white px-4 py-2 text-sm font-medium text-marca hover:bg-fondo"
+        >
+          Ver sus pedidos
+        </Link>
         <CambioDeEstado
           activo={representante.activo}
           confirmacionDesactivar={`¿Desactivar a ${representante.nombre} ${representante.apellido}? Ya no podrá elegirse en pedidos nuevos.`}

@@ -3,7 +3,15 @@
 // sistema a partir de lo entregado (RN-41) y lo entregado solo lo cambian las distribuciones (FR-009).
 // Cualquier valor de esos campos que llegue del formulario se descarta.
 import { z } from "zod";
-import { cantidadEntera, fechaNoFutura, idObligatorio, marcarProductosRepetidos, textoOpcional } from "./comunes";
+import {
+  cantidadEntera,
+  fechaNoFutura,
+  fechaOpcionalDeFiltro,
+  idObligatorio,
+  marcarProductosRepetidos,
+  textoOpcional,
+  vacioComoAusente,
+} from "./comunes";
 
 export const esquemaLineaPedido = z.object({
   productoId: idObligatorio("Elige un producto"),
@@ -26,3 +34,27 @@ export const esquemaPedido = z
 
 export type DatosPedido = z.infer<typeof esquemaPedido>;
 export type DatosLineaPedido = z.infer<typeof esquemaLineaPedido>;
+
+/** Opciones del filtro de estado del listado (FR-013, research P-07). "por-atender" = PENDIENTE y PARCIAL. */
+export const ESTADOS_FILTRO_PEDIDOS = ["por-atender", "pendientes", "parciales", "atendidos", "anulados", "todos"] as const;
+export type EstadoFiltroPedidos = (typeof ESTADOS_FILTRO_PEDIDOS)[number];
+
+/**
+ * Filtros del listado de pedidos (FR-013, data-model §4). Por defecto, los que tienen algo por entregar,
+ * sin rango de fechas: un pedido por atender puede ser antiguo. Un valor inválido en la URL toma el valor
+ * por defecto en lugar de romper la página.
+ */
+export const esquemaFiltroPedidos = z
+  .object({
+    estado: z.enum(ESTADOS_FILTRO_PEDIDOS).catch("por-atender"),
+    representante: z.preprocess(vacioComoAusente, z.coerce.number().int().positive()).optional().catch(undefined),
+    desde: fechaOpcionalDeFiltro(),
+    hasta: fechaOpcionalDeFiltro(),
+    pagina: z.preprocess(vacioComoAusente, z.coerce.number().int().min(1).default(1)).catch(1),
+  })
+  .refine((filtro) => !filtro.desde || !filtro.hasta || filtro.desde <= filtro.hasta, {
+    error: "La fecha «desde» no puede ser posterior a «hasta»",
+    path: ["hasta"],
+  });
+
+export type FiltroPedidos = z.infer<typeof esquemaFiltroPedidos>;

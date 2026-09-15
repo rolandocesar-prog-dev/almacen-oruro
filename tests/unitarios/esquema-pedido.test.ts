@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { esquemaPedido } from "@/esquemas/pedidos";
+import { esquemaFiltroPedidos, esquemaPedido } from "@/esquemas/pedidos";
 import { erroresPorRuta } from "@/lib/errores";
 import { hoyEnLaPaz } from "@/lib/fechas";
 
@@ -74,5 +74,31 @@ describe("esquemaPedido (FR-001, RN-40)", () => {
     });
     expect(datos).not.toHaveProperty("estado");
     expect(datos.lineas[0]).not.toHaveProperty("cantidadEntregada");
+  });
+});
+
+describe("esquemaFiltroPedidos (FR-013)", () => {
+  it("por defecto muestra los pedidos por atender, sin rango y en la página 1", () => {
+    expect(esquemaFiltroPedidos.parse({})).toEqual({ estado: "por-atender", pagina: 1 });
+  });
+
+  it("un estado o un representante inválidos toman el valor por defecto", () => {
+    expect(esquemaFiltroPedidos.parse({ estado: "enviado", representante: "abc", pagina: "-2" })).toEqual({ estado: "por-atender", representante: undefined, pagina: 1 });
+  });
+
+  it("acepta un estado concreto, representante y rango de fechas", () => {
+    expect(esquemaFiltroPedidos.parse({ estado: "anulados", representante: "3", desde: "2026-09-01", hasta: "2026-09-10", pagina: "2" })).toEqual({
+      estado: "anulados",
+      representante: 3,
+      desde: "2026-09-01",
+      hasta: "2026-09-10",
+      pagina: 2,
+    });
+  });
+
+  it("rechaza «desde» posterior a «hasta»", () => {
+    const resultado = esquemaFiltroPedidos.safeParse({ desde: "2026-09-10", hasta: "2026-09-01" });
+    expect(resultado.success).toBe(false);
+    expect(resultado.error?.issues[0]?.message).toBe("La fecha «desde» no puede ser posterior a «hasta»");
   });
 });

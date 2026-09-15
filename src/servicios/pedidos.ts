@@ -7,7 +7,7 @@
 // continuar, ve el estado que dejó el primero. En todo el sistema se bloquea primero el pedido y después
 // los productos, así una distribución y una compra nunca se esperan en círculo.
 import type { EstadoPedido, Prisma } from "@/generado/prisma/client";
-import type { DatosPedido } from "@/esquemas/pedidos";
+import type { DatosPedido, EstadoFiltroPedidos } from "@/esquemas/pedidos";
 import { ErrorDeNegocio } from "@/lib/errores";
 import { aFechaDocumento, textoDeFechaDocumento } from "@/lib/fechas";
 import { prisma } from "@/lib/prisma";
@@ -200,5 +200,84 @@ export async function obtenerPedido(id: number) {
       // Lo que falta entregar de la línea: se calcula al mostrar, no se guarda (data-model §2).
       pendiente: linea.cantidadSolicitada - linea.cantidadEntregada,
     })),
+  };
+}
+
+/** Estados de cada opción del filtro: "por atender" son los que todavía tienen algo por entregar. */
+const ESTADOS_DEL_FILTRO: Record<EstadoFiltroPedidos, EstadoPedido[] | undefined> = {
+  "por-atender": ["PENDIENTE", "PARCIAL"],
+  pendientes: ["PENDIENTE"],
+  parciales: ["PARCIAL"],
+  atendidos: ["ATENDIDO"],
+  anulados: ["ANULADO"],
+  todos: undefined,
+};
+
+/**
+ * Porcentaje atendido del pedido: unidades entregadas sobre solicitadas, redondeado hacia ABAJO. Así un
+ * pedido con 199 de 200 muestra 99 % y nunca un 100 % engañoso cuando todavía falta algo (research P-07).
+ */
+function porcentajeAtendido(entregadas: number, solicitadas: number): number {
+  return solicitadas === 0 ? 0 : Math.floor((entregadas * 100) / solicitadas);
+}
+
+/**
+ * Listado de pedidos (FR-013, research P-07): filtros en la base por estado, representante y rango de
+ * fechas; del más antiguo al más reciente, para atender primero lo que más espera.
+ */
+export async function listarPedidos(filtro: {
+  estado: EstadoFiltroPedidos;
+  representanteId?: number;
+  desde?: string;
+  hasta?: string;
+  pagina: number;
+}) {
+  const estados = ESTADOS_DEL_FILTRO[filtro.estado];
+  const where: Prisma.PedidoWhereInput = {
+    estado: estados ? { in: estados } : undefined,
+    representanteId: filtro.representanteId,
+    fecha: {
+      gte: filtro.desde ? aFechaDocumento(filtro.desde) : undefined,
+      lte: filtro.hasta ? aFechaDocumento(filtro.hasta) : undefined,
+    },
+  };
+
+  const [pedidos, total] = await Promise.all([
+    prisma.pedido.findMany({
+      where,
+      orderBy: [{ fecha: "asc" }, { id: "asc" }],
+      skip: (filtro.pagina - 1) * PEDIDOS_POR_PAGINA,
+      take: PEDIDOS_POR_PAGINA,
+      include: {
+        representante: { select: { nombre: true, apellido: true, servicio: true } },
+        _count: { select: { lineas: true } },
+      },
+    }),
+    prisma.pedido.count({ where }),
+  ]);
+
+  // Sumas de solicitado y entregado solo de los pedidos de esta página, en una consulta.
+  const sumas = await prisma.pedidoDetalle.groupBy({
+    by: ["pedidoId"],
+    where: { pedidoId: { in: pedidos.map((pedido) => pedido.id) } },
+    _sum: { cantidadSolicitada: true, cantidadEntregada: true },
+  });
+  const sumaPorPedido = new Map(sumas.map((suma) => [suma.pedidoId, suma._sum]));
+
+  return {
+    total,
+    pedidos: pedidos.map((pedido) => {
+      const suma = sumaPorPedido.get(pedido.id);
+      return {
+        id: pedido.id,
+        fecha: textoDeFechaDocumento(pedido.fecha),
+        representante: `${pedido.representante.apellido}, ${pedido.representante.nombre}`,
+        representanteId: pedido.representanteId,
+        servicio: pedido.representante.servicio,
+        productos: pedido._count.lineas,
+        porcentajeAtendido: porcentajeAtendido(suma?.cantidadEntregada ?? 0, suma?.cantidadSolicitada ?? 0),
+        estado: pedido.estado,
+      };
+    }),
   };
 }
