@@ -4,7 +4,8 @@
 // (X-08). Lo que depende del pedido y del stock (pendiente, máximo, fecha del pedido) lo verifica el
 // servicio con los datos bloqueados (research V-03).
 import { z } from "zod";
-import { cantidadEntera, fechaNoFutura, idObligatorio, textoOpcional, vacioComoAusente } from "./comunes";
+import { hoyEnLaPaz, inicioDelMesEnCurso } from "@/lib/fechas";
+import { cantidadEntera, fechaDeFiltro, fechaNoFutura, idObligatorio, textoOpcional, vacioComoAusente } from "./comunes";
 
 const MENSAJE_CANTIDAD = "La cantidad debe ser un número entero entre 1 y 1.000.000";
 
@@ -56,6 +57,33 @@ export const esquemaDistribucion = z
       });
     });
   });
+
+/**
+ * Filtros del listado de distribuciones (FR-010, research V-07). Por defecto, el mes en curso hasta hoy.
+ * `vale` busca los números que empiezan con lo escrito. Un valor inválido en la URL toma el valor por
+ * defecto en lugar de romper la página.
+ */
+export const esquemaFiltroDistribuciones = z
+  .object({
+    desde: fechaDeFiltro(inicioDelMesEnCurso),
+    hasta: fechaDeFiltro(hoyEnLaPaz),
+    representante: z.preprocess(vacioComoAusente, z.coerce.number().int().positive()).optional().catch(undefined),
+    producto: z.preprocess(vacioComoAusente, z.coerce.number().int().positive()).optional().catch(undefined),
+    estado: z.enum(["todas", "registradas", "anuladas"]).catch("todas"),
+    vale: z
+      .string()
+      .trim()
+      .regex(/^[0-9]{0,20}$/, { error: "El Nº de vale solo admite dígitos" })
+      .transform((valor) => (valor ? valor : undefined))
+      .optional(),
+    pagina: z.preprocess(vacioComoAusente, z.coerce.number().int().min(1).default(1)).catch(1),
+  })
+  .refine((filtro) => filtro.desde <= filtro.hasta, {
+    error: "La fecha «desde» no puede ser posterior a «hasta»",
+    path: ["hasta"],
+  });
+
+export type FiltroDistribuciones = z.infer<typeof esquemaFiltroDistribuciones>;
 
 /** Datos para avisar, al salir del campo, si el vale ya está en una distribución vigente (RN-31). */
 export const esquemaVerificacionVale = z.object({ nroVale });

@@ -187,7 +187,7 @@ export async function obtenerPedido(id: number) {
       representante: { select: { id: true, nombre: true, apellido: true, servicio: true, activo: true, centroSalud: { select: { nombre: true } } } },
       usuario: { select: { nombre: true, apellido: true } },
       anuladaPor: { select: { nombre: true, apellido: true } },
-      distribuciones: { orderBy: { id: "asc" }, select: { id: true, nroVale: true, fecha: true, estado: true } },
+      distribuciones: { orderBy: { id: "asc" }, select: { id: true, nroVale: true, fecha: true, estado: true, lineas: { select: { cantidad: true } } } },
       lineas: {
         orderBy: { id: "asc" },
         include: { producto: { select: { id: true, codigo: true, nombre: true, activo: true, unidadMedida: { select: { abreviatura: true } } } } },
@@ -220,6 +220,8 @@ export async function obtenerPedido(id: number) {
       nroVale: distribucion.nroVale,
       fecha: textoDeFechaDocumento(distribucion.fecha),
       estado: distribucion.estado,
+      // SC-008 de F-005: con las unidades de cada distribución se explica de dónde sale lo entregado.
+      unidades: distribucion.lineas.reduce((suma, linea) => suma + linea.cantidad, 0),
     })),
     lineas: pedido.lineas.map((linea) => ({
       id: linea.id,

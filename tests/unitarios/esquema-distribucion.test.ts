@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { esquemaAvisoDistribucion, esquemaDistribucion } from "@/esquemas/distribuciones";
+import { esquemaAvisoDistribucion, esquemaDistribucion, esquemaFiltroDistribuciones } from "@/esquemas/distribuciones";
 import { erroresPorRuta } from "@/lib/errores";
-import { hoyEnLaPaz } from "@/lib/fechas";
+import { hoyEnLaPaz, inicioDelMesEnCurso } from "@/lib/fechas";
 
 function manana() {
   const fecha = new Date(`${hoyEnLaPaz()}T12:00:00Z`);
@@ -86,5 +86,44 @@ describe("esquemaAvisoDistribucion", () => {
   it("reconoce el aviso de registro e ignora otros valores", () => {
     expect(esquemaAvisoDistribucion.parse({ aviso: "registrada" })).toEqual({ aviso: "registrada" });
     expect(esquemaAvisoDistribucion.parse({ aviso: "otra" })).toEqual({ aviso: undefined });
+  });
+});
+
+describe("esquemaFiltroDistribuciones (FR-010)", () => {
+  it("por defecto muestra el mes en curso, todas las distribuciones y la página 1", () => {
+    expect(esquemaFiltroDistribuciones.parse({})).toEqual({
+      desde: inicioDelMesEnCurso(),
+      hasta: hoyEnLaPaz(),
+      representante: undefined,
+      producto: undefined,
+      estado: "todas",
+      vale: undefined,
+      pagina: 1,
+    });
+  });
+
+  it("valores inválidos toman el valor por defecto", () => {
+    expect(esquemaFiltroDistribuciones.parse({ estado: "vigentes", representante: "abc", producto: "-3", pagina: "0" })).toMatchObject({
+      estado: "todas",
+      representante: undefined,
+      producto: undefined,
+      pagina: 1,
+    });
+  });
+
+  it("acepta representante, producto, estado y vale", () => {
+    expect(esquemaFiltroDistribuciones.parse({ representante: "2", producto: "5", estado: "anuladas", vale: "05" })).toMatchObject({
+      representante: 2,
+      producto: 5,
+      estado: "anuladas",
+      vale: "05",
+    });
+  });
+
+  it("rechaza un vale con letras y «desde» posterior a «hasta»", () => {
+    expect(esquemaFiltroDistribuciones.safeParse({ vale: "12a" }).error?.issues[0]?.message).toBe("El Nº de vale solo admite dígitos");
+    expect(esquemaFiltroDistribuciones.safeParse({ desde: "2026-09-10", hasta: "2026-09-01" }).error?.issues[0]?.message).toBe(
+      "La fecha «desde» no puede ser posterior a «hasta»",
+    );
   });
 });

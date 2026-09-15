@@ -118,11 +118,12 @@ export default async function PaginaDetallePedido({
       {pedido.distribuciones.length === 0 ? (
         <p className="text-sm text-gray-600">Todavía no hay distribuciones para este pedido.</p>
       ) : (
-        <Tabla encabezados={["Nº de vale", "Fecha", "Estado", "Acción"]}>
+        <Tabla encabezados={["Nº de vale", "Fecha", "Unidades", "Estado", "Acción"]}>
           {pedido.distribuciones.map((distribucion) => (
             <tr key={distribucion.id}>
               <Celda>{distribucion.nroVale}</Celda>
               <Celda>{formatearFecha(distribucion.fecha)}</Celda>
+              <Celda className="text-right tabular-nums">{distribucion.unidades}</Celda>
               <Celda>
                 <InsigniaDocumento estado={distribucion.estado} />
               </Celda>

@@ -24,7 +24,7 @@ describe("obtenerPedido", () => {
     ]);
   });
 
-  it("lista las distribuciones del pedido con Nº de vale, fecha y estado (E3)", async () => {
+  it("lista las distribuciones del pedido con Nº de vale, fecha, estado y unidades (E3; SC-008 de F-005)", async () => {
     const producto = await crearProductoDePrueba();
     const pedido = await crearPedidoDePrueba({ lineas: [{ productoId: producto.id, solicitada: 10 }] });
     const primera = await crearDistribucionDePedidoDePrueba({ pedidoId: pedido.id, productoId: producto.id, cantidad: 4, fecha: "2026-09-03" });
@@ -32,8 +32,8 @@ describe("obtenerPedido", () => {
 
     const detalle = await obtenerPedido(pedido.id);
     expect(detalle?.distribuciones).toEqual([
-      { id: primera.id, nroVale: primera.nroVale, fecha: "2026-09-03", estado: "ANULADA" },
-      { id: segunda.id, nroVale: segunda.nroVale, fecha: "2026-09-04", estado: "REGISTRADA" },
+      { id: primera.id, nroVale: primera.nroVale, fecha: "2026-09-03", estado: "ANULADA", unidades: 4 },
+      { id: segunda.id, nroVale: segunda.nroVale, fecha: "2026-09-04", estado: "REGISTRADA", unidades: 2 },
     ]);
   });
 

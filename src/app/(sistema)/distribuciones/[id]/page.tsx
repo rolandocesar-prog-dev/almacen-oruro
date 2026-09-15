@@ -9,6 +9,7 @@ import { formatearFecha, formatearFechaHora } from "@/lib/fechas";
 import { idDeRuta } from "@/lib/parametros";
 import { requerirSesion } from "@/lib/sesion";
 import { obtenerDistribucion } from "@/servicios/distribuciones";
+import { InsigniaPedido } from "../../pedidos/insignia-pedido";
 
 export const metadata = { title: "Detalle de distribución · Almacén Regional Oruro" };
 
@@ -44,9 +45,12 @@ export default async function PaginaDetalleDistribucion({
         <Dato
           etiqueta="Pedido"
           valor={
-            <Link href={`/pedidos/${pedido.id}`} className="text-marca underline">
-              Nº {pedido.id}
-            </Link>
+            <span className="inline-flex flex-wrap items-center gap-2">
+              <Link href={`/pedidos/${pedido.id}`} className="text-marca underline">
+                Nº {pedido.id}
+              </Link>
+              <InsigniaPedido estado={pedido.estado} />
+            </span>
           }
         />
         {/* El representante sale del pedido: la distribución no lo guarda aparte (X-08). */}
@@ -64,7 +68,26 @@ export default async function PaginaDetalleDistribucion({
         <Dato etiqueta="Centro de salud" valor={representante.centroSalud} />
         <Dato etiqueta="Observación" valor={distribucion.observacion} />
         <Dato etiqueta="Registrada por" valor={`${distribucion.registradaPor} · ${formatearFechaHora(distribucion.registradaEn)}`} />
+        {distribucion.estado === "ANULADA" && (
+          <>
+            <Dato etiqueta="Motivo de la anulación" valor={distribucion.motivoAnulacion} />
+            <Dato
+              etiqueta="Anulada por"
+              valor={`${distribucion.anuladaPor ?? ""} · ${distribucion.anuladaEn ? formatearFechaHora(distribucion.anuladaEn) : ""}`}
+            />
+          </>
+        )}
       </dl>
+
+      {/* Historia 3 · E4: solo imprimir el vale y, si está vigente, anularla. */}
+      <div className="flex flex-wrap gap-3">
+        <Link
+          href={`/distribuciones/${distribucion.id}/vale`}
+          className="rounded-md border border-marca bg-white px-4 py-2 text-sm font-medium text-marca hover:bg-fondo"
+        >
+          Imprimir vale
+        </Link>
+      </div>
 
       {/* Una distribución no tiene "Editar" ni "Borrar": solo se anula (D-16, FR-012). */}
       <Tabla encabezados={["Código", "Producto", "Unidad", "Cantidad"]}>

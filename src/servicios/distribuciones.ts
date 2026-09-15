@@ -6,6 +6,7 @@
 // P-03, K-01). Con el pedido bloqueado, dos distribuciones del mismo pedido se ordenan solas y la segunda
 // ve el pendiente nuevo; con los productos bloqueados, ven el stock vigente. El stock solo cambia con
 // registrarMovimiento() y el estado del pedido solo con recalcularEstadoPedido().
+import type { Prisma } from "@/generado/prisma/client";
 import type { DatosDistribucion } from "@/esquemas/distribuciones";
 import { ErrorDeNegocio } from "@/lib/errores";
 import { aFechaDocumento, formatearFecha, textoDeFechaDocumento } from "@/lib/fechas";
@@ -219,6 +220,66 @@ export async function registrarDistribucion(
     }
     throw error;
   }
+}
+
+/**
+ * Listado de distribuciones (FR-010, research V-07): filtros en la base por rango de fechas, representante
+ * (el del pedido, X-08), producto (alguna línea), estado y Nº de vale que empieza con lo escrito; de la más
+ * reciente a la más antigua.
+ */
+export async function listarDistribuciones(filtro: {
+  desde: string;
+  hasta: string;
+  representanteId?: number;
+  productoId?: number;
+  estado: "todas" | "registradas" | "anuladas";
+  vale?: string;
+  pagina: number;
+}) {
+  const where: Prisma.DistribucionWhereInput = {
+    fecha: { gte: aFechaDocumento(filtro.desde), lte: aFechaDocumento(filtro.hasta) },
+    pedido: filtro.representanteId ? { representanteId: filtro.representanteId } : undefined,
+    lineas: filtro.productoId ? { some: { pedidoDetalle: { productoId: filtro.productoId } } } : undefined,
+    estado: filtro.estado === "todas" ? undefined : filtro.estado === "registradas" ? "REGISTRADA" : "ANULADA",
+    nroVale: filtro.vale ? { startsWith: filtro.vale } : undefined,
+  };
+
+  const [distribuciones, total] = await Promise.all([
+    prisma.distribucion.findMany({
+      where,
+      orderBy: [{ fecha: "desc" }, { id: "desc" }],
+      skip: (filtro.pagina - 1) * DISTRIBUCIONES_POR_PAGINA,
+      take: DISTRIBUCIONES_POR_PAGINA,
+      include: {
+        pedido: { select: { id: true, representante: { select: { nombre: true, apellido: true, servicio: true } } } },
+        _count: { select: { lineas: true } },
+      },
+    }),
+    prisma.distribucion.count({ where }),
+  ]);
+
+  // Unidades entregadas por distribución, solo de las filas de esta página, en una consulta.
+  const sumas = await prisma.distribucionDetalle.groupBy({
+    by: ["distribucionId"],
+    where: { distribucionId: { in: distribuciones.map((distribucion) => distribucion.id) } },
+    _sum: { cantidad: true },
+  });
+  const unidadesPorDistribucion = new Map(sumas.map((suma) => [suma.distribucionId, suma._sum.cantidad ?? 0]));
+
+  return {
+    total,
+    distribuciones: distribuciones.map((distribucion) => ({
+      id: distribucion.id,
+      fecha: textoDeFechaDocumento(distribucion.fecha),
+      nroVale: distribucion.nroVale,
+      pedidoId: distribucion.pedido.id,
+      representante: `${distribucion.pedido.representante.apellido}, ${distribucion.pedido.representante.nombre}`,
+      servicio: distribucion.pedido.representante.servicio,
+      productos: distribucion._count.lineas,
+      unidades: unidadesPorDistribucion.get(distribucion.id) ?? 0,
+      estado: distribucion.estado,
+    })),
+  };
 }
 
 /** Detalle de una distribución (FR-011, FR-016), con el representante tomado del pedido (X-08), o null. */
