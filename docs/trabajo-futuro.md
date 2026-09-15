@@ -47,3 +47,11 @@ Alcance general fuera de la entrega: ver
 ## Otras funcionalidades
 
 Se completa a medida que se implementan F-002 a F-007.
+
+## F-006 · Reportes
+
+- Exportar a Excel o a un PDF descargable propio (hoy se imprime o se guarda como PDF desde el navegador).
+- Gráficos de tablero y comparaciones entre períodos.
+- Reportes programados o enviados por correo.
+- Reportes por centro de salud, cuando haya más de uno.
+- Existencias "a una fecha pasada" (hoy se obtienen producto por producto con el kardex).
