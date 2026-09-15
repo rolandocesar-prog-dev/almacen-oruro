@@ -1,4 +1,5 @@
 // Errores y resultado común de las Server Actions (research R-10).
+import type { ZodError } from "zod";
 
 /**
  * Enlace que acompaña a un mensaje de error. Lo usan los duplicados de un registro inactivo:
@@ -48,6 +49,21 @@ export function aResultadoDeError(error: unknown): ResultadoAccion<never> {
   const detalle = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
   console.error(`[error inesperado] ${detalle}`);
   return { ok: false, mensaje: MENSAJE_INESPERADO };
+}
+
+/**
+ * Mensajes de Zod agrupados por ruta completa: "lineas.1.cantidad" para la cantidad de la segunda línea.
+ * `z.flattenError` solo agrupa por el primer nivel ("lineas"), y un formulario con líneas necesita
+ * saber qué línea y qué campo marcar (F-003, FR-007, research K-03). Para los campos de primer nivel
+ * la clave es su nombre, igual que con `z.flattenError`.
+ */
+export function erroresPorRuta(error: ZodError): Partial<Record<string, string[]>> {
+  const errores: Partial<Record<string, string[]>> = {};
+  for (const problema of error.issues) {
+    const ruta = problema.path.map(String).join(".");
+    errores[ruta] = [...(errores[ruta] ?? []), problema.message];
+  }
+  return errores;
 }
 
 /** Resultado de validación fallida con los mensajes por campo de Zod. */

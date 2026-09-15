@@ -5,6 +5,8 @@ import { requerirSesion } from "@/lib/sesion";
 export const metadata = { title: "Inicio · Almacén Regional Oruro" };
 
 const modulos = [
+  { ruta: "/compras", titulo: "Compras", descripcion: "Registrar compras con factura y anularlas" },
+  { ruta: "/existencias", titulo: "Existencias", descripcion: "Stock actual, bajo mínimo y kardex de cada producto" },
   { ruta: "/productos", titulo: "Productos", descripcion: "Código, categoría, unidad, stock actual y stock mínimo" },
   { ruta: "/categorias", titulo: "Categorías", descripcion: "Grupos para ordenar los productos" },
   { ruta: "/unidades", titulo: "Unidades de medida", descripcion: "Cómo se cuenta cada producto" },

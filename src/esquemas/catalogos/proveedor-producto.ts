@@ -1,19 +1,19 @@
 // Esquemas de los productos que ofrece un proveedor (Historia 6, research C-08).
 import { z } from "zod";
-import { idObligatorio } from "../comunes";
+import { esMontoPositivo, idObligatorio } from "../comunes";
 
 const MENSAJE_PRECIO = "Escribe un precio mayor que 0 con hasta 2 decimales";
 
 /**
- * Precio referencial opcional. Se escribe con coma o con punto ("12,50" o "12.50") y llega como
- * texto con punto ("12.50"): así el servicio lo guarda como decimal exacto, sin pasar por un número
- * de coma flotante que podría redondearlo. Hasta 10 dígitos enteros, como decimal(12,2) de la base.
+ * Precio referencial opcional: la misma regla que el precio de una compra (`montoPositivo`), pero un
+ * campo vacío significa "sin precio". Llega como texto con punto ("12.50") para guardarlo como decimal
+ * exacto (research C-08).
  */
 export const esquemaPrecioReferencial = z
   .string()
   .trim()
   .transform((valor) => valor.replace(",", "."))
-  .refine((valor) => valor === "" || (/^\d{1,10}(\.\d{1,2})?$/.test(valor) && Number(valor) > 0), { error: MENSAJE_PRECIO })
+  .refine((valor) => valor === "" || esMontoPositivo(valor), { error: MENSAJE_PRECIO })
   .transform((valor) => (valor ? valor : undefined))
   .optional();
 

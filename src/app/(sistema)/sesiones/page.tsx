@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { Aviso } from "@/componentes/ui/aviso";
+import { Paginacion } from "@/componentes/ui/paginacion";
 import { Celda, Tabla } from "@/componentes/ui/tabla";
 import { esquemaFiltroSesiones, type FiltroSesiones } from "@/esquemas/acceso";
 import { formatearFechaHora, hoyEnLaPaz, inicioDelMesEnCurso } from "@/lib/fechas";
@@ -62,23 +62,7 @@ export default async function PaginaSesiones({ searchParams }: { searchParams: P
         ))}
       </Tabla>
 
-      {paginas > 1 && (
-        <nav aria-label="Páginas" className="flex items-center gap-3 text-sm">
-          {filtro.pagina > 1 && (
-            <Link href={enlacePagina(filtro.pagina - 1)} className="text-marca underline">
-              ← Anterior
-            </Link>
-          )}
-          <span>
-            Página {filtro.pagina} de {paginas}
-          </span>
-          {filtro.pagina < paginas && (
-            <Link href={enlacePagina(filtro.pagina + 1)} className="text-marca underline">
-              Siguiente →
-            </Link>
-          )}
-        </nav>
-      )}
+      <Paginacion pagina={filtro.pagina} paginas={paginas} enlace={enlacePagina} />
     </section>
   );
 }
