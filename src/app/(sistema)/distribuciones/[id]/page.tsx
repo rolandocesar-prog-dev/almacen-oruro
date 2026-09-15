@@ -10,6 +10,8 @@ import { idDeRuta } from "@/lib/parametros";
 import { requerirSesion } from "@/lib/sesion";
 import { obtenerDistribucion } from "@/servicios/distribuciones";
 import { InsigniaPedido } from "../../pedidos/insignia-pedido";
+import { anularDistribucionAccion } from "../acciones";
+import { AnularDistribucion } from "./anular-distribucion";
 
 export const metadata = { title: "Detalle de distribución · Almacén Regional Oruro" };
 
@@ -105,6 +107,16 @@ export default async function PaginaDetalleDistribucion({
           </tr>
         ))}
       </Tabla>
+
+      {/* Solo una distribución REGISTRADA se puede anular; una ANULADA ya no ofrece nada (FR-015). */}
+      {distribucion.estado === "REGISTRADA" && (
+        <AnularDistribucion
+          accion={anularDistribucionAccion.bind(null, distribucion.id)}
+          nroVale={distribucion.nroVale}
+          pedidoId={pedido.id}
+          cantidadProductos={distribucion.lineas.length}
+        />
+      )}
     </section>
   );
 }

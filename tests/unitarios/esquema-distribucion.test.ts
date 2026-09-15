@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { esquemaAvisoDistribucion, esquemaDistribucion, esquemaFiltroDistribuciones } from "@/esquemas/distribuciones";
+import { esquemaAnulacionDistribucion, esquemaAvisoDistribucion, esquemaDistribucion, esquemaFiltroDistribuciones } from "@/esquemas/distribuciones";
 import { erroresPorRuta } from "@/lib/errores";
 import { hoyEnLaPaz, inicioDelMesEnCurso } from "@/lib/fechas";
 
@@ -125,5 +125,17 @@ describe("esquemaFiltroDistribuciones (FR-010)", () => {
     expect(esquemaFiltroDistribuciones.safeParse({ desde: "2026-09-10", hasta: "2026-09-01" }).error?.issues[0]?.message).toBe(
       "La fecha «desde» no puede ser posterior a «hasta»",
     );
+  });
+});
+
+describe("esquemaAnulacionDistribucion (FR-013)", () => {
+  it("exige el motivo", () => {
+    expect(esquemaAnulacionDistribucion.safeParse({ motivo: "  " }).error?.issues.map((p) => p.message)).toEqual(["Escribe el motivo de la anulación"]);
+  });
+
+  it("limita el motivo a 200 caracteres", () => {
+    expect(esquemaAnulacionDistribucion.safeParse({ motivo: "x".repeat(201) }).error?.issues.map((p) => p.message)).toEqual([
+      "El motivo admite hasta 200 caracteres",
+    ]);
   });
 });

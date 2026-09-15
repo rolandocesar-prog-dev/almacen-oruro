@@ -223,6 +223,68 @@ export async function registrarDistribucion(
 }
 
 /**
+ * Anula una distribución con motivo (FR-013 a FR-015, RN-35; research V-06). Es completa o no ocurre:
+ *
+ * 1. Bloquea el PEDIDO, igual que el registro: así una anulación y un registro del mismo pedido nunca se
+ *    esperan en círculo.
+ * 2. Cambia la distribución a ANULADA solo si sigue REGISTRADA. Esa actualización bloquea su fila: si dos
+ *    personas anulan a la vez, la segunda espera y luego ya no la encuentra REGISTRADA (una sola reversión).
+ * 3. Bloquea los PRODUCTOS y registra un ANULACION_DISTRIBUCION positivo por línea, con la fecha de la
+ *    distribución anulada (RN-53). No hace falta verificar stock: una anulación de distribución solo suma.
+ * 4. Resta la cantidad de lo entregado de cada línea y recalcula el estado del pedido; un pedido ANULADO
+ *    sigue ANULADO y su saldo anulado sube (RN-35).
+ *
+ * Se permite sin plazo, igual que en compras: los totales de su período cambian en consultas posteriores.
+ */
+export async function anularDistribucion(id: number, motivo: string, usuarioId: number): Promise<{ pedidoId: number; productoIds: number[] }> {
+  // El pedido de una distribución no cambia nunca: se puede leer antes de bloquear.
+  const existente = await prisma.distribucion.findUnique({ where: { id }, select: { pedidoId: true } });
+  if (!existente) throw new ErrorDeNegocio("No existe la distribución indicada");
+  const { pedidoId } = existente;
+
+  return prisma.$transaction(async (tx) => {
+    await bloquearPedido(tx, pedidoId);
+
+    const cambio = await tx.distribucion.updateMany({
+      where: { id, estado: "REGISTRADA" },
+      data: { estado: "ANULADA", motivoAnulacion: motivo, anuladaEn: new Date(), anuladaPorId: usuarioId },
+    });
+    // FR-015: una distribución anulada no se vuelve a anular.
+    if (cambio.count === 0) throw new ErrorDeNegocio("La distribución ya está anulada");
+
+    const distribucion = await tx.distribucion.findUniqueOrThrow({
+      where: { id },
+      select: { fecha: true, lineas: { select: { cantidad: true, pedidoDetalleId: true, pedidoDetalle: { select: { productoId: true } } } } },
+    });
+    const lineas = distribucion.lineas
+      .map((linea) => ({ cantidad: linea.cantidad, pedidoDetalleId: linea.pedidoDetalleId, productoId: linea.pedidoDetalle.productoId }))
+      .sort((a, b) => a.productoId - b.productoId);
+
+    await bloquearProductos(
+      tx,
+      lineas.map((linea) => linea.productoId),
+    );
+    for (const linea of lineas) {
+      await registrarMovimiento(tx, {
+        productoId: linea.productoId,
+        tipo: "ANULACION_DISTRIBUCION",
+        cantidad: linea.cantidad,
+        fechaDocumento: distribucion.fecha,
+        distribucionId: id,
+        usuarioId,
+      });
+    }
+
+    for (const linea of lineas) {
+      await tx.pedidoDetalle.update({ where: { id: linea.pedidoDetalleId }, data: { cantidadEntregada: { decrement: linea.cantidad } } });
+    }
+    await recalcularEstadoPedido(tx, pedidoId);
+
+    return { pedidoId, productoIds: lineas.map((linea) => linea.productoId) };
+  }, OPCIONES_TRANSACCION);
+}
+
+/**
  * Listado de distribuciones (FR-010, research V-07): filtros en la base por rango de fechas, representante
  * (el del pedido, X-08), producto (alguna línea), estado y Nº de vale que empieza con lo escrito; de la más
  * reciente a la más antigua.

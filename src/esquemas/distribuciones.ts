@@ -5,7 +5,7 @@
 // servicio con los datos bloqueados (research V-03).
 import { z } from "zod";
 import { hoyEnLaPaz, inicioDelMesEnCurso } from "@/lib/fechas";
-import { cantidadEntera, fechaDeFiltro, fechaNoFutura, idObligatorio, textoOpcional, vacioComoAusente } from "./comunes";
+import { cantidadEntera, fechaDeFiltro, fechaNoFutura, idObligatorio, textoObligatorio, textoOpcional, vacioComoAusente } from "./comunes";
 
 const MENSAJE_CANTIDAD = "La cantidad debe ser un número entero entre 1 y 1.000.000";
 
@@ -100,6 +100,11 @@ export const esquemaAvisoDistribucion = z.object({
 export const esquemaPedidoParaDistribuir = z.object({
   pedido: z.preprocess(vacioComoAusente, z.coerce.number().int().positive()).optional().catch(undefined),
   pagina: z.preprocess(vacioComoAusente, z.coerce.number().int().min(1).default(1)).catch(1),
+});
+
+/** Anular una distribución exige el motivo (RN-35, FR-013). */
+export const esquemaAnulacionDistribucion = z.object({
+  motivo: textoObligatorio("el motivo de la anulación", "El motivo", 200),
 });
 
 export type DatosDistribucion = z.infer<typeof esquemaDistribucion>;

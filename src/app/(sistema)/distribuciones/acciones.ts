@@ -2,10 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { esquemaDistribucion, esquemaVerificacionVale } from "@/esquemas/distribuciones";
+import { z } from "zod";
+import { esquemaAnulacionDistribucion, esquemaDistribucion, esquemaVerificacionVale } from "@/esquemas/distribuciones";
 import { aResultadoDeError, aResultadoDeValidacion, erroresPorRuta, type ResultadoAccion } from "@/lib/errores";
 import { requerirSesion } from "@/lib/sesion";
-import { buscarValeVigente, registrarDistribucion } from "@/servicios/distribuciones";
+import { anularDistribucion, buscarValeVigente, registrarDistribucion } from "@/servicios/distribuciones";
 
 // Orden fijo de toda acción (contracts/acciones-f005.md):
 // 1. requerirSesion  2. validar con Zod  3. servicio  4. errores  5. revalidar y redirigir
@@ -40,6 +41,31 @@ export async function registrarDistribucionAccion(datos: unknown): Promise<Resul
 
   revalidarAfectadas(resultado.id, resultado.pedidoId, resultado.productoIds);
   redirect(`/distribuciones/${resultado.id}?aviso=registrada`);
+}
+
+/**
+ * Anular una distribución con motivo (Historia 4). El id se fija con .bind() en la ficha. Es la única
+ * corrección posible: una distribución no se edita (D-16).
+ */
+export async function anularDistribucionAccion(
+  distribucionId: number,
+  _estadoPrevio: ResultadoAccion | undefined,
+  formData: FormData,
+): Promise<ResultadoAccion> {
+  const { usuario } = await requerirSesion();
+
+  const validacion = esquemaAnulacionDistribucion.safeParse(Object.fromEntries(formData));
+  if (!validacion.success) return aResultadoDeValidacion(z.flattenError(validacion.error).fieldErrors);
+
+  let resultado: Awaited<ReturnType<typeof anularDistribucion>>;
+  try {
+    resultado = await anularDistribucion(distribucionId, validacion.data.motivo, usuario.id);
+  } catch (error) {
+    return aResultadoDeError(error);
+  }
+
+  revalidarAfectadas(distribucionId, resultado.pedidoId, resultado.productoIds);
+  return { ok: true, datos: undefined, mensaje: "Distribución anulada. El stock se repuso y lo entregado del pedido se descontó." };
 }
 
 /**
