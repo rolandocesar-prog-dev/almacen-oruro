@@ -103,6 +103,20 @@ los anteriores:
 
 Nada se borra: un registro que ya no se usa se **desactiva** desde su ficha y se puede reactivar.
 
+**6. Registrar compras y consultar el inventario**
+
+- **Compras → Registrar compra**, con la factura en mano: proveedor, Nº de factura, fecha y una línea
+  por producto con cantidad y precio. El sistema calcula los subtotales y el total, y al guardar sube
+  el stock de cada producto. Si la factura ya está registrada para ese proveedor, lo avisa al salir
+  del campo.
+- Una compra **no se edita**. Si tiene un error, desde su detalle se **anula** indicando el motivo: el
+  stock se revierte y la factura queda libre para registrarla bien. No se puede anular si ese stock
+  ya se entregó.
+- **Existencias** muestra el stock de cada producto con los que están bajo el mínimo arriba. Desde
+  cada producto se abre su **kardex**, con todos los movimientos que explican su stock.
+- **Existencias → Verificar consistencia** comprueba que el stock de cada producto sea igual a la
+  suma de sus movimientos.
+
 Para detener el sistema, presionar `Ctrl + C` en la ventana de PowerShell. La base de datos sigue
 guardada: la próxima vez basta con abrir Docker Desktop, ejecutar `docker compose up -d` y `npm start`.
 

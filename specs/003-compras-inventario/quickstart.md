@@ -63,3 +63,15 @@ Con la aplicación en marcha (`npm run dev`) y una sesión iniciada.
 Los escenarios que necesitan distribuciones (H3 · E7 con una distribución real, H5 · E2 con stock ya
 distribuido) se prueban con movimientos de salida insertados por `registrarMovimiento` en las pruebas
 de integración, y se recorren en pantalla cuando exista F-005.
+
+## 4. Estado de la validación (15/09/2026)
+
+| Qué | Estado | Cómo se verificó |
+|---|---|---|
+| Pruebas automatizadas (§2) | ✅ | 289 pruebas en verde en 40 archivos (198 de F-001 y F-002, 91 de F-003), más `lint`, `typecheck` y `build` sin errores. Incluyen concurrencia real: 10 compras simultáneas, factura duplicada simultánea, productos en orden inverso, anulación doble y anulación contra salida |
+| Pasos 1, 3, 4, 5, 11, 13, 15, 16 y 17 | ✅ | Páginas pedidas con una sesión de prueba contra la base de pruebas, con datos cargados por los esquemas y servicios reales (método de `docs/decisiones.md`, I-15): proveedor y producto inactivos fuera del formulario; ficha con Bs 125,00, Bs 120,00, Bs 75,00 y total Bs 320,00, "Anular compra" y sin editar ni borrar; existencias con "3 productos · 1 bajo mínimo" y el bajo mínimo arriba; kardex con "Factura 1234 · Distribuidora Andina" y stock 10; filtros por proveedor, factura "12" y estado; compra anulada con motivo y sin opción de anular; kardex con "Anulación de compra"; saldos del rango y aviso de rango invertido; "El inventario es consistente…" con 4 productos; inactivos y búsqueda "LAVANDÍNA"; id inexistente → 404; sin sesión → `/ingreso` |
+| Pasos 2, 6 a 10, 12 y 14: vista previa, aviso de factura al salir del campo, errores por línea, anulación sin motivo y registro de la factura liberada | ✅ por pruebas · ⏳ en pantalla | Cada regla y mensaje está comprobado en las pruebas unitarias e integración; falta verlos en el navegador con una sesión real, porque exigen escribir en el formulario |
+| T038 (375 px, accesibilidad) | ✅ revisión de código · ⏳ visual | Etiquetas en cada campo de cada línea dentro de un `<fieldset>` "Línea n", errores con `aria-describedby`, tablas con desplazamiento propio y bajo mínimo resaltado con texto además de color; falta mirarlo en un teléfono |
+| SC-001 (compra de 5 productos en menos de 3 min) | ⏳ | Se mide en el recorrido manual con Raymond |
+| SC-007 (bajo mínimo en menos de 30 s) | ✅ parte del sistema · ⏳ persona | Existencias respondió en unos 140 ms con los bajo mínimo arriba y contados en el encabezado |
+| H3 · E7 y H5 · E2 (con distribuciones) | ✅ por pruebas | Salidas registradas con `registrarMovimiento` en las pruebas; en pantalla, cuando exista F-005 |

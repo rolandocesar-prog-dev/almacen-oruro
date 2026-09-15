@@ -53,6 +53,27 @@ Detalle completo en [`specs/002-catalogos/research.md`](../specs/002-catalogos/r
 
 ---
 
+## Compras e inventario (plan de F-003, 14/09/2026)
+
+Detalle completo en [`specs/003-compras-inventario/research.md`](../specs/003-compras-inventario/research.md).
+
+| # | Fecha | Decisión | Fundamento | Alternativas descartadas |
+|---|---|---|---|---|
+| K-01 | 14/09 | `registrarMovimiento(tx, …)` en `src/servicios/inventario.ts` es la única escritura del stock: bloquea la fila del producto con `SELECT … FOR UPDATE`, verifica que no quede negativo y escribe movimiento y stock en la misma transacción; con varios productos, en orden de `id` y **antes** de insertar filas que los referencien | Principio III en una frase; el orden de `id` evita interbloqueos, y bloquear antes evita el choque con el `FOR KEY SHARE` de las claves foráneas | `UPDATE … WHERE stock >= x` sin bloqueo explícito, `SERIALIZABLE` con reintentos, triggers |
+| K-02 | 14/09 | Anulación: primero el estado (solo si sigue REGISTRADA), después todos los productos a la vez con un único mensaje de faltantes, después los movimientos inversos con la fecha de la compra | Completa o nada; la anulación doble simultánea revierte una sola vez; el usuario ve todo lo que falta de una vez | Fallar en el primer producto sin stock, bloquear la compra aparte |
+| K-03 | 14/09 | Formulario de compra con las líneas en estado de React; la acción recibe un objeto validado con el mismo esquema y los errores vuelven por ruta (`lineas.1.cantidad`) | Un `FormData` plano no representa bien una lista; lo escrito nunca se pierde | React Hook Form, un formulario por línea, campos indexados |
+| K-04 | 14/09 | Montos como texto con coma o punto; vista previa en centavos enteros; guardado con `Prisma.Decimal` calculado por el servidor | Sin redondeos de coma flotante; el cliente nunca envía montos (X-14) | `number` de JavaScript, centavos en la base |
+| K-05 | 14/09 | Aviso de factura duplicada al salir del campo con una Server Action de solo lectura; al guardar decide el índice único parcial | RN-21: avisar antes y verificar como autoridad | Verificar en cada tecla, ruta de API aparte |
+| K-06 | 14/09 | Fecha del documento como texto `AAAA-MM-DD`, guardada a medianoche UTC; "no futura" contra hoy en La Paz | Una columna `date` no tiene hora: así no se corre un día | Convertir con la hora de Bolivia |
+| K-07 | 14/09 | Existencias filtradas en memoria, bajo mínimo primero; por defecto activos e inactivos con stock | Decenas de productos; SC-007 sin interacción | Reutilizar el listado de productos, ordenar en SQL |
+| K-08 | 14/09 | Kardex en orden de `id`, sin paginar, con saldo anterior y final por fecha del documento; verificación de consistencia con `groupBy` a pedido | Todo con consultas de Prisma; un kardex completo se explica mejor | Función de ventana en SQL, paginar el kardex |
+| K-09 | 14/09 | Listado de compras filtrado en la base, factura "empieza con", 50 por página | Las compras crecen sin límite (36 meses simulados) | Filtrar en memoria como los catálogos |
+| K-10 | 14/09 | Rutas `/compras`, `/existencias`, `/existencias/verificacion` y `/kardex/[productoId]`; ficha de compra sin editar ni borrar, solo anular | Nombres ya reservados en F-001; D-16 | — |
+| K-11 | 14/09 | Registro: verificaciones fuera de la transacción, montos, y una transacción que bloquea productos, crea compra y líneas y registra las entradas | Mensajes claros antes; todo o nada después (RN-20) | Validar dentro de la transacción |
+| K-12 | 14/09 | Pruebas de concurrencia reales con `Promise.all`; transacciones con `maxWait` y `timeout` de 10 s | Sin concurrencia real el `FOR UPDATE` no se prueba; los límites por defecto (2 s y 5 s) cortarían esperas legítimas | Simular la concurrencia |
+
+---
+
 ## Implementación
 
 Decisiones tomadas durante la implementación que no estaban en el plan.
@@ -74,3 +95,10 @@ Decisiones tomadas durante la implementación que no estaban en el plan.
 | I-13 | 14/09 | Componentes compartidos de catálogos: `CambioDeEstado` (generalizado desde personal), `InsigniaEstado`, `Selector`, `Dato`, `MensajeVacio`, `EncabezadoListado` | Evita repetir el mismo marcado en seis catálogos sin esconder la lógica de cada uno |
 | I-14 | 14/09 | La búsqueda y el filtro por categoría se implementaron junto con cada catálogo (fases 3 a 6) y la fase de la Historia 5 agregó su prueba | Escribir cada listado una sola vez; el resultado es el mismo que el orden de tareas previsto |
 | I-15 | 14/09 | El recorrido de F-002 se verificó con un servidor de desarrollo contra la base de pruebas, datos cargados por esquemas y servicios, y una sesión de prueba creada en la base | Mismo criterio que I-08: sin escribir contraseñas en el navegador y sin dejar datos en la base de desarrollo |
+| I-16 | 15/09 | Dos funciones para fechas de filtros: `fechaDeFiltro(porDefecto)` y `fechaOpcionalDeFiltro()` | Con un solo parámetro opcional, TypeScript perdía que la fecha con valor por defecto siempre existe y el historial de sesiones dejaba de compilar |
+| I-17 | 15/09 | `aFechaDocumento`, `textoDeFechaDocumento` y `formatearFecha` viven en `src/lib/fechas.ts` | Los usan compras e inventario; en el servicio de compras obligaban a inventario a importarlo, y compras ya importa inventario |
+| I-18 | 15/09 | `verificarConsistenciaInventario` lee productos y sumas en una transacción `REPEATABLE READ` | Las dos lecturas ven el mismo instante: una compra registrada entre ambas no produce una diferencia falsa |
+| I-19 | 15/09 | El precio referencial de F-002 comparte con `montoPositivo` la regla `esMontoPositivo`, pero conserva su esquema propio | Envolver `montoPositivo` como opcional volvía obligatoria la clave en el tipo y rompía llamadas sin precio; reglas y mensajes no cambian |
+| I-20 | 15/09 | Cada línea del formulario de compra es un `<fieldset>` con leyenda "Línea n" y etiquetas visibles (Producto, Cantidad, Precio unitario) | Da el mismo contexto que etiquetas ocultas "Producto de la línea n", se lee mejor en pantallas chicas y el aviso general repite los errores con su número de línea |
+| I-21 | 15/09 | `crearMovimientoDePrueba` de F-002 registra una compra real con `registrarCompra` | Ninguna prueba escribe el stock por fuera de la función central; las pruebas de catálogos siguieron en verde |
+| I-22 | 15/09 | El recorrido de F-003 usó el mismo método que I-15 | Mismo criterio: sin contraseñas en el navegador y sin datos en la base de desarrollo |
