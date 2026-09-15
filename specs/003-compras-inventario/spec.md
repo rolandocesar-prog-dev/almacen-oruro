@@ -57,8 +57,8 @@ X-05, X-06, X-12 y X-14.
 El encargado registra la compra que llegó con una factura: elige el proveedor, escribe el número de
 factura y la fecha, agrega los productos con cantidad y precio unitario, y guarda. El sistema
 calcula los subtotales y el total, suma el stock de cada producto y deja el movimiento en el
-kardex. Si el número de factura ya está registrado para ese proveedor, se le avisa apenas lo
-escribe, antes de cargar los productos.
+kardex. Si el número de factura ya está registrado para ese proveedor, se le avisa al salir del
+campo, antes de cargar los productos.
 
 **Por qué esta prioridad**: es la única forma de que entre stock al almacén; sin compras no hay
 distribuciones ni histórico. Corrige el defecto más grave de 2022 (X-01).
@@ -76,7 +76,7 @@ una línea inválida y se verifica que no cambia nada.
    subtotales son 125,00 y 120,00 y el total es 245,00, calculados por el sistema aunque se envíe
    otro valor desde el formulario (RN-23).
 3. **Dada** una factura 1234 vigente del proveedor A, **cuando** se escribe 1234 con el proveedor A
-   elegido, **entonces** el formulario avisa de inmediato "La factura 1234 ya está registrada para
+   elegido y se sale del campo, **entonces** el formulario avisa de inmediato "La factura 1234 ya está registrada para
    este proveedor"; si igual se intenta guardar, se rechaza y no cambia ningún stock (RN-21).
 4. **Dada** la misma factura 1234 vigente del proveedor A, **cuando** se registra la factura 1234
    del proveedor B, **entonces** se acepta (X-05).
@@ -242,8 +242,9 @@ factura queda libre; se intenta anular una compra cuyo stock ya se distribuyó.
 - **Precio con más de 2 decimales:** se rechaza indicando que el precio admite hasta 2 decimales.
 - **Cantidad desmedida en una línea:** más de 1 000 000 unidades se rechaza indicando el máximo; ninguna
   compra real del almacén se acerca a ese valor y así el stock nunca desborda su columna.
-- **Sesión expirada al guardar:** no se guarda nada (F-001) y los datos escritos se pierden; el
-  mensaje lo advierte.
+- **Sesión expirada al guardar:** no se guarda nada (F-001): se vuelve al ingreso con el aviso de
+  sesión expirada de F-001 y lo escrito en el formulario se pierde. La sesión dura 8 horas desde el
+  ingreso, así que solo ocurre si la compra se carga al final de la jornada.
 - **Documento con fecha anterior a otros ya registrados:** en el kardex aparece según su orden de
   registro, por lo que las fechas del documento pueden verse desordenadas; los saldos de cada fila
   no cambian, y el saldo anterior y final de un rango sí reflejan la fecha del documento.
@@ -265,8 +266,8 @@ factura queda libre; se intenta anular una compra cuyo stock ya se distribuyó.
   `total = suma de subtotales`, ignorando cualquier subtotal o total enviado desde el formulario
   (RN-23, X-14). El formulario muestra una vista previa de los cálculos mientras se carga.
 - **FR-004**: El sistema DEBE impedir registrar una compra con un Nº de factura que ya tiene otra
-  compra REGISTRADA del mismo proveedor (RN-21, RN-26), avisándolo al escribir el número y
-  verificándolo de nuevo al guardar.
+  compra REGISTRADA del mismo proveedor (RN-21, RN-26), avisándolo al salir del campo del
+  número y verificándolo de nuevo al guardar.
 - **FR-005**: Al guardar, el sistema DEBE, en una sola operación indivisible: guardar la cabecera y
   todas las líneas, registrar un movimiento `ENTRADA_COMPRA` por línea con la cantidad y el saldo
   resultante, y sumar la cantidad al stock actual de cada producto. Si cualquier paso falla, NO

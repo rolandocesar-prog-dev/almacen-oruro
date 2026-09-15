@@ -148,7 +148,7 @@ porque F-005 lo usa igual para las distribuciones.
 |---|---|
 | Interbloqueos o esperas largas con compras y anulaciones simultáneas | Bloqueo en orden de `id`; pruebas de concurrencia con productos en orden inverso (K-12) |
 | El formulario de líneas es el componente de cliente más grande del sistema | Estado simple (arreglo de líneas), mismo esquema Zod, errores por ruta; se prueba primero la lógica pura (centavos, errores) |
-| Fechas de tipo `date` corridas un día por zona horaria | Se tratan como texto `AAAA-MM-DD` y medianoche UTC (K-06); prueba de una compra registrada a las 21:00 de La Paz |
+| Fechas de tipo `date` corridas un día por zona horaria | Se tratan como texto `AAAA-MM-DD` y medianoche UTC (K-06); prueba unitaria de `fechaNoFutura` a las 21:30 y a las 00:30 de La Paz, y prueba de integración de que la fecha se guarda y se lee igual |
 | F-005 necesita reglas de salida que F-003 no ejercita en pantalla | `registrarMovimiento` ya rechaza saldos negativos y se prueba con salidas insertadas por un ayudante |
 | El día 16/09 no alcanza para todo | Orden de corte: primero la Historia 5 (anulación, P2); las Historias 1 a 4 son imprescindibles para F-004 y F-005 |
 

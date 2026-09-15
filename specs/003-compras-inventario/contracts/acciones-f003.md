@@ -24,7 +24,7 @@ Todas bajo `src/app/(sistema)/`, protegidas con `requerirSesion()`.
 |---|---|---|
 | `/compras` | Listado de compras | `desde`, `hasta`, `proveedor`, `estado`, `factura`, `pagina` (data-model §5) |
 | `/compras/nueva` | Registrar compra | — |
-| `/compras/[id]` | Detalle de la compra y anulación | `aviso` = `registrada` |
+| `/compras/[id]` | Detalle de la compra y anulación | `aviso` = `registrada` (`esquemaAvisoCompra`; otro valor se ignora) |
 | `/existencias` | Consulta de existencias | `q`, `categoria`, `estado`, `bajoMinimo` |
 | `/existencias/verificacion` | Verificación de consistencia del inventario | — |
 | `/kardex/[productoId]` | Kardex de un producto | `desde`, `hasta` |

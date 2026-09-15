@@ -21,6 +21,12 @@ transacción interactiva (`prisma.$transaction(async (tx) => …)`):
    (consulta parametrizada con `tx.$queryRaw` y `Prisma.join`) y devuelve el stock de cada producto.
    El `ORDER BY id` hace que dos documentos con los mismos productos los bloqueen siempre en el mismo
    orden: no hay interbloqueos.
+
+   **Se bloquea siempre antes de insertar filas que referencien al producto** (líneas de compra o de
+   pedido, movimientos). Al insertar una de esas filas, PostgreSQL toma sobre el producto un bloqueo
+   `FOR KEY SHARE`, por la clave foránea, y `FOR UPDATE` choca con él. Si dos transacciones insertaran
+   primero y bloquearan después, cada una esperaría a la otra y PostgreSQL abortaría una por
+   interbloqueo.
 2. `registrarMovimiento(tx, { productoId, tipo, cantidad, fechaDocumento, compraId | distribucionId,
    usuarioId })`: vuelve a leer la fila bloqueada (dentro de la misma transacción el bloqueo ya es
    suyo), calcula `saldo = stock_actual + cantidad`, rechaza si `saldo < 0`, inserta el movimiento con
@@ -246,8 +252,8 @@ sin traer facturas que solo lo contienen en el medio.
 1. Fuera de la transacción, lecturas que dan mensajes claros: proveedor existe y está activo; todos
    los productos existen y están activos (RN-14, un solo `findMany`); factura libre (K-05).
 2. Cálculo de subtotales y total con `Prisma.Decimal` y control del máximo (K-04).
-3. Transacción: crear la compra con sus líneas (`lineas: { create: [...] }`); `bloquearProductos` con
-   los productos ordenados por `id`; un `registrarMovimiento` `ENTRADA_COMPRA` por línea con
+3. Transacción: **primero** `bloquearProductos` con los productos ordenados por `id` (K-01); después
+   crear la compra con sus líneas (`lineas: { create: [...] }`); un `registrarMovimiento` `ENTRADA_COMPRA` por línea con
    `fechaDocumento` = fecha de la compra.
 4. Si la transacción falla por P2002 del índice de factura, se responde con el mensaje de factura
    duplicada. Cualquier otro error deshace todo (RN-20, X-01).
@@ -274,8 +280,10 @@ base real, cada una con su propia transacción:
 | 2 anulaciones simultáneas de la misma compra | una anula; la otra recibe "ya está anulada"; el stock se revierte una sola vez |
 | Anulación con stock insuficiente en una de varias líneas | nada cambia |
 
-El pool de conexiones del adaptador `pg` permite varias transacciones a la vez; el tiempo de espera
-de las transacciones interactivas se amplía a 10 s para estas pruebas si hace falta.
+`registrarCompra` y `anularCompra` abren su transacción con
+`prisma.$transaction(fn, { maxWait: 10_000, timeout: 10_000 })`. Por defecto Prisma espera 2 s por
+una conexión libre y corta la transacción a los 5 s. Con varias compras simultáneas que esperan el
+mismo bloqueo, esos límites se alcanzarían sin que haya ningún error real.
 
 **Fundamento**: el principio IX pone los movimientos de stock y la no negatividad entre las reglas
 que deben quedar demostradas; sin concurrencia real, el `FOR UPDATE` no se probaría.

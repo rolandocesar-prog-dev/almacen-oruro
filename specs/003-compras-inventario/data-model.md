@@ -123,9 +123,11 @@ Con `{f}` = 1 se usa "falta 1 unidad".
 **Secuencia dentro de una transacción de documento**:
 
 ```text
-1. crear o actualizar el documento (compra con líneas | compra → ANULADA)
+1. [anulación] compra → ANULADA solo si sigue REGISTRADA (updateMany condicional)
 2. bloquearProductos(tx, ids ordenados)        → SELECT … ORDER BY id FOR UPDATE
-3. [anulación] verificar faltantes de todos los productos y rechazar con un único error
+   (siempre ANTES de insertar filas que referencien al producto: research K-01)
+3. [registro]  crear la compra con sus líneas
+   [anulación] verificar faltantes de todos los productos y rechazar con un único error
 4. por cada línea, en orden de producto: registrarMovimiento(tx, …)
       saldo = stock_actual + cantidad  →  saldo < 0 ⇒ error
       INSERT movimiento_inventario (…, saldo_resultante = saldo)
@@ -159,6 +161,10 @@ Fila: código, producto, categoría, unidad, stock actual, stock mínimo, indica
 | Parámetro | Valores | Por defecto |
 |---|---|---|
 | `desde`, `hasta` | fecha `AAAA-MM-DD` (del documento); `desde ≤ hasta` ("La fecha «desde» no puede ser posterior a «hasta»") | sin rango |
+
+Con solo `desde`: saldo anterior = suma con fecha del documento anterior a `desde`, y saldo final =
+suma de todos los movimientos (el stock actual). Con solo `hasta`: saldo anterior 0, y saldo final =
+suma hasta `hasta`.
 
 Fila: fecha del documento, registrado el, tipo ("Entrada por compra", "Anulación de compra",
 "Salida por distribución", "Anulación de distribución"), documento ("Factura 1234 · Distribuidora
