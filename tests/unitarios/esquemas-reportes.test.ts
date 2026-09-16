@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { esquemaReporteCompras, esquemaReporteDistribuciones, textoDeFiltros } from "@/esquemas/reportes";
+import { esquemaReporteCompras, esquemaReporteDistribuciones, esquemaReporteExistencias, textoDeFiltros } from "@/esquemas/reportes";
 import { hoyEnLaPaz, inicioDelMesEnCurso } from "@/lib/fechas";
 
 describe("textoDeFiltros (FR-006)", () => {
@@ -73,5 +73,16 @@ describe("esquemaReporteDistribuciones (FR-010)", () => {
 
   it("ignora un representante o un producto inválidos", () => {
     expect(esquemaReporteDistribuciones.parse({ representante: "x", producto: "-1" })).toMatchObject({ representante: undefined, producto: undefined });
+  });
+});
+
+describe("esquemaReporteExistencias (FR-011)", () => {
+  it("no lleva rango de fechas: es la situación al emitirlo", () => {
+    expect(esquemaReporteExistencias.parse({})).toEqual({ categoria: undefined, soloBajoMinimo: false });
+  });
+
+  it("acepta la categoría y la casilla de bajo mínimo", () => {
+    expect(esquemaReporteExistencias.parse({ categoria: "3", soloBajoMinimo: "si" })).toEqual({ categoria: 3, soloBajoMinimo: true });
+    expect(esquemaReporteExistencias.parse({ categoria: "abc" }).categoria).toBeUndefined();
   });
 });

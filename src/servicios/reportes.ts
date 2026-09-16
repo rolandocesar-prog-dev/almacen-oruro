@@ -10,6 +10,7 @@ import type { Prisma } from "@/generado/prisma/client";
 import { aFechaDocumento, textoDeFechaDocumento } from "@/lib/fechas";
 import { prisma } from "@/lib/prisma";
 import { compararEnEspanol } from "@/lib/texto";
+import { listarExistencias } from "./inventario";
 
 /** En pantalla el reporte se pagina; la vista de impresión pide todas las filas (research E-04). */
 export const FILAS_POR_PAGINA_REPORTE = 100;
@@ -158,5 +159,42 @@ export async function reporteDistribuciones(
       estado: linea.distribucion.estado,
     })),
     totales: { porProducto: [...porProducto.values()].sort((a, b) => compararEnEspanol(a.nombre, b.nombre)) },
+  };
+}
+
+/**
+ * R-3 · Existencias al momento de emitir el reporte (FR-011). Reutiliza `listarExistencias` de F-003 para
+ * que sean exactamente los mismos productos e indicadores que la consulta en pantalla —incluidos los
+ * inactivos que todavía tienen stock—, y los agrupa por categoría. No lleva rango de fechas: el pasado se
+ * consulta con el kardex (Historia 3 · E4).
+ */
+export async function reporteExistencias(filtro: { categoriaId?: number; soloBajoMinimo: boolean }) {
+  const { productos } = await listarExistencias({
+    // "habituales": activos e inactivos con stock, los mismos que muestra la consulta de F-003 (FR-011).
+    estado: "habituales",
+    categoriaId: filtro.categoriaId,
+    soloBajoMinimo: filtro.soloBajoMinimo,
+  });
+
+  const filas = productos.map((producto) => ({
+    id: producto.id,
+    codigo: producto.codigo,
+    nombre: producto.nombre,
+    categoria: producto.categoria,
+    unidad: producto.unidad,
+    abreviatura: producto.abreviatura,
+    stockActual: producto.stockActual,
+    stockMinimo: producto.stockMinimo,
+    // RN-52: solo un producto activo está "bajo mínimo"; los inactivos se marcan como tales.
+    indicador: producto.bajoMinimo ? "Bajo mínimo" : producto.activo ? "—" : "Inactivo",
+  }));
+
+  const categorias = [...new Set(filas.map((fila) => fila.categoria))].sort(compararEnEspanol);
+  return {
+    grupos: categorias.map((categoria) => ({
+      categoria,
+      filas: filas.filter((fila) => fila.categoria === categoria).sort((a, b) => compararEnEspanol(a.nombre, b.nombre)),
+    })),
+    totales: { productos: filas.length, bajoMinimo: filas.filter((fila) => fila.indicador === "Bajo mínimo").length },
   };
 }
