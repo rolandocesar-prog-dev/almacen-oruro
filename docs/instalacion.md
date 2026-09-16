@@ -70,6 +70,29 @@ npx prisma db seed
 
 Debe decir `✓ Usuario 'admin' creado`.
 
+**6. (Solo para la demostración) Cargar el histórico simulado.** El almacén no tiene años de datos
+digitalizados y el pronóstico necesita historia. Este comando crea el catálogo y **36 meses** de compras,
+pedidos y distribuciones usando las mismas reglas que el sistema, y deja la base marcada como de
+demostración:
+
+```bash
+npm run datos:simulados -- --semilla 20260915
+```
+
+- Tarda **unos 10 segundos** y muestra el avance mes a mes. Termina con `✓ Histórico simulado generado`.
+- Con la misma semilla, los datos son siempre los mismos.
+- **Solo funciona sobre una base sin compras, pedidos ni distribuciones**; si ya hay documentos, se niega y
+  no cambia nada. No se ofrece en ninguna pantalla, a propósito.
+- Mientras la base tenga estos datos, todas las pantallas y hojas impresas dicen "Datos simulados con
+  fines de demostración".
+- Para volver a generarlo, se recrea la base: `docker compose down -v`, `docker compose up -d`,
+  `npx prisma migrate deploy`, `npx prisma db seed` y otra vez este comando. **Eso borra todos los datos.**
+
+**7. (Opcional) Clave para los informes IA.** Para **generar** informes redactados por el modelo de
+lenguaje, poner en `.env` la línea `ANTHROPIC_API_KEY="…"` con la clave de la cuenta de Anthropic. Sin
+clave, todo lo demás funciona igual —incluidos el pronóstico, la evaluación y la consulta e impresión de
+informes ya guardados— y "Generar informe" avisa que el servicio de redacción no está disponible.
+
 ---
 
 ## 3. Usar el sistema
@@ -160,6 +183,28 @@ Nada se borra: un registro que ya no se usa se **desactiva** desde su ficha y se
 - Si la base tiene datos simulados (los carga el generador del módulo de inteligencia artificial), todas
   las pantallas y las hojas impresas muestran "Datos simulados con fines de demostración".
 
+**10. Pronóstico, reposición e informes IA**
+
+- **IA → Pronóstico y reposición** muestra, para cada producto activo, cuánto se espera consumir **este
+  mes**, el stock, el mínimo y la **reposición sugerida**, con la fórmula a la vista:
+  `máx(0, ⌈pronóstico + stock mínimo − stock actual⌉)`. Se filtra por categoría y por "Solo con reposición
+  mayor que 0". Con 24 meses de historia o más se usa Holt-Winters; con menos, un promedio. Se calcula en
+  el momento, **sin internet**, y no se guarda nada.
+- **Ver gráfico** abre el consumo mensual del producto, el pronóstico del mes y, si tiene al menos 30
+  meses, los pronósticos de los 6 meses reservados para validar; debajo, la tabla con los mismos números.
+- **IA → Evaluación del pronóstico** compara el método del sistema con dos métodos simples (ingenuo
+  estacional y promedio móvil) sobre los últimos 6 meses, con MAE y WAPE por producto y en general. En los
+  dos, **menos es mejor**.
+- **IA → Informes IA → Generar informe**: tipo (compras o distribuciones) y período (por defecto, el mes
+  anterior). El sistema calcula los datos y el modelo **solo redacta** el resumen, los hallazgos, las alertas
+  y las recomendaciones. **Necesita internet y la clave del paso 7**; puede tardar hasta un minuto. Si falla,
+  no se guarda nada y el mensaje dice por qué.
+- Cada informe guarda el texto **junto a la tabla de datos** con que se redactó, el modelo, la fecha y quién
+  lo generó. Si una cifra del texto no está en la tabla, se marca con "Cifra no encontrada en los datos".
+  Los informes no se editan ni se borran; generar otro crea uno nuevo.
+- Los informes guardados se consultan e **imprimen sin internet**.
+- El procedimiento de cálculo, paso a paso, está en [`metodo-pronostico.md`](metodo-pronostico.md).
+
 Para detener el sistema, presionar `Ctrl + C` en la ventana de PowerShell. La base de datos sigue
 guardada: la próxima vez basta con abrir Docker Desktop, ejecutar `docker compose up -d` y `npm start`.
 
@@ -174,6 +219,8 @@ guardada: la próxima vez basta con abrir Docker Desktop, ejecutar `docker compo
 | `Define CONTRASENA_INICIAL en .env con al menos 8 caracteres` | Revisar el paso 2 de la sección 2 |
 | Nadie recuerda la contraseña de `admin` | Otro usuario activo puede restablecerla desde **Personal → ficha de admin → Restablecer contraseña** |
 | "Tu sesión expiró. Ingresa nuevamente" | Es normal: la sesión dura 8 horas desde el ingreso |
+| `El generador solo se ejecuta sobre una base sin compras, pedidos ni distribuciones` | La base ya tiene documentos: para regenerar el histórico, recrearla como dice el paso 6 de la sección 2 |
+| "No se pudo generar el informe: sin conexión con el servicio de redacción" | Revisar la conexión a internet y la línea `ANTHROPIC_API_KEY` de `.env` (paso 7 de la sección 2); los informes ya guardados se siguen consultando |
 
 ---
 

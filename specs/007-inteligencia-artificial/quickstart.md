@@ -69,3 +69,22 @@ Con la aplicación en marcha (`npm run dev`) y una sesión iniciada, sobre la ba
 | 17 | Imprimir un informe | Hoja con el encabezado de reportes, texto, tabla, modelo, fecha, la nota "Texto redactado por un modelo de lenguaje a partir de los datos de la tabla" y la leyenda de datos simulados | H6 · E3 |
 | 18 | Generar otra vez el mismo tipo y período | Se guarda uno nuevo; el anterior no cambia | H6 · E4 |
 | 19 | Medir el paso 4 con la evaluación completa y el paso 11 | Pronóstico y evaluación en menos de 10 s; informe en menos de 60 s | SC-005, SC-006 |
+
+## 4. Estado de la validación (16/09/2026)
+
+| Qué | Estado | Cómo se verificó |
+|---|---|---|
+| Pruebas automatizadas (§2) | ✅ | 602 pruebas en verde en 87 archivos (477 de F-001 a F-006 y 125 de F-007), más `lint`, `typecheck` y `build` sin errores. Ninguna llama al modelo ni necesita clave. Incluyen además el consumo simulado con estación, tendencia y ruido acotado, el formato del texto guardado, la traducción de los errores del SDK, el resaltado de cifras (FR-025) y los invariantes: el cálculo no escribe, los informes solo se crean, `redactor.ts` es el único archivo que importa el SDK y el generador no aparece en ninguna pantalla |
+| Pasos 1 a 3 (histórico simulado) | ✅ | `npm run datos:simulados -- --semilla 20260915` sobre la base de pruebas vacía: 36 meses, 25 productos, 113 compras (5 anuladas), 188 pedidos (6 anulados), 187 distribuciones (7 anuladas), 1864 movimientos, en **9,4 s**. Banda de datos simulados en todas las pantallas, productos sin stock junto a otros con stock de sobra y "El inventario es consistente" |
+| Pasos 4 a 8 y 10 | ✅ | Páginas pedidas con una sesión de prueba (método de `docs/decisiones.md`, I-15 e I-52): 25 productos con Holt-Winters, 838 unidades sugeridas y la fórmula a la vista; dos cargas idénticas; BOL-002 con 81,7 + 68 − 0 → 150 y DES-003 con 214 en stock → 0; filtros por categoría y "solo con reposición"; evaluación con los 25 productos evaluables y Holt-Winters primero (MAE 10,6 y WAPE 17,1 % contra 10,9 y 17,7 % del ingenuo estacional y 19,9 y 32,1 % del promedio móvil); gráfico de DES-002 con barras, línea de validación, barra rayada del mes y tabla de respaldo. Sin sesión, todas las rutas llevan a `/ingreso` |
+| Paso 9 (sin internet) | ✅ por código · ⏳ físico | Una prueba verifica que serie, método, pronóstico, evaluación y detalle no importan el redactor, `fetch` ni el SDK; no se desconectó la red en el recorrido |
+| Pasos 11 a 13 y SC-006, SC-007 (redacción real) | ⏳ Q-02 | No hay clave de API. Se verificó el formulario (tipos, mes anterior por defecto, aviso de que generar necesita internet); la redacción, su tiempo y la comparación cifra por cifra quedan para cuando Raymond tenga la clave |
+| Pasos 14 y 15 | ✅ | Período sin documentos → "No hay datos suficientes para ese período: no se generó el informe"; con el redactor **real** y sin clave → "No se pudo generar el informe: sin conexión con el servicio de redacción…" en 112 ms, sin guardar nada |
+| Pasos 16 a 18 | ✅ con redactor de prueba | Tres informes guardados con un redactor de prueba marcado como tal: listado del más reciente al más antiguo con filtro por tipo, ficha con texto, "Sin alertas en el período", tabla de datos, modelo, fecha, usuario y la nota del modelo; hoja de impresión con el encabezado de reportes, la leyenda de datos simulados y sin menú; generar dos veces crea dos informes y el primero no cambia |
+| SC-005 (pronóstico y evaluación en menos de 10 s) | ✅ | Con los 36 meses: pronóstico en 379 ms y evaluación en 417 ms |
+| 375 px y gráfico | ✅ | Revisado en el navegador integrado: ninguna pantalla del módulo desborda a 375 px y el gráfico se lee con su leyenda |
+| SC-010 (reposición rehecha a mano por alguien ajeno) | ⏳ | En el recorrido con Raymond |
+
+Mejoras que salieron del recorrido: el generador pedía la quinta parte del consumo previsto y dejaba meses
+en 0 que arrastraban el pronóstico (corregido, I-50), la unidad del eje del gráfico se encimaba con la
+primera marca y la ficha del informe desbordaba en pantallas angostas (corregidos).

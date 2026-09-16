@@ -45,7 +45,7 @@ export default async function PaginaImprimirInforme({ params }: { params: Promis
 
       <section className="flex flex-col gap-2">
         <h2 className="text-lg font-semibold">Texto del informe</h2>
-        <TextoInforme texto={informe.texto} />
+        <TextoInforme texto={informe.texto} datos={informe.datosEntrada} />
         <p className="text-sm italic">{NOTA_TEXTO_REDACTADO}.</p>
       </section>
 

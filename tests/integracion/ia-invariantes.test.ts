@@ -25,7 +25,7 @@ function archivos(carpeta: string): string[] {
 
 describe("invariantes del código de IA", () => {
   it("serie, método, pronóstico, evaluación y detalle solo leen (FR-004)", () => {
-    for (const archivo of ["serie.ts", "holt-winters.ts", "pronostico.ts", "evaluacion.ts", "detalle.ts", "texto-informe.ts"]) {
+    for (const archivo of ["serie.ts", "holt-winters.ts", "pronostico.ts", "evaluacion.ts", "detalle.ts", "texto-informe.ts", "verificacion-cifras.ts"]) {
       expect(leer(`src/servicios/ia/${archivo}`), archivo).not.toMatch(ESCRITURA);
     }
   });

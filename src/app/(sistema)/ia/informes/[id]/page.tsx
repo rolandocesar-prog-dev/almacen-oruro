@@ -51,10 +51,10 @@ export default async function PaginaInforme({
       </dl>
 
       {/* FR-013: el texto junto a la tabla de datos con que se redactó, para verificar cada cifra (SC-007). */}
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className="flex flex-col gap-2 rounded-md border border-borde bg-white p-4">
           <h2 className="text-lg font-semibold">Texto del informe</h2>
-          <TextoInforme texto={informe.texto} />
+          <TextoInforme texto={informe.texto} datos={informe.datosEntrada} />
           <p className="mt-2 text-xs italic text-gray-600">{NOTA_TEXTO_REDACTADO}.</p>
         </div>
         <div className="flex min-w-0 flex-col gap-2 overflow-x-auto rounded-md border border-borde bg-white p-4">

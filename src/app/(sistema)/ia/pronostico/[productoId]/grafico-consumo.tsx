@@ -15,7 +15,7 @@ const COLOR_GRILLA = "#e4e7eb";
 
 const ANCHO = 760;
 const ALTO = 300;
-const MARGEN = { arriba: 16, derecha: 12, abajo: 44, izquierda: 44 };
+const MARGEN = { arriba: 28, derecha: 12, abajo: 44, izquierda: 44 };
 
 /** Escala "linda" del eje vertical: el máximo redondeado hacia arriba a 1, 2 o 5 × 10ⁿ. */
 function maximoDelEje(valor: number): number {
@@ -105,7 +105,7 @@ export function GraficoConsumo({ detalle }: { detalle: DetalleDePronostico }) {
               </text>
             </g>
           ))}
-          <text x={4} y={MARGEN.arriba - 4} fontSize="11" fill={COLOR_EJE}>
+          <text x={4} y={12} fontSize="11" fill={COLOR_EJE}>
             {detalle.producto.unidad}
           </text>
 

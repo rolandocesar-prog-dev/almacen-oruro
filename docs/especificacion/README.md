@@ -100,8 +100,8 @@ Las especificaciones de las 7 funcionalidades se escriben **juntas al inicio**, 
 | Mar | 15/09 | Implementar F-001 ✅ (adelantado: `plan`, `tasks`, `analyze` e implementación el 13–14/09, 77 pruebas en verde) y F-002 ✅ (adelantado al 14/09: 198 pruebas en verde) | Ingreso y catálogos funcionando |
 | Mié | 16/09 | Implementar F-003 ✅ (adelantado al 15/09: 289 pruebas en verde) | Compras, kardex y existencias |
 | Jue | 17/09 | Implementar F-004 ✅ (adelantado al 15/09: 365 pruebas en verde) y F-005 ✅ (adelantado al 15/09: 427 pruebas en verde) | Ciclo completo compra → pedido → distribución |
-| Vie | 18/09 | Implementar F-006 ✅ (adelantado al 15/09: 477 pruebas en verde) y el generador de datos simulados de F-007 | Reportes y 36 meses de datos |
-| Sáb | 19/09 | Implementar pronóstico, evaluación, reposición e informes IA | Módulo de IA |
+| Vie | 18/09 | Implementar F-006 ✅ (adelantado al 15/09: 477 pruebas en verde) y el generador de datos simulados de F-007 ✅ (adelantado al 16/09) | Reportes y 36 meses de datos |
+| Sáb | 19/09 | Implementar pronóstico, evaluación, reposición e informes IA ✅ (adelantado al 16/09: 602 pruebas en verde; la redacción con el modelo real espera la clave, Q-02) | Módulo de IA |
 | Dom | 20/09 | Prueba de punta a punta, `/speckit-analyze`, correcciones, `docs/decisiones.md`, guía de instalación | Versión candidata |
 | Lun | 21/09 | **Entrega a Raymond** | Sistema, especificaciones y documento de decisiones |
 

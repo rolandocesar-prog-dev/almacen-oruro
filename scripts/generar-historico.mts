@@ -28,7 +28,7 @@ function leerSemilla(argumentos: string[]): number {
 async function main() {
   const semilla = leerSemilla(process.argv.slice(2));
   console.log(`Generando 36 meses de histórico simulado con la semilla ${semilla}…`);
-  console.log("Puede tardar varios minutos: cada compra, pedido y distribución se registra con los servicios reales.\n");
+  console.log("Tarda unos segundos: cada compra, pedido y distribución se registra con los servicios reales.\n");
 
   const inicio = Date.now();
   const resumen = await generarHistorico({ semilla, alPaso: (aviso) => console.log(`  ${aviso}`) });

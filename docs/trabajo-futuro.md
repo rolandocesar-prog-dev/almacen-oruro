@@ -58,7 +58,9 @@ Alcance general fuera de la entrega: ver
 - Pronóstico del mes siguiente además del mes en curso, y reentrenamiento programado.
 - Chat conversacional con los datos y pronóstico de precios.
 - Envío de informes por correo y edición del texto de un informe.
-- Resaltado automático de las cifras del texto que no están en los datos (FR-025, P3), si no alcanza el tiempo.
+- Enlazar el resaltado de cifras con la celda de la tabla donde está cada número (hoy solo se marca lo que no se encontró).
+- Mostrar `docs/metodo-pronostico.md` dentro del sistema (hoy las pantallas indican dónde está el archivo).
+- Probar otros métodos de referencia (suavizado exponencial simple, Holt sin estacionalidad) y elegir el método por producto según la evaluación.
 
 ## Otras funcionalidades
 

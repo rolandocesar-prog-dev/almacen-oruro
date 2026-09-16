@@ -137,6 +137,30 @@ Detalle completo en [`specs/006-reportes/research.md`](../specs/006-reportes/res
 
 ---
 
+## Inteligencia artificial (plan de F-007, 15/09/2026)
+
+Detalle completo en [`specs/007-inteligencia-artificial/research.md`](../specs/007-inteligencia-artificial/research.md).
+El procedimiento de cálculo, paso a paso y con un ejemplo, está en [`metodo-pronostico.md`](metodo-pronostico.md).
+
+| # | Fecha | Decisión | Fundamento | Alternativas descartadas |
+|---|---|---|---|---|
+| A-01 | 15/09 | Serie de consumo mensual = −Σ de las salidas por distribución y sus anulaciones, agrupada por mes en TypeScript, del primer movimiento al mes anterior al actual y con 0 en los meses sin movimientos | Sale del kardex (principio III); la anulación lleva la fecha del documento (RN-53) y ningún mes queda negativo | `date_trunc` con SQL crudo; guardar la serie en una tabla |
+| A-02 | 15/09 | Holt-Winters aditivo escrito en el proyecto: inicialización fija, recursión aditiva y búsqueda en rejilla de 729 combinaciones con desempate por valores más bajos | Se explica paso a paso y es reproducible (FR-003, FR-004) | Librerías de pronóstico; optimización numérica |
+| A-03 | 15/09 | Método según la historia: ≥ 24 meses Holt-Winters, 3 a 23 promedio móvil de 3, 1 o 2 promedio disponible, sin consumo 0 | Holt-Winters necesita dos ciclos para estimar la estacionalidad (FR-002) | Holt-Winters para todos |
+| A-04 | 15/09 | Evaluación con los últimos 6 meses reservados; cada método se ajusta solo con los anteriores; MAE, WAPE ("No aplica" si el real suma 0) y resultado general | Elegir parámetros mirando la validación inflaría el resultado (aclaración del 13/09) | Validación cruzada; ajustar con toda la serie |
+| A-05 | 15/09 | Reposición = máx(0, ⌈pronóstico + mínimo − stock⌉), con la fórmula en pantalla | Responde "¿qué compro y cuánto?" y se rehace a mano (SC-010) | Reposición a varios meses |
+| A-06 | 15/09 | Todo se calcula al consultar y nada se guarda; la serie se lee una vez por petición, pero el ajuste del pronóstico y el de la evaluación son distintos | Un documento retroactivo se refleja solo (FR-004); compartir el ajuste contaminaría la evaluación | Guardar el pronóstico del mes |
+| A-07 | 15/09 | Generador de 36 meses por comando de instalación, con los servicios reales y `mulberry32` sembrado; se niega sobre una base con documentos y marca la base como de demostración | Kardex consistente (SC-004) y datos reproducibles (SC-001) | `INSERT` masivo; ejecutarlo desde el menú; `Math.random()` |
+| A-08 | 15/09 | Puerto `Redactor` con la implementación de Claude (`claude-opus-5`, salida estructurada con Zod, 60 s sin reintentos); los errores se traducen de lo más específico a lo más general | Toda la funcionalidad se prueba sin red ni clave; la demora extiende a la falta de conexión | `fetch` a mano; texto libre con expresiones regulares |
+| A-09 | 15/09 | Un único objeto de datos por informe: es lo que se envía, se guarda y se muestra junto al texto | Si lo mostrado y lo enviado pudieran diferir, verificar cifra por cifra no probaría nada (SC-007) | Guardar solo el texto |
+| A-10 | 15/09 | Los datos se arman campo por campo; una prueba recorre el objeto y falla si aparece un teléfono, dirección, correo, CI o contraseña | FR-012 demostrado por código | Serializar entidades de Prisma |
+| A-11 | 15/09 | Cada generación crea un informe nuevo; listado, ficha e impresión solo leen la base y funcionan sin conexión | En la defensa puede no haber internet (SC-008) | Regenerar el texto al abrirlo |
+| A-12 | 15/09 | Gráfico SVG dibujado en el servidor, sin librería, con tabla de respaldo | Unas 40 barras; se imprime y se explica (P3) | Chart.js o Recharts |
+| A-13 | 15/09 | Rutas `/ia`, `/ia/pronostico` (+ `[productoId]`), `/ia/evaluacion`, `/ia/informes` (+ `nuevo`, `[id]`, `[id]/imprimir`); **IA** en el menú después de Reportes | Mismo esquema de navegación que los módulos anteriores | Pantallas sueltas en otros módulos |
+| A-14 | 15/09 | Pruebas unitarias del método, las métricas y la reposición; de integración para la serie, el generador reducido y los informes con redactor falso | Ninguna prueba llama al modelo ni necesita clave | Probar contra el servicio real |
+
+---
+
 ## Implementación
 
 Decisiones tomadas durante la implementación que no estaban en el plan.
@@ -184,3 +208,15 @@ Decisiones tomadas durante la implementación que no estaban en el plan.
 | I-39 | 15/09 | Los nombres de los tipos de movimiento pasaron a `src/componentes/reportes/etiquetas-movimiento.ts` y los usan el kardex de F-003 y R-4 | El mismo texto en dos pantallas, escrito una sola vez |
 | I-40 | 15/09 | Las reglas de impresión (`thead` repetido, filas sin cortar, fondo blanco) se agregaron una sola vez en `globals.css` bajo `@media print`, y el layout de impresión se ensanchó a `max-w-5xl` | Sirven para el vale de F-005 y para los cinco reportes; las tablas de reporte llegan a nueve columnas |
 | I-41 | 15/09 | El recorrido de F-006 usó el mismo método que I-15, I-29 e I-35, y encendió y apagó `modo_demostracion` con `psql` dentro del contenedor | Es la única forma de ver la leyenda antes de que exista el generador de F-007 |
+| I-42 | 16/09 | Holt-Winters guarda cuántos meses observó y el pronóstico usa el índice estacional de la posición que sigue a la serie | Empezar siempre en la posición 0 le aplicaba al mes pronosticado el índice de otro mes; lo detectó la prueba de estacionalidad perfecta (SC-003) |
+| I-43 | 16/09 | Los servicios nuevos no llevan `import "server-only"` | Igual que el resto de los servicios: el generador los usa desde un comando `tsx`, donde ese paquete lanza un error |
+| I-44 | 16/09 | `mesPronosticado()` es una función y no la constante `MES_PRONOSTICADO` del contrato; los ayudantes de meses (`mesEnCurso`, `mesAnterior`, `mesAnteriorCompleto`, `formatearMes`) se sumaron a `src/lib/fechas.ts` | El servidor queda encendido días enteros y una constante no cambiaría al empezar el mes |
+| I-45 | 16/09 | La reposición se redondea a un decimal antes del techo | Sin ese paso, 20,1 + 10 − 30,1 da 0,0000000000000036 y sugiere comprar 1 unidad |
+| I-46 | 16/09 | El redactor usa `max_tokens: 8000` y `maxRetries: 0` (el plan decía 4000 y no mencionaba reintentos); research A-08 y el contrato se actualizaron | Claude Opus 5 piensa por defecto y ese pensamiento cuenta dentro del límite; el SDK reintenta también las demoras y una petición podría esperar tres veces 60 s |
+| I-47 | 16/09 | El texto guardado del informe es texto plano con los cuatro títulos fijos (`texto-informe.ts`); una sección vacía se escribe "Sin … en el período" y la pantalla lo vuelve a partir en secciones | Se lee tal cual en la base y se muestra con títulos y viñetas; las secciones vacías no obligan al modelo a inventar (FR-012) |
+| I-48 | 16/09 | Los datos del informe de compras usan agregados propios (`aggregate` y `groupBy` sobre compras vigentes) en lugar de `reporteCompras`; los de distribuciones sí reutilizan `reporteDistribuciones` y `reportePedidos` | `reporteCompras` trae filas paginadas y no agrupa por proveedor ni por producto |
+| I-49 | 16/09 | `detalleDePronostico` (serie, pronóstico y validación de un producto, para el gráfico) vive en `src/servicios/ia/detalle.ts` | Usa el pronóstico y la evaluación; en `pronostico.ts` habría creado una dependencia circular |
+| I-50 | 16/09 | El generador pide el consumo completo de cada producto a un solo servicio, compra con holgura de 1,9 o 3,2 según el producto y saca los estados PENDIENTE y ANULADO de pedidos adicionales; una distribución anulada se vuelve a registrar corregida | El recorrido mostró que la primera versión consumía la quinta parte de lo previsto, no dejaba productos bajo mínimo y ponía meses en 0 que arrastraban el pronóstico |
+| I-51 | 16/09 | Los números del módulo se muestran con `formatearUnDecimal` y `formatearPorcentaje` (`src/lib/numeros.ts`) | Coma decimal y "No aplica" escritos una sola vez |
+| I-52 | 16/09 | El recorrido de F-007 usó el método de I-15: el histórico se cargó con el comando real sobre la base de pruebas, el paso 15 se probó con el redactor real sin clave y los informes guardados de los pasos 16 a 18 se crearon con un redactor de prueba marcado como tal; el gráfico y los 375 px se revisaron en el navegador integrado con la cookie de la sesión de prueba | Todavía no hay clave de API (Q-02) y no se escriben contraseñas en el navegador |
+| I-53 | 16/09 | Se implementó el resaltado de cifras (FR-025, P3) en `verificacion-cifras.ts`: cada número del texto se compara con todos los números de los datos —incluidos los de nombres y códigos—, se acepta el redondeo a un decimal y el valor sin signo, y se ignoran fechas, años y la numeración de listas | Quedaba tiempo antes del 21/09; la advertencia ayuda a verificar SC-007 sin bloquear el informe |

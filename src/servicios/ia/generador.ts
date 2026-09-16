@@ -105,6 +105,10 @@ const REPRESENTANTES = [
 
 const CENTRO_SALUD = "Centro de Salud Oruro Central";
 
+/** Cuánto se compra respecto del consumo del mes: normal y con stock de sobra. */
+const HOLGURA_NORMAL = 1.9;
+const HOLGURA_AMPLIA = 3.2;
+
 const MOTIVOS_ANULACION_COMPRA = [
   "Factura cargada con el proveedor equivocado",
   "La factura se anuló en origen",
@@ -286,10 +290,12 @@ export async function generarHistorico(opciones: OpcionesGenerador): Promise<Res
     const stock = await stockPorProducto(idsDeProductos);
     const porProveedor = new Map<number, { productoId: number; cantidad: number; precioUnitario: string }[]>();
     catalogo.productos.forEach((producto, indice) => {
-      // Un quinto del catálogo deja de reponerse en los últimos meses: así quedan productos bajo
-      // mínimo junto a otros con stock holgado (H1 · E8).
+      // Un quinto del catálogo deja de reponerse en los últimos meses y queda bajo mínimo; un tercio se
+      // compra con mucha holgura y queda con stock de sobra. Así la demostración muestra las dos
+      // situaciones (H1 · E8).
       if (ultimosMeses && indice % 5 === 0) return;
-      const meta = Math.ceil((objetivo.get(producto.id) ?? 0) * 1.6);
+      const holgura = indice % 3 === 0 ? HOLGURA_AMPLIA : HOLGURA_NORMAL;
+      const meta = Math.ceil((objetivo.get(producto.id) ?? 0) * holgura);
       const faltante = meta - (stock.get(producto.id) ?? 0);
       if (faltante <= 0) return;
       const proveedorId = catalogo.proveedores[indice % catalogo.proveedores.length]!;
@@ -329,7 +335,8 @@ export async function generarHistorico(opciones: OpcionesGenerador): Promise<Res
       resumen.comprasAnuladas += 1;
     }
 
-    // 3. Un pedido por representante: cada uno pide una parte del consumo del mes.
+    // 3. Un pedido por representante. Cada producto lo pide un solo servicio, por su consumo del mes: así
+    //    lo distribuido sigue la forma del consumo objetivo (estación, tendencia y ruido).
     const disponible = await stockPorProducto(idsDeProductos);
     const pedidosDelMes: { id: number; representanteIndice: number }[] = [];
     for (const [indiceRepresentante, representanteId] of catalogo.representantes.entries()) {
@@ -337,7 +344,7 @@ export async function generarHistorico(opciones: OpcionesGenerador): Promise<Res
         .filter((_, indice) => (indice + indiceRepresentante) % catalogo.representantes.length === 0)
         .map((producto) => ({
           productoId: producto.id,
-          cantidadSolicitada: Math.max(1, Math.round(((objetivo.get(producto.id) ?? 1) / catalogo.representantes.length) * 1.2)),
+          cantidadSolicitada: objetivo.get(producto.id) ?? 1,
         }));
       if (lineas.length === 0) continue;
 
@@ -349,21 +356,15 @@ export async function generarHistorico(opciones: OpcionesGenerador): Promise<Res
       pedidosDelMes.push({ id, representanteIndice: indiceRepresentante });
     }
 
-    // 4. Atención de los pedidos: unos completos, otros parciales, alguno sin entregar y alguno anulado.
-    //    Así el listado de pedidos muestra los cuatro estados (H1 · E5, FR-020).
-    let ultimaDistribucion: number | null = null;
+    // 4. Atención de los pedidos del mes: casi todos completos y algunos parciales (PARCIAL).
+    //    Lo entregado es el consumo que verá el pronóstico, así que ningún pedido principal se deja sin
+    //    atender ni se anula: eso pondría meses en 0 que el almacén real no tuvo.
+    let ultimaDistribucion: { id: number; pedidoId: number; dia: number; lineas: { pedidoDetalleId: number; cantidad?: number }[] } | null = null;
     for (const [indicePedido, pedido] of pedidosDelMes.entries()) {
       const suerte = aleatorio();
-
-      if (suerte < 0.06) {
-        await anularPedido(pedido.id, elegirDe(aleatorio, MOTIVOS_ANULACION_PEDIDO), usuarioId);
-        resumen.pedidosAnulados += 1;
-        continue;
-      }
-      // Sin entrega: el pedido queda PENDIENTE hasta el mes siguiente.
-      if (suerte < 0.20) continue;
-
-      const proporcion = suerte < 0.45 ? 0.6 : 1;
+      // Entregas parciales: al menos una cada semestre.
+      const parcial = suerte < 0.15 || (indiceDelMes % 6 === 1 && indicePedido === 0);
+      const proporcion = parcial ? 0.8 : 1;
       const lineasDelPedido = await prisma.pedidoDetalle.findMany({
         where: { pedidoId: pedido.id },
         select: { id: true, productoId: true, cantidadSolicitada: true, cantidadEntregada: true },
@@ -374,31 +375,72 @@ export async function generarHistorico(opciones: OpcionesGenerador): Promise<Res
         const pendiente = linea.cantidadSolicitada - linea.cantidadEntregada;
         const enStock = disponible.get(linea.productoId) ?? 0;
         // Nunca se entrega más de lo que hay: el servicio lo rechazaría y con razón (RN-32).
-        const cantidad = Math.min(Math.ceil(pendiente * proporcion), pendiente, enStock);
+        const cantidad = Math.min(Math.floor(pendiente * proporcion), pendiente, enStock);
         if (cantidad > 0) disponible.set(linea.productoId, enStock - cantidad);
         return { pedidoDetalleId: linea.id, cantidad: cantidad > 0 ? cantidad : undefined };
       });
       if (!lineas.some((linea) => linea.cantidad !== undefined)) continue;
 
+      const dia = 14 + indicePedido * 2;
       numeroDeVale += 1;
       const { id } = await registrarDistribucion(
+        { pedidoId: pedido.id, nroVale: String(numeroDeVale), fecha: diaDelMes(mes, dia), observacion: undefined, lineas },
+        usuarioId,
+      );
+      resumen.distribuciones += 1;
+      ultimaDistribucion = { id, pedidoId: pedido.id, dia, lineas };
+    }
+
+    // 5. Cada tanto una distribución se registró mal: se anula y se vuelve a registrar corregida con otro
+    //    vale, como se hace en el almacén (principio IV). El consumo del mes no cambia.
+    if (indiceDelMes % 5 === 2 && ultimaDistribucion !== null) {
+      await anularDistribucion(ultimaDistribucion.id, elegirDe(aleatorio, MOTIVOS_ANULACION_DISTRIBUCION), usuarioId);
+      resumen.distribucionesAnuladas += 1;
+      numeroDeVale += 1;
+      await registrarDistribucion(
         {
-          pedidoId: pedido.id,
+          pedidoId: ultimaDistribucion.pedidoId,
           nroVale: String(numeroDeVale),
-          fecha: diaDelMes(mes, 14 + indicePedido * 2),
-          observacion: undefined,
-          lineas,
+          fecha: diaDelMes(mes, ultimaDistribucion.dia + 1),
+          observacion: "Reemplaza al vale anulado",
+          lineas: ultimaDistribucion.lineas,
         },
         usuarioId,
       );
       resumen.distribuciones += 1;
-      ultimaDistribucion = id;
     }
 
-    // 5. Cada tanto se anula una distribución del mes: el stock vuelve y el pedido retrocede de estado.
-    if (indiceDelMes % 5 === 2 && ultimaDistribucion !== null) {
-      await anularDistribucion(ultimaDistribucion, elegirDe(aleatorio, MOTIVOS_ANULACION_DISTRIBUCION), usuarioId);
-      resumen.distribucionesAnuladas += 1;
+    // 6. Pedidos adicionales que no forman parte del consumo del mes:
+    //    - cada semestre, uno cargado dos veces se anula (ANULADO);
+    //    - en el último mes, dos servicios hicieron un pedido que todavía no se atendió (PENDIENTE).
+    const producto = elegirDe(aleatorio, catalogo.productos);
+    if (indiceDelMes % 6 === 4) {
+      const { id } = await registrarPedido(
+        {
+          representanteId: catalogo.representantes[0]!,
+          fecha: diaDelMes(mes, 20),
+          observacion: undefined,
+          lineas: [{ productoId: producto.id, cantidadSolicitada: enteroEntre(aleatorio, 2, 6) }],
+        },
+        usuarioId,
+      );
+      resumen.pedidos += 1;
+      await anularPedido(id, elegirDe(aleatorio, MOTIVOS_ANULACION_PEDIDO), usuarioId);
+      resumen.pedidosAnulados += 1;
+    }
+    if (indiceDelMes === listaDeMeses.length - 1) {
+      for (const representanteId of catalogo.representantes.slice(0, 2)) {
+        await registrarPedido(
+          {
+            representanteId,
+            fecha: diaDelMes(mes, 27),
+            observacion: "Pedido para el mes siguiente",
+            lineas: [{ productoId: elegirDe(aleatorio, catalogo.productos).id, cantidadSolicitada: enteroEntre(aleatorio, 3, 10) }],
+          },
+          usuarioId,
+        );
+        resumen.pedidos += 1;
+      }
     }
 
     alPaso(`${mes}: ${resumen.compras} compras, ${resumen.pedidos} pedidos y ${resumen.distribuciones} distribuciones acumuladas.`);

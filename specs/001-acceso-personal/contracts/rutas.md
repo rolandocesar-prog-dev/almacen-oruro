@@ -37,7 +37,7 @@ que los planes siguientes usen los mismos nombres. Todas las rutas usan el App R
 | `/pedidos`, `/pedidos/nuevo`, `/pedidos/[id]`, `/pedidos/[id]/editar` | Pedidos | F-004 |
 | `/distribuciones`, `/distribuciones/nueva`, `/distribuciones/[id]`, `/distribuciones/[id]/vale` | Distribución | F-005 |
 | `/reportes` (índice), `/reportes/compras`, `/reportes/distribuciones`, `/reportes/existencias`, `/reportes/kardex`, `/reportes/pedidos` y `/reportes/{reporte}/imprimir` | Reportes | F-006 |
-| `/ia/pronostico`, `/ia/evaluacion`, `/ia/informes`, `/ia/informes/nuevo`, `/ia/informes/[id]` | Inteligencia artificial | F-007 |
+| `/ia` (índice), `/ia/pronostico`, `/ia/pronostico/[productoId]`, `/ia/evaluacion`, `/ia/informes`, `/ia/informes/nuevo`, `/ia/informes/[id]` y `/ia/informes/[id]/imprimir` (grupo `(impresion)`) | Inteligencia artificial | F-007 |
 
 ## Parámetros de búsqueda de F-001
 
