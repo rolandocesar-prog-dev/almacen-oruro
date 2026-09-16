@@ -1,5 +1,3 @@
-import "server-only";
-
 // Serie de consumo mensual de un producto (F-007, research A-01; FR-001).
 //
 // El consumo sale del kardex y de ningún otro lado (constitución, principio III): son las salidas por

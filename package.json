@@ -18,6 +18,7 @@
     "test:integracion": "vitest run --project integracion",
     "db:migrar": "prisma migrate deploy",
     "db:semilla": "prisma db seed",
+    "datos:simulados": "tsx --tsconfig ./tsconfig.json scripts/generar-historico.mts",
     "postinstall": "prisma generate"
   },
   "dependencies": {

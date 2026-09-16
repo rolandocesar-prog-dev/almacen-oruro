@@ -28,6 +28,8 @@ export function enteroEntre(aleatorio: () => number, minimo: number, maximo: num
 }
 
 /** Elige un elemento de la lista. La lista no puede estar vacía. */
-export function elegirDe<T>(aleatorio: () => number, opciones: readonly [T, ...T[]]): T {
-  return opciones[Math.floor(aleatorio() * opciones.length)] ?? opciones[0];
+export function elegirDe<T>(aleatorio: () => number, opciones: readonly T[]): T {
+  const elegido = opciones[Math.floor(aleatorio() * opciones.length)];
+  if (elegido === undefined) throw new Error("elegirDe necesita al menos una opción");
+  return elegido;
 }
