@@ -160,7 +160,7 @@ al lado.
 
 **Prueba independiente**: quickstart §3, paso 10.
 
-- [ ] T026 [US7] Crear `src/app/(sistema)/ia/pronostico/[productoId]/page.tsx` y `grafico-consumo.tsx` (componente de **servidor** que dibuja un SVG sin librerías, research A-12): barras del consumo mensual de la serie, los pronósticos del método principal para los 6 meses de validación si el producto es evaluable y el pronóstico del mes en curso, cada serie con su color y su leyenda en texto; meses en el eje horizontal y unidades en el vertical; tabla de respaldo con los mismos valores debajo del gráfico, para quien no vea colores y para imprimir; enlace "← Volver al pronóstico"
+- [X] T026 [US7] Crear `src/app/(sistema)/ia/pronostico/[productoId]/page.tsx` y `grafico-consumo.tsx` (componente de **servidor** que dibuja un SVG sin librerías, research A-12): barras del consumo mensual de la serie, los pronósticos del método principal para los 6 meses de validación si el producto es evaluable y el pronóstico del mes en curso, cada serie con su color y su leyenda en texto; meses en el eje horizontal y unidades en el vertical; tabla de respaldo con los mismos valores debajo del gráfico, para quien no vea colores y para imprimir; enlace "← Volver al pronóstico"
 
 **Punto de control**: quickstart paso 10.
 
