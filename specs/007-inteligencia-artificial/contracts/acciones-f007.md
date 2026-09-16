@@ -88,7 +88,7 @@ Es la **única** acción de F-007: el pronóstico, la evaluación y la consulta 
 | Pieza | Detalle |
 |---|---|
 | `type Redactor` | `(peticion: { tipo, datos }) => Promise<SeccionesInforme>` |
-| `redactorAnthropic` | `@anthropic-ai/sdk`, modelo `claude-opus-5`, `client.messages.parse` con `zodOutputFormat`, `max_tokens: 4000`, `output_config.effort: "medium"`, `timeout: 60_000` ms; clave en `ANTHROPIC_API_KEY` |
+| `redactorAnthropic` | `@anthropic-ai/sdk`, modelo `claude-opus-5`, `client.messages.parse` con `zodOutputFormat`, `max_tokens: 8000`, `output_config.effort: "medium"`, `timeout: 60_000` ms, `maxRetries: 0`; clave en `ANTHROPIC_API_KEY` |
 | `MODELO_IA` | `"claude-opus-5"`, se guarda en cada informe |
 | Errores | `ErrorDeRedaccion` con motivo (`sin-conexion`, `demora`, `formato`), que el servicio traduce a los mensajes de data-model §4 |
 

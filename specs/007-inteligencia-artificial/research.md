@@ -158,8 +158,13 @@ oficial de Anthropic (`@anthropic-ai/sdk`, **única dependencia nueva**):
   secciones vienen garantizadas por el formato y, además, se validan (FR-012, FR-015). Los tres arreglos
   **pueden venir vacíos**: exigir al menos un elemento obligaría al modelo a inventar una alerta donde no
   la hay, justo lo contrario de FR-012; la pantalla resuelve el caso con "Sin alertas en el período";
-- `max_tokens: 4000`, `output_config.effort: "medium"` (redactar no es una tarea de razonamiento profundo
-  y conviene no acercarse al límite de 60 s) y `timeout: 60_000` ms por petición (FR-015);
+- `max_tokens: 8000`, `output_config.effort: "medium"` (redactar no es una tarea de razonamiento profundo
+  y conviene no acercarse al límite de 60 s) y `timeout: 60_000` ms por petición (FR-015). `max_tokens` sube
+  de 4000 a 8000 en la implementación porque Claude Opus 5 piensa por defecto y ese pensamiento cuenta dentro
+  del límite: con 4000 una respuesta larga podría cortarse y quedar sin formato;
+- `maxRetries: 0`: el SDK reintenta por defecto hasta dos veces, **también las demoras**, así que una petición
+  podría esperar tres veces 60 s. Sin reintentos, el límite de SC-006 se cumple y el usuario decide si vuelve
+  a intentar;
 - instrucciones del sistema en español: no inventar cifras, usar solo los datos entregados, tono de informe
   para la administración del centro de salud;
 - la clave vive en `ANTHROPIC_API_KEY` (variable de entorno, nunca versionada, principio VII);
