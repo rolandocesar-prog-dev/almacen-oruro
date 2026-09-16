@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { textoDeFiltros } from "@/esquemas/reportes";
+import { esquemaReporteCompras, textoDeFiltros } from "@/esquemas/reportes";
+import { hoyEnLaPaz, inicioDelMesEnCurso } from "@/lib/fechas";
 
 describe("textoDeFiltros (FR-006)", () => {
   it("arma la línea de filtros aplicados uniendo con · ", () => {
@@ -25,5 +26,35 @@ describe("textoDeFiltros (FR-006)", () => {
   it("sin filtros lo dice", () => {
     expect(textoDeFiltros([])).toBe("Sin filtros");
     expect(textoDeFiltros([{ etiqueta: "Categoría", valor: undefined }])).toBe("Sin filtros");
+  });
+});
+
+describe("esquemaReporteCompras (FR-002, FR-003)", () => {
+  it("por defecto toma el mes en curso, sin proveedor, sin anuladas y la página 1", () => {
+    expect(esquemaReporteCompras.parse({})).toEqual({
+      desde: inicioDelMesEnCurso(),
+      hasta: hoyEnLaPaz(),
+      proveedor: undefined,
+      incluirAnulados: false,
+      pagina: 1,
+    });
+  });
+
+  it("la casilla solo cuenta si llega con «si»", () => {
+    expect(esquemaReporteCompras.parse({ incluirAnulados: "si" }).incluirAnulados).toBe(true);
+    expect(esquemaReporteCompras.parse({ incluirAnulados: "1" }).incluirAnulados).toBe(false);
+  });
+
+  it("un proveedor o una página inválidos toman el valor por defecto", () => {
+    expect(esquemaReporteCompras.parse({ proveedor: "abc", pagina: "0" })).toMatchObject({ proveedor: undefined, pagina: 1 });
+  });
+
+  it("rechaza «desde» posterior a «hasta»", () => {
+    const resultado = esquemaReporteCompras.safeParse({ desde: "2026-09-10", hasta: "2026-09-01" });
+    expect(resultado.error?.issues[0]?.message).toBe("La fecha «desde» no puede ser posterior a «hasta»");
+  });
+
+  it("acepta un rango de fechas futuras (caso borde)", () => {
+    expect(esquemaReporteCompras.parse({ desde: "2027-01-01", hasta: "2027-01-31" })).toMatchObject({ desde: "2027-01-01", hasta: "2027-01-31" });
   });
 });

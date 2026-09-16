@@ -6,10 +6,11 @@
 export function TablaReporte({
   encabezados,
   children,
-  vacio = "Sin resultados para los filtros aplicados",
+  vacio,
 }: {
   encabezados: string[];
   children: React.ReactNode;
+  /** Mensaje cuando no hay filas; la página lo pasa con `filas.length === 0 ? SIN_RESULTADOS : undefined`. */
   vacio?: React.ReactNode;
 }) {
   return (
@@ -30,6 +31,9 @@ export function TablaReporte({
     </div>
   );
 }
+
+/** Mensaje común cuando los filtros no devuelven nada (regla de resultado vacío de la especificación). */
+export const SIN_RESULTADOS = "Sin resultados para los filtros aplicados";
 
 /** Celda de una fila del reporte. */
 export function CeldaReporte({ children, className = "" }: { children: React.ReactNode; className?: string }) {
