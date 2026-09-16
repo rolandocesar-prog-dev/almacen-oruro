@@ -6,7 +6,7 @@
 // - Las fechas filtran por la FECHA DEL DOCUMENTO, no por el momento de registro (RN-53).
 // - Los totales cuentan SOLO los documentos vigentes, aunque el listado incluya los anulados (FR-003), y
 //   se calculan sobre todo el rango con agregados de la base, no sobre las filas mostradas (research E-02).
-import type { Prisma } from "@/generado/prisma/client";
+import type { EstadoPedido, Prisma } from "@/generado/prisma/client";
 import { aFechaDocumento, textoDeFechaDocumento } from "@/lib/fechas";
 import { prisma } from "@/lib/prisma";
 import { compararEnEspanol } from "@/lib/texto";
@@ -214,5 +214,79 @@ export async function reporteKardex(productoId: number, rango: Rango) {
     movimientos: kardex.movimientos,
     saldoInicial: kardex.saldoAnterior,
     saldoFinal: kardex.saldoFinal,
+  };
+}
+
+/** Estados de pedido de cada opción del filtro de R-5 (FR-013). */
+const ESTADOS_DEL_REPORTE: Record<string, EstadoPedido[] | undefined> = {
+  todos: undefined,
+  pendientes: ["PENDIENTE"],
+  parciales: ["PARCIAL"],
+  atendidos: ["ATENDIDO"],
+  anulados: ["ANULADO"],
+};
+
+/**
+ * R-5 · Pedidos del período (FR-013). El conteo por estado es del rango completo, sin importar los filtros
+ * de estado ni la opción de anulados, para que la hoja diga siempre cuántos pedidos hay de cada clase.
+ * Elegir el estado ANULADO los muestra aunque no se marque "incluir anulados".
+ */
+export async function reportePedidos(
+  filtro: Rango & Paginado & { estado: string; representanteId?: number; incluirAnulados: boolean },
+) {
+  const estados = ESTADOS_DEL_REPORTE[filtro.estado];
+  const where: Prisma.PedidoWhereInput = {
+    fecha: entreFechas(filtro),
+    representanteId: filtro.representanteId,
+    // Con un estado elegido manda ese estado; con "todos", los anulados solo salen si se piden.
+    estado: estados ? { in: estados } : filtro.incluirAnulados ? undefined : { not: "ANULADO" },
+  };
+
+  const [pedidos, total, porEstado] = await Promise.all([
+    prisma.pedido.findMany({
+      where,
+      orderBy: [{ fecha: "asc" }, { id: "asc" }],
+      ...recorte(filtro),
+      include: {
+        representante: { select: { nombre: true, apellido: true, servicio: true } },
+        _count: { select: { lineas: true } },
+      },
+    }),
+    prisma.pedido.count({ where }),
+    prisma.pedido.groupBy({
+      by: ["estado"],
+      _count: true,
+      where: { fecha: entreFechas(filtro), representanteId: filtro.representanteId },
+    }),
+  ]);
+
+  // Porcentaje atendido: lo entregado a la fecha de emisión sobre lo solicitado, aunque las distribuciones
+  // sean posteriores al rango (caso borde). Se redondea hacia abajo, como en el listado de F-004.
+  const sumas = await prisma.pedidoDetalle.groupBy({
+    by: ["pedidoId"],
+    where: { pedidoId: { in: pedidos.map((pedido) => pedido.id) } },
+    _sum: { cantidadSolicitada: true, cantidadEntregada: true },
+  });
+  const sumaPorPedido = new Map(sumas.map((suma) => [suma.pedidoId, suma._sum]));
+
+  const conteo = { PENDIENTE: 0, PARCIAL: 0, ATENDIDO: 0, ANULADO: 0 };
+  for (const grupo of porEstado) conteo[grupo.estado] = grupo._count;
+
+  return {
+    total,
+    filas: pedidos.map((pedido) => {
+      const suma = sumaPorPedido.get(pedido.id);
+      const solicitadas = suma?.cantidadSolicitada ?? 0;
+      return {
+        id: pedido.id,
+        fecha: textoDeFechaDocumento(pedido.fecha),
+        representante: `${pedido.representante.apellido}, ${pedido.representante.nombre}`,
+        servicio: pedido.representante.servicio,
+        productos: pedido._count.lineas,
+        porcentajeAtendido: solicitadas === 0 ? 0 : Math.floor(((suma?.cantidadEntregada ?? 0) * 100) / solicitadas),
+        estado: pedido.estado,
+      };
+    }),
+    totales: { porEstado: conteo },
   };
 }

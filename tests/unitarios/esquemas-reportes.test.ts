@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { esquemaReporteCompras, esquemaReporteDistribuciones, esquemaReporteExistencias, esquemaReporteKardex, textoDeFiltros } from "@/esquemas/reportes";
+import { esquemaReporteCompras, esquemaReporteDistribuciones, esquemaReporteExistencias, esquemaReporteKardex, esquemaReportePedidos, textoDeFiltros } from "@/esquemas/reportes";
 import { hoyEnLaPaz, inicioDelMesEnCurso } from "@/lib/fechas";
 
 describe("textoDeFiltros (FR-006)", () => {
@@ -97,5 +97,25 @@ describe("esquemaReporteKardex (FR-012)", () => {
     expect(esquemaReporteKardex.safeParse({ desde: "2026-09-10", hasta: "2026-09-01" }).error?.issues[0]?.message).toBe(
       "La fecha «desde» no puede ser posterior a «hasta»",
     );
+  });
+});
+
+describe("esquemaReportePedidos (FR-013)", () => {
+  it("por defecto toma el mes en curso, todos los estados y sin anulados", () => {
+    expect(esquemaReportePedidos.parse({})).toEqual({
+      desde: inicioDelMesEnCurso(),
+      hasta: hoyEnLaPaz(),
+      estado: "todos",
+      representante: undefined,
+      incluirAnulados: false,
+      pagina: 1,
+    });
+  });
+
+  it("un estado inválido toma «todos» y acepta los cinco válidos", () => {
+    expect(esquemaReportePedidos.parse({ estado: "enviados" }).estado).toBe("todos");
+    for (const estado of ["pendientes", "parciales", "atendidos", "anulados"]) {
+      expect(esquemaReportePedidos.parse({ estado }).estado).toBe(estado);
+    }
   });
 });
