@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { esquemaReporteCompras, textoDeFiltros } from "@/esquemas/reportes";
+import { esquemaReporteCompras, esquemaReporteDistribuciones, textoDeFiltros } from "@/esquemas/reportes";
 import { hoyEnLaPaz, inicioDelMesEnCurso } from "@/lib/fechas";
 
 describe("textoDeFiltros (FR-006)", () => {
@@ -56,5 +56,22 @@ describe("esquemaReporteCompras (FR-002, FR-003)", () => {
 
   it("acepta un rango de fechas futuras (caso borde)", () => {
     expect(esquemaReporteCompras.parse({ desde: "2027-01-01", hasta: "2027-01-31" })).toMatchObject({ desde: "2027-01-01", hasta: "2027-01-31" });
+  });
+});
+
+describe("esquemaReporteDistribuciones (FR-010)", () => {
+  it("por defecto toma el mes en curso, sin representante ni producto y sin anuladas", () => {
+    expect(esquemaReporteDistribuciones.parse({})).toEqual({
+      desde: inicioDelMesEnCurso(),
+      hasta: hoyEnLaPaz(),
+      representante: undefined,
+      producto: undefined,
+      incluirAnulados: false,
+      pagina: 1,
+    });
+  });
+
+  it("ignora un representante o un producto inválidos", () => {
+    expect(esquemaReporteDistribuciones.parse({ representante: "x", producto: "-1" })).toMatchObject({ representante: undefined, producto: undefined });
   });
 });
