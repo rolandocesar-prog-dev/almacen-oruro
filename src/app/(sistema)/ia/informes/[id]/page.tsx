@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { z } from "zod";
+import { TablaDatosInforme } from "@/componentes/ia/tabla-datos-informe";
 import { NOTA_TEXTO_REDACTADO, TextoInforme, TITULO_DEL_INFORME } from "@/componentes/ia/texto-informe";
 import { Aviso } from "@/componentes/ui/aviso";
 import { Dato } from "@/componentes/ui/dato";
@@ -49,9 +50,17 @@ export default async function PaginaInforme({
         <Dato etiqueta="Modelo" valor={informe.modelo} />
       </dl>
 
-      <div className="rounded-md border border-borde bg-white p-4">
-        <TextoInforme texto={informe.texto} />
-        <p className="mt-3 text-xs italic text-gray-600">{NOTA_TEXTO_REDACTADO}.</p>
+      {/* FR-013: el texto junto a la tabla de datos con que se redactó, para verificar cada cifra (SC-007). */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div className="flex flex-col gap-2 rounded-md border border-borde bg-white p-4">
+          <h2 className="text-lg font-semibold">Texto del informe</h2>
+          <TextoInforme texto={informe.texto} />
+          <p className="mt-2 text-xs italic text-gray-600">{NOTA_TEXTO_REDACTADO}.</p>
+        </div>
+        <div className="flex min-w-0 flex-col gap-2 overflow-x-auto rounded-md border border-borde bg-white p-4">
+          <h2 className="text-lg font-semibold">Datos enviados al modelo</h2>
+          <TablaDatosInforme tipo={informe.tipo} datos={informe.datosEntrada} />
+        </div>
       </div>
     </section>
   );
