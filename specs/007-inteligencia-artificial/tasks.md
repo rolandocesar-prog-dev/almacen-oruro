@@ -133,8 +133,8 @@ al lado.
 
 **Prueba independiente**: quickstart §3, paso 13.
 
-- [ ] T021 [P] [US5] Crear `tests/integracion/informe-distribuciones.test.ts` con el redactor falso: `datosInformeDistribuciones({ desde, hasta })` trae `porRepresentante` (representante, servicio y unidades), `topProductos` (los 10 más distribuidos), `pedidosPorEstado` (`{ PENDIENTE, PARCIAL, ATENDIDO, ANULADO }`), `totales` con la variación contra el período anterior y `pronostico` de los 10 productos principales (FR-011); no contiene claves de contacto (A-10); `generarInforme("DISTRIBUCIONES", …)` guarda el informe y respeta los mismos rechazos que la Historia 4 (H5 · E2)
-- [ ] T022 [US5] Agregar `datosInformeDistribuciones` a `src/servicios/ia/informes.ts` reutilizando `reporteDistribuciones`, `reportePedidos` y el pronóstico; conectarlo en `generarInforme` según el tipo y ofrecer los dos tipos en el formulario de `/ia/informes/nuevo`
+- [X] T021 [P] [US5] Crear `tests/integracion/informe-distribuciones.test.ts` con el redactor falso: `datosInformeDistribuciones({ desde, hasta })` trae `porRepresentante` (representante, servicio y unidades), `topProductos` (los 10 más distribuidos), `pedidosPorEstado` (`{ PENDIENTE, PARCIAL, ATENDIDO, ANULADO }`), `totales` con la variación contra el período anterior y `pronostico` de los 10 productos principales (FR-011); no contiene claves de contacto (A-10); `generarInforme("DISTRIBUCIONES", …)` guarda el informe y respeta los mismos rechazos que la Historia 4 (H5 · E2)
+- [X] T022 [US5] Agregar `datosInformeDistribuciones` a `src/servicios/ia/informes.ts` reutilizando `reporteDistribuciones`, `reportePedidos` y el pronóstico; conectarlo en `generarInforme` según el tipo y ofrecer los dos tipos en el formulario de `/ia/informes/nuevo`
 
 **Punto de control**: T021 en verde; quickstart paso 13.
 
