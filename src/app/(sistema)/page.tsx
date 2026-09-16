@@ -9,6 +9,7 @@ const modulos = [
   { ruta: "/pedidos", titulo: "Pedidos", descripcion: "Registrar los pedidos de los representantes y ver qué falta entregar" },
   { ruta: "/distribuciones", titulo: "Distribuciones", descripcion: "Entregar productos para atender los pedidos y anular entregas mal registradas" },
   { ruta: "/reportes", titulo: "Reportes", descripcion: "Consultar e imprimir compras, distribuciones, existencias, kardex y pedidos" },
+  { ruta: "/ia", titulo: "Inteligencia artificial", descripcion: "Pronóstico de consumo, reposición sugerida e informes redactados" },
   { ruta: "/existencias", titulo: "Existencias", descripcion: "Stock actual, bajo mínimo y kardex de cada producto" },
   { ruta: "/productos", titulo: "Productos", descripcion: "Código, categoría, unidad, stock actual y stock mínimo" },
   { ruta: "/categorias", titulo: "Categorías", descripcion: "Grupos para ordenar los productos" },

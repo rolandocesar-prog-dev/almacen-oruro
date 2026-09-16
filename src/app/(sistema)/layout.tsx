@@ -9,6 +9,7 @@ const menu = [
   { ruta: "/pedidos", texto: "Pedidos" },
   { ruta: "/distribuciones", texto: "Distribuciones" },
   { ruta: "/reportes", texto: "Reportes" },
+  { ruta: "/ia", texto: "IA" },
   { ruta: "/existencias", texto: "Existencias" },
   { ruta: "/personal", texto: "Personal" },
   { ruta: "/sesiones", texto: "Sesiones" },

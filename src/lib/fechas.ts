@@ -90,3 +90,77 @@ const formatoFechaHora = new Intl.DateTimeFormat("es-BO", {
 export function formatearFechaHora(momento: Date): string {
   return formatoFechaHora.format(momento).replace(",", "");
 }
+
+// ---------------------------------------------------------------------------------------------
+// Meses (AAAA-MM). Los usan el pronóstico y los informes de F-007: la serie de consumo se agrupa por
+// mes y el período por defecto de un informe es el mes anterior completo (FR-001, FR-010).
+// ---------------------------------------------------------------------------------------------
+
+/** Parte un mes "AAAA-MM" en sus dos números. */
+function partesDelMes(mes: string): { anio: number; numero: number } {
+  return { anio: Number(mes.slice(0, 4)), numero: Number(mes.slice(5, 7)) };
+}
+
+/** Arma un mes "AAAA-MM" a partir de sus dos números. */
+function textoDelMes(anio: number, numero: number): string {
+  return `${anio}-${String(numero).padStart(2, "0")}`;
+}
+
+/** Mes en curso en La Paz, en formato AAAA-MM. Es el mes que pronostica F-007 (FR-002). */
+export function mesEnCurso(ahora: Date = new Date()): string {
+  return hoyEnLaPaz(ahora).slice(0, 7);
+}
+
+/** Mes anterior a uno dado ("2026-01" → "2025-12"). */
+export function mesAnterior(mes: string): string {
+  const { anio, numero } = partesDelMes(mes);
+  return numero === 1 ? textoDelMes(anio - 1, 12) : textoDelMes(anio, numero - 1);
+}
+
+/** Mes siguiente a uno dado ("2025-12" → "2026-01"). */
+export function mesSiguiente(mes: string): string {
+  const { anio, numero } = partesDelMes(mes);
+  return numero === 12 ? textoDelMes(anio + 1, 1) : textoDelMes(anio, numero + 1);
+}
+
+/** Mes (AAAA-MM) de una fecha de documento leída de la base. */
+export function mesDeFechaDocumento(fecha: Date): string {
+  return textoDeFechaDocumento(fecha).slice(0, 7);
+}
+
+/** Primer día de un mes: "2026-08" → "2026-08-01". */
+export function primerDiaDelMes(mes: string): string {
+  return `${mes}-01`;
+}
+
+/**
+ * Último día de un mes: "2026-08" → "2026-08-31". Se calcula pidiendo el día 0 del mes siguiente,
+ * que en JavaScript es el último del mes pedido; así febrero y los años bisiestos salen solos.
+ */
+export function ultimoDiaDelMes(mes: string): string {
+  const { anio, numero } = partesDelMes(mes);
+  return new Date(Date.UTC(anio, numero, 0)).toISOString().slice(0, 10);
+}
+
+/** Mes anterior completo, el período por defecto de los informes IA (F-007, FR-010). */
+export function mesAnteriorCompleto(ahora: Date = new Date()): { desde: string; hasta: string } {
+  const mes = mesAnterior(mesEnCurso(ahora));
+  return { desde: primerDiaDelMes(mes), hasta: ultimoDiaDelMes(mes) };
+}
+
+const NOMBRES_DE_MES = [
+  "enero", "febrero", "marzo", "abril", "mayo", "junio",
+  "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
+];
+
+/** Mes para mostrar en pantalla: "2026-08" → "agosto de 2026". */
+export function formatearMes(mes: string): string {
+  const { anio, numero } = partesDelMes(mes);
+  return `${NOMBRES_DE_MES[numero - 1] ?? mes} de ${anio}`;
+}
+
+/** Mes corto para el eje de un gráfico: "2026-08" → "ago 26". */
+export function formatearMesCorto(mes: string): string {
+  const { anio, numero } = partesDelMes(mes);
+  return `${(NOMBRES_DE_MES[numero - 1] ?? mes).slice(0, 3)} ${String(anio).slice(2)}`;
+}
