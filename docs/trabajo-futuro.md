@@ -52,6 +52,14 @@ Alcance general fuera de la entrega: ver
 - Reportes por centro de salud, cuando haya más de uno.
 - Existencias "a una fecha pasada" (hoy se obtienen producto por producto con el kardex).
 
+## F-007 · Inteligencia artificial
+
+- Modelos de aprendizaje profundo y pronóstico por representante o por servicio.
+- Pronóstico del mes siguiente además del mes en curso, y reentrenamiento programado.
+- Chat conversacional con los datos y pronóstico de precios.
+- Envío de informes por correo y edición del texto de un informe.
+- Resaltado automático de las cifras del texto que no están en los datos (FR-025, P3), si no alcanza el tiempo.
+
 ## Otras funcionalidades
 
 Se completa a medida que se implementan F-002 a F-007.
