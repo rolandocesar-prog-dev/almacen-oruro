@@ -4,7 +4,7 @@
 
 **Creada**: 2026-09-13
 
-**Estado**: Borrador
+**Estado**: Aprobada
 
 **Entrada**: Descripción del usuario: "Módulo de inteligencia artificial con dos capas. Capa de
 pronóstico: a partir del kardex, el sistema arma la serie mensual de consumo (salidas por
@@ -371,8 +371,11 @@ comparan algunos meses con el kardex.
     duración, con variación porcentual; pronóstico del mes de los 10 productos principales.
 - **FR-012**: El sistema DEBE enviar al modelo solo esos datos agregados, con la instrucción de
   redactar en español, no inventar cifras, usar solo los datos entregados y responder con las
-  secciones *Resumen*, *Hallazgos*, *Alertas* y *Recomendaciones*. NO DEBE enviar contraseñas,
-  teléfonos, direcciones, correos ni CI.
+  secciones *Resumen*, *Hallazgos*, *Alertas* y *Recomendaciones*. Las cuatro secciones DEBEN
+  venir siempre, pero *Hallazgos*, *Alertas* y *Recomendaciones* PUEDEN venir vacías cuando los
+  datos no dan lugar a nada que decir: la pantalla muestra "Sin alertas en el período" antes que
+  obligar al modelo a inventar una. NO DEBE enviar contraseñas, teléfonos, direcciones, correos
+  ni CI.
 - **FR-013**: El sistema DEBE mostrar el texto del informe junto a la tabla de datos que lo originó,
   el modelo usado, la fecha y hora de generación y el usuario.
 - **FR-014**: El sistema DEBE guardar cada informe generado con tipo, período, datos de entrada,
@@ -422,7 +425,8 @@ comparan algunos meses con el kardex.
 **Generales**
 
 - **FR-023**: Todos los textos de pantalla y mensajes DEBEN estar en español; el procedimiento de
-  cálculo del pronóstico, la evaluación y la reposición DEBE estar documentado paso a paso para
+  cálculo del pronóstico, la evaluación y la reposición DEBE estar documentado paso a paso, en un
+  documento propio para el lector (`docs/metodo-pronostico.md`) enlazado desde las pantallas, para
   poder explicarse sin leer el código (principio VIII).
 
 ### Entidades clave

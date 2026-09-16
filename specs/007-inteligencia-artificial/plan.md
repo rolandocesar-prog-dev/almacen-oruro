@@ -65,7 +65,7 @@ generador solo corre sobre una base sin documentos y solo desde el comando de in
 
 | # | Principio | Cómo lo cumple este plan | Antes | Después del diseño |
 |---|---|---|---|---|
-| I | Explicabilidad | Holt-Winters escrito en el proyecto en ~60 líneas con su inicialización y su desempate documentados; el generador y las métricas, funciones puras; decisiones A-01 a A-14 en `docs/decisiones.md`; la fórmula de reposición se muestra en pantalla | ✅ | ✅ |
+| I | Explicabilidad | Holt-Winters escrito en el proyecto en ~60 líneas con su inicialización y su desempate documentados; el generador y las métricas, funciones puras; decisiones A-01 a A-14 en `docs/decisiones.md`; el método paso a paso en `docs/metodo-pronostico.md`; la fórmula de reposición se muestra en pantalla | ✅ | ✅ |
 | II | Lógica en la aplicación | Serie, pronóstico, evaluación y agregados en `src/servicios/ia/`; consultas de Prisma, sin SQL crudo | ✅ | ✅ |
 | III | Kardex como única fuente | La serie sale de `movimiento_inventario`; el generador crea documentos con los servicios reales, así que cada movimiento pasa por `registrarMovimiento`; la consistencia se verifica al terminar (SC-004) | ✅ | ✅ |
 | IV | Documentos inmutables | El generador anula documentos, no los edita; los informes guardados no se modifican ni se borran | ✅ | ✅ |
@@ -143,6 +143,8 @@ del módulo y un `scripts/` nuevo para el comando de instalación.
 - `specs/001-acceso-personal/contracts/rutas.md`: sumar `/ia`, `/ia/pronostico/[productoId]` y
   `/ia/informes/[id]/imprimir`.
 - `docs/instalacion.md`: paso de instalación del histórico simulado y sección de uso del módulo de IA.
+- `docs/metodo-pronostico.md` (**nuevo**): el procedimiento de pronóstico, evaluación y reposición paso a
+  paso, con un ejemplo numérico, enlazado desde las pantallas de IA (FR-023).
 - `docs/trabajo-futuro.md`: sección F-007 con los fuera de alcance de la especificación.
 
 ## Riesgos
@@ -150,7 +152,7 @@ del módulo y un `scripts/` nuevo para el comando de instalación.
 | Riesgo | Mitigación |
 |---|---|
 | El generador tarda o falla a mitad (36 meses de documentos con todas las reglas) | Correr por mes con avance en consola; si falla, la base queda sin marcar y se recrea; en las pruebas se usa una configuración reducida (3 productos, 6 meses) |
-| La búsqueda en rejilla (729 combinaciones × 25 productos) pasa de 10 s | Son operaciones aritméticas sobre ~36 valores; se mide en el recorrido (SC-005) y, si hiciera falta, se comparte el ajuste entre pronóstico y evaluación |
+| La búsqueda en rejilla (729 combinaciones × 25 productos) pasa de 10 s | Son operaciones aritméticas sobre ~36 valores; se mide en el recorrido (SC-005) y, si hiciera falta, se lee la serie una sola vez por producto y se recorta la rejilla. El ajuste **no** se comparte entre pronóstico y evaluación: son datos distintos (A-04, A-06) |
 | Sin clave de API (Q-02) no se puede probar la redacción | Todo lo demás es independiente: el puerto `Redactor` deja las pruebas sin red y el recorrido marca qué pasos necesitan internet |
 | El modelo inventa una cifra | Salida estructurada, instrucciones explícitas y, sobre todo, el texto junto a su tabla de datos (SC-007); el resaltado automático es P3 (FR-025) |
 | El pronóstico del método principal resulta peor que el ingenuo estacional en algún producto | La evaluación lo muestra tal cual, por producto y en general: es un resultado, no una falla; la prueba con serie construida a mano fija el piso (SC-003) |

@@ -35,6 +35,8 @@ modelo ni necesita `ANTHROPIC_API_KEY`. Pruebas mínimas de F-007:
 | MAE y WAPE, con "No aplica" cuando el consumo real de validación suma 0 | unitaria | FR-009 |
 | Reposición sugerida: 40 + 10 − 35 = 15; stock holgado → 0; sin historial → `máx(0, mínimo − stock)` | unitaria | FR-005 |
 | Generador pseudoaleatorio: misma semilla, misma secuencia | unitaria | FR-019 |
+| Consumo objetivo simulado: junio a agosto por encima del resto, +3 % de un año al siguiente, ruido dentro de ±15 % | unitaria | FR-019 |
+| Secciones del informe: los tres arreglos pueden venir vacíos; falta una sección → rechazo | unitaria | FR-012, FR-015 |
 | Serie de consumo desde el kardex: un mes con distribución y su anulación vuelve a 0; el mes en curso no entra | integración | FR-001 |
 | Pronóstico y evaluación reproducibles sobre los mismos datos | integración | SC-002 |
 | Generador reducido (3 productos, 6 meses): misma semilla → mismos datos; inventario consistente; rechazo si ya hay documentos; marca de demostración con fecha y semilla | integración | SC-001, SC-004, FR-021, FR-022 |

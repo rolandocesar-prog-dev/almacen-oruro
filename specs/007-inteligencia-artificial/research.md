@@ -103,7 +103,10 @@ vista, cualquiera puede rehacer la cuenta con los tres números de la fila (SC-0
 
 **Decisión**: pronóstico, evaluación y reposición se calculan en cada consulta a partir del kardex y de los
 productos; no hay tablas ni columnas nuevas (FR-004). Dentro de una misma petición, la serie de cada
-producto se lee una sola vez y el ajuste de Holt-Winters se comparte entre el pronóstico y la evaluación.
+producto se lee una sola vez y se reutiliza. **El ajuste de Holt-Winters no se comparte** entre el
+pronóstico y la evaluación: el del pronóstico se calcula con toda la serie y el de la evaluación **solo con
+los meses de ajuste** (A-04, aclaración del 13/09). Compartirlo dejaría que los parámetros hubieran visto
+los meses de validación y la evaluación perdería sentido.
 
 **Fundamento**: si un documento se registra con fecha pasada, el pronóstico siguiente ya lo refleja sin
 recalcular nada a mano (caso borde de la especificación). El costo es bajo: 25 productos × 729
@@ -152,12 +155,18 @@ oficial de Anthropic (`@anthropic-ai/sdk`, **única dependencia nueva**):
 - modelo **`claude-opus-5`**, guardado en cada informe (`informe_ia.modelo`);
 - **salida estructurada** con Zod (`client.messages.parse` + `zodOutputFormat`), con el esquema
   `{ resumen: string, hallazgos: string[], alertas: string[], recomendaciones: string[] }`: así las cuatro
-  secciones vienen garantizadas por el formato y, además, se validan (FR-012, FR-015);
+  secciones vienen garantizadas por el formato y, además, se validan (FR-012, FR-015). Los tres arreglos
+  **pueden venir vacíos**: exigir al menos un elemento obligaría al modelo a inventar una alerta donde no
+  la hay, justo lo contrario de FR-012; la pantalla resuelve el caso con "Sin alertas en el período";
 - `max_tokens: 4000`, `output_config.effort: "medium"` (redactar no es una tarea de razonamiento profundo
   y conviene no acercarse al límite de 60 s) y `timeout: 60_000` ms por petición (FR-015);
 - instrucciones del sistema en español: no inventar cifras, usar solo los datos entregados, tono de informe
   para la administración del centro de salud;
-- la clave vive en `ANTHROPIC_API_KEY` (variable de entorno, nunca versionada, principio VII).
+- la clave vive en `ANTHROPIC_API_KEY` (variable de entorno, nunca versionada, principio VII);
+- los errores del SDK se traducen **de lo más específico a lo más general**:
+  `APIConnectionTimeoutError` → `demora`, después `APIConnectionError` → `sin-conexion`, después el resto
+  → `sin-conexion`. El orden importa porque el error de demora **extiende** al de conexión: al revés, una
+  demora se informaría como "sin conexión".
 
 El servicio de informes recibe el redactor como parámetro, con el de Anthropic por defecto.
 

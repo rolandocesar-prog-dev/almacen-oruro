@@ -120,7 +120,10 @@ Salida estructurada validada con Zod:
 { resumen: string, hallazgos: string[], alertas: string[], recomendaciones: string[] }
 ```
 
-Se guarda como texto con esas cuatro secciones (*Resumen*, *Hallazgos*, *Alertas*, *Recomendaciones*).
+`resumen` no puede estar vacío; los tres arreglos **sí pueden venir vacíos** cuando los datos no dan lugar a
+nada que decir (FR-012: antes vacío que inventado). Se guarda como texto con esas cuatro secciones
+(*Resumen*, *Hallazgos*, *Alertas*, *Recomendaciones*); una sección sin elementos se muestra e imprime como
+"Sin hallazgos en el período", "Sin alertas en el período" o "Sin recomendaciones en el período".
 
 ### Rechazos (FR-015) — nada se guarda
 
