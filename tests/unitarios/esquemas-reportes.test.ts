@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { esquemaReporteCompras, esquemaReporteDistribuciones, esquemaReporteExistencias, textoDeFiltros } from "@/esquemas/reportes";
+import { esquemaReporteCompras, esquemaReporteDistribuciones, esquemaReporteExistencias, esquemaReporteKardex, textoDeFiltros } from "@/esquemas/reportes";
 import { hoyEnLaPaz, inicioDelMesEnCurso } from "@/lib/fechas";
 
 describe("textoDeFiltros (FR-006)", () => {
@@ -84,5 +84,18 @@ describe("esquemaReporteExistencias (FR-011)", () => {
   it("acepta la categoría y la casilla de bajo mínimo", () => {
     expect(esquemaReporteExistencias.parse({ categoria: "3", soloBajoMinimo: "si" })).toEqual({ categoria: 3, soloBajoMinimo: true });
     expect(esquemaReporteExistencias.parse({ categoria: "abc" }).categoria).toBeUndefined();
+  });
+});
+
+describe("esquemaReporteKardex (FR-012)", () => {
+  it("por defecto no trae producto y usa el mes en curso", () => {
+    expect(esquemaReporteKardex.parse({})).toEqual({ producto: undefined, desde: inicioDelMesEnCurso(), hasta: hoyEnLaPaz() });
+  });
+
+  it("ignora un producto inválido y rechaza el rango invertido", () => {
+    expect(esquemaReporteKardex.parse({ producto: "abc" }).producto).toBeUndefined();
+    expect(esquemaReporteKardex.safeParse({ desde: "2026-09-10", hasta: "2026-09-01" }).error?.issues[0]?.message).toBe(
+      "La fecha «desde» no puede ser posterior a «hasta»",
+    );
   });
 });

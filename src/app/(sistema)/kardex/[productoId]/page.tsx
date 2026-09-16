@@ -2,22 +2,15 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Aviso } from "@/componentes/ui/aviso";
 import { Celda, Tabla } from "@/componentes/ui/tabla";
-import type { TipoMovimiento } from "@/generado/prisma/client";
 import { esquemaFiltroKardex, type FiltroKardex as ValoresFiltroKardex } from "@/esquemas/inventario";
 import { formatearFecha, formatearFechaHora } from "@/lib/fechas";
 import { idDeRuta } from "@/lib/parametros";
+import { NOMBRE_DEL_TIPO } from "@/componentes/reportes/etiquetas-movimiento";
 import { requerirSesion } from "@/lib/sesion";
 import { obtenerKardex } from "@/servicios/inventario";
 import { FiltroKardex } from "./filtro-kardex";
 
 export const metadata = { title: "Kardex · Almacén Regional Oruro" };
-
-const nombreDelTipo: Record<TipoMovimiento, string> = {
-  ENTRADA_COMPRA: "Entrada por compra",
-  ANULACION_COMPRA: "Anulación de compra",
-  SALIDA_DISTRIBUCION: "Salida por distribución",
-  ANULACION_DISTRIBUCION: "Anulación de distribución",
-};
 
 export default async function PaginaKardex({
   params,
@@ -92,7 +85,7 @@ export default async function PaginaKardex({
           <tr key={movimiento.id}>
             <Celda>{formatearFecha(movimiento.fechaDocumento)}</Celda>
             <Celda>{formatearFechaHora(movimiento.registradoEn)}</Celda>
-            <Celda>{nombreDelTipo[movimiento.tipo]}</Celda>
+            <Celda>{NOMBRE_DEL_TIPO[movimiento.tipo]}</Celda>
             <Celda>
               {/* Las distribuciones llegan con F-005: hasta entonces su enlace no tiene página. */}
               {movimiento.documento ? (

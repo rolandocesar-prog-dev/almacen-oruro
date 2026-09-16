@@ -10,7 +10,7 @@ import type { Prisma } from "@/generado/prisma/client";
 import { aFechaDocumento, textoDeFechaDocumento } from "@/lib/fechas";
 import { prisma } from "@/lib/prisma";
 import { compararEnEspanol } from "@/lib/texto";
-import { listarExistencias } from "./inventario";
+import { listarExistencias, obtenerKardex } from "./inventario";
 
 /** En pantalla el reporte se pagina; la vista de impresión pide todas las filas (research E-04). */
 export const FILAS_POR_PAGINA_REPORTE = 100;
@@ -196,5 +196,23 @@ export async function reporteExistencias(filtro: { categoriaId?: number; soloBaj
       filas: filas.filter((fila) => fila.categoria === categoria).sort((a, b) => compararEnEspanol(a.nombre, b.nombre)),
     })),
     totales: { productos: filas.length, bajoMinimo: filas.filter((fila) => fila.indicador === "Bajo mínimo").length },
+  };
+}
+
+/**
+ * R-4 · Kardex de un producto en un período (FR-012). Reutiliza `obtenerKardex` de F-003, que ya calcula el
+ * saldo anterior al rango y el saldo hasta el fin del rango por fecha del documento (RN-53), de modo que con
+ * un rango que termina hoy el saldo final es el stock actual (SC-002). Los movimientos de anulación se
+ * incluyen siempre: son parte del kardex (Historia 4 · E4), por eso este reporte no ofrece "incluir anulados".
+ */
+export async function reporteKardex(productoId: number, rango: Rango) {
+  const kardex = await obtenerKardex(productoId, rango);
+  if (!kardex) return null;
+
+  return {
+    producto: kardex.producto,
+    movimientos: kardex.movimientos,
+    saldoInicial: kardex.saldoAnterior,
+    saldoFinal: kardex.saldoFinal,
   };
 }
