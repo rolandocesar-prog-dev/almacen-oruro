@@ -22,3 +22,25 @@ body {
   outline: 3px solid var(--color-marca);
   outline-offset: 2px;
 }
+
+/* Impresión de reportes y vales (F-006, Historia 6 · E2). Sin fondos ni sombras, con el encabezado de
+   columnas repetido en cada hoja y sin cortar filas por la mitad. */
+@media print {
+  body {
+    background-color: #fff;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  tr,
+  img {
+    break-inside: avoid;
+  }
+
+  h1,
+  h2 {
+    break-after: avoid;
+  }
+}

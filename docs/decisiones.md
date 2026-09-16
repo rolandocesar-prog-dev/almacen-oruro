@@ -116,6 +116,27 @@ Detalle completo en [`specs/005-distribucion/research.md`](../specs/005-distribu
 
 ---
 
+## Reportes (plan de F-006, 15/09/2026)
+
+Detalle completo en [`specs/006-reportes/research.md`](../specs/006-reportes/research.md).
+
+| # | Fecha | Decisión | Fundamento | Alternativas descartadas |
+|---|---|---|---|---|
+| E-01 | 15/09 | `src/servicios/reportes.ts` con una función por reporte; R-3 y R-4 reutilizan `listarExistencias` y `obtenerKardex` de F-003, y R-1, R-2 y R-5 tienen consulta propia | Cada reporte se explica con su consulta a la vista y no se duplica lo que ya existe | Un generador genérico parametrizado; reutilizar los listados paginados |
+| E-02 | 15/09 | Totales con agregados de la base sobre todo el rango y solo con documentos vigentes; sin filas, valen 0 | Los totales no dependen de la página mostrada (SC-001, SC-003) | Sumar en memoria las filas traídas |
+| E-03 | 15/09 | "Incluir anulados" cambia el listado, nunca los totales; en R-5 el estado ANULADO manda sobre la opción | Regla común de la especificación en una frase; evita el error de sumar anulados | Mostrarlos en gris sin marca |
+| E-04 | 15/09 | Pantalla paginada de 100 en 100; la vista de impresión trae todas las filas | Resuelve el caso borde del rango muy amplio: se navega en pantalla y sale todo en papel | Pantalla sin paginar; impresión paginada |
+| E-05 | 15/09 | Una página por reporte y su gemela `/reportes/{reporte}/imprimir` en el grupo `(impresion)`, con los filtros en la dirección | El grupo ya existía desde el vale; la hoja corresponde a lo que se veía en pantalla | Una sola ruta de impresión con un `switch` por reporte |
+| E-06 | 15/09 | `EncabezadoReporte` y `TablaReporte` compartidos; la tabla de impresión no va dentro de un contenedor con `overflow` | El encabezado hace entendible la hoja suelta (SC-006, SC-007) y el `overflow` impide repetir el `<thead>` por hoja | Repetir el encabezado en cada página; usar la tabla común |
+| E-07 | 15/09 | `obtenerConfiguracion()` lee la fila única de `configuracion`; la leyenda de datos simulados sale en los reportes y en una banda del sistema | Una sola marca de toda la base, como aclaró la especificación (D-07) | Marca por documento; variable de entorno |
+| E-08 | 15/09 | Un esquema Zod por reporte, con rango por defecto del mes en curso y valores inválidos corregidos con aviso | Mismos valores y mensajes que el resto del sistema; el reporte nunca falla por la dirección | Rechazar la petición con un error |
+| E-09 | 15/09 | Filas del más antiguo al más reciente (al revés que los listados de pantalla) | Una hoja impresa se lee en orden cronológico y el saldo del kardex se sigue con el dedo | Mantener el orden descendente de los listados |
+| E-10 | 15/09 | `BotonImprimir` compartido en `componentes/ui` | El mismo control en seis páginas | Una copia por página |
+| E-11 | 15/09 | Menú con **Reportes**, acceso en el inicio e índice `/reportes` con una tarjeta por reporte | Los cinco reportes se encuentran desde un solo lugar | Enlaces sueltos en cada módulo |
+| E-12 | 15/09 | Pruebas de cada total contra la suma esperada y prueba de que el servicio no escribe (código y conteos de tablas) | SC-001 a SC-003 son comparaciones numéricas; FR-005 se demuestra leyendo el código | Confiar en la revisión manual |
+
+---
+
 ## Implementación
 
 Decisiones tomadas durante la implementación que no estaban en el plan.
@@ -157,3 +178,9 @@ Decisiones tomadas durante la implementación que no estaban en el plan.
 | I-33 | 15/09 | El grupo de rutas `(impresion)` convive con `(sistema)/distribuciones/[id]` sin cambios: `npm run build` lista `/distribuciones/[id]/vale` | No hizo falta el plan B de V-09 |
 | I-34 | 15/09 | Las pruebas de concurrencia de F-005 se ejecutaron tres veces seguidas antes de cerrar | Un resultado de concurrencia puede depender del orden; repetirlas descarta un verde por azar |
 | I-35 | 15/09 | El recorrido de F-005 usó el mismo método que I-15 e I-29, con la distribución anulada y la registrada de nuevo cargadas por el script con los servicios reales | Mismo criterio: sin contraseñas en el navegador y sin datos en la base de desarrollo |
+| I-36 | 15/09 | Los reportes no exportan ayudantes desde `page.tsx`: los parámetros de dirección de cada uno viven en un `parametros.ts` junto a la página | Next.js valida las exportaciones de una página y rechaza las que no reconoce; además, la vista de impresión reutiliza esa función |
+| I-37 | 15/09 | `TablaReporte` recibe el mensaje de vacío solo cuando no hay filas (`SIN_RESULTADOS`), como la tabla común | Con un valor por defecto, el mensaje aparecía debajo de la tabla aunque hubiera resultados |
+| I-38 | 15/09 | El filtro de existencias de R-3 usa `estado: "habituales"` de F-003 | Es el valor que significa "activos e inactivos con stock", justo lo que pide FR-011; "activos" no existe en ese esquema |
+| I-39 | 15/09 | Los nombres de los tipos de movimiento pasaron a `src/componentes/reportes/etiquetas-movimiento.ts` y los usan el kardex de F-003 y R-4 | El mismo texto en dos pantallas, escrito una sola vez |
+| I-40 | 15/09 | Las reglas de impresión (`thead` repetido, filas sin cortar, fondo blanco) se agregaron una sola vez en `globals.css` bajo `@media print`, y el layout de impresión se ensanchó a `max-w-5xl` | Sirven para el vale de F-005 y para los cinco reportes; las tablas de reporte llegan a nueve columnas |
+| I-41 | 15/09 | El recorrido de F-006 usó el mismo método que I-15, I-29 e I-35, y encendió y apagó `modo_demostracion` con `psql` dentro del contenedor | Es la única forma de ver la leyenda antes de que exista el generador de F-007 |

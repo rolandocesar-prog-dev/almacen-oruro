@@ -146,6 +146,20 @@ Nada se borra: un registro que ya no se usa se **desactiva** desde su ficha y se
 - **Imprimir vale** abre una hoja limpia con los productos y espacios para las firmas de quien entrega y
   quien recibe.
 
+**9. Consultar e imprimir reportes**
+
+- **Reportes** reúne cinco: compras, distribuciones, existencias, kardex de un producto y pedidos.
+- Los que llevan fechas empiezan con el **mes en curso**, del día 1 a hoy, y filtran por la fecha del
+  documento. Cada reporte tiene además sus propios filtros (proveedor, representante, producto,
+  categoría, estado).
+- Los documentos anulados **no aparecen** salvo que se marque "Incluir anulados", y **nunca suman** en los
+  totales: el total de compras, las cantidades entregadas y el conteo de pedidos cuentan solo lo vigente.
+- **Imprimir** abre la hoja con el nombre del sistema, el nombre del reporte, los filtros aplicados, la
+  fecha y hora de emisión y quién lo emite; los botones no salen impresos. Desde el navegador también se
+  puede guardar como PDF.
+- Si la base tiene datos simulados (los carga el generador del módulo de inteligencia artificial), todas
+  las pantallas y las hojas impresas muestran "Datos simulados con fines de demostración".
+
 Para detener el sistema, presionar `Ctrl + C` en la ventana de PowerShell. La base de datos sigue
 guardada: la próxima vez basta con abrir Docker Desktop, ejecutar `docker compose up -d` y `npm start`.
 

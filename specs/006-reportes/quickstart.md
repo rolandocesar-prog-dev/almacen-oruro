@@ -12,7 +12,7 @@ F-006 **no agrega migraciones**. Para el recorrido hacen falta datos de dos mese
   además, una compra del mes anterior;
 - 2 categorías con productos sobre y bajo el mínimo, y un producto inactivo con stock;
 - 2 representantes con pedidos en los cuatro estados dentro del mes en curso;
-- distribuciones del mes en curso, una de ellas anulada, con "Lavandina 1 L" entregada 6 y 4 unidades.
+- distribuciones del mes en curso, una de ellas anulada, con "Lavandina 1 L" entregada en dos vales de 4 unidades.
 
 ## 2. Pruebas automatizadas
 
@@ -54,3 +54,13 @@ Con la aplicación en marcha (`npm run dev`) y una sesión iniciada.
 | 12 | Filtrar pedidos por estado ANULADO | Aparecen los anulados sin marcar "incluir anulados" | H5 · E3 |
 | 13 | **Imprimir** en cualquier reporte | Vista sin menús ni botones, con nombre del sistema, nombre del reporte, filtros aplicados, fecha y hora de emisión y usuario; todas las filas y los totales al final | H6 · E1, E2 |
 | 14 | Encender `modoDemostracion` en `configuracion` y recargar | "Datos simulados con fines de demostración" en el reporte y en la hoja impresa; al apagarlo, desaparece | H6 · E3, FR-007 |
+
+## 4. Estado de la validación (15/09/2026)
+
+| Qué | Estado | Cómo se verificó |
+|---|---|---|
+| Pruebas automatizadas (§2) | ✅ | 477 pruebas en verde en 68 archivos (427 de F-001 a F-005 y 50 de F-006), más `lint`, `typecheck` y `build` sin errores. Incluyen los totales al centavo de R-1, el total por producto de R-2, los mismos productos que `listarExistencias` en R-3, el saldo final igual al stock actual en R-4, el conteo por estado de R-5 y la prueba de que los reportes no escriben (conteos de todas las tablas antes y después de emitir los cinco) |
+| Pasos 1 a 14 del recorrido | ✅ | Páginas pedidas con una sesión de prueba contra la base de pruebas, con dos meses de datos cargados por los servicios reales (método de `docs/decisiones.md`, I-15, I-29 e I-35): índice con los cinco reportes; R-1 con Bs 400,00 y 3 compras vigentes, que no cambian al incluir la anulada, filtro por proveedor (Bs 149,50) y aviso de rango invertido; R-2 con una fila por línea entregada y "Lavandina 1 L: 8 BID5", filtros combinados y la anulada que no suma; R-3 agrupado por categoría con "Bajo mínimo", sin rango de fechas, y "2 productos · 2 bajo mínimo" con los filtros; R-4 que pide elegir producto y luego muestra saldo inicial 5, los movimientos y saldo final 7; R-5 con "Pendientes: 4 · Parciales: 2 · Atendidos: 4 · Anulados: 1" y el filtro ANULADO sin marcar la opción; las cinco vistas de impresión con encabezado, filtros, emisión y usuario, sin menú; sin sesión → `/ingreso`; y la leyenda "Datos simulados con fines de demostración" en el reporte, en la hoja y en el sistema al encender `modo_demostracion`, que desaparece al apagarlo |
+| SC-005 (reporte de un año en menos de 5 s) | ⏳ pendiente de F-007 | Con los datos del mes, los reportes respondieron entre 90 y 230 ms; la medición con 36 meses se hará cuando el generador de F-007 cargue el histórico |
+| Vista previa de impresión (encabezados repetidos por hoja) y 375 px | ✅ revisión de código · ⏳ visual | Tablas de reporte sin contenedor con `overflow`, `thead { display: table-header-group }` y `tr { break-inside: avoid }` en `globals.css`, controles con `print:hidden` y filtros con etiqueta; falta mirarlo en la vista previa del navegador y en un teléfono |
+| SC-004 y SC-007 (generar e imprimir en menos de 1 minuto; hoja entendible por alguien ajeno) | ⏳ | Se miden en el recorrido manual con Raymond |

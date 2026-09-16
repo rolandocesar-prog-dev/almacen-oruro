@@ -6,5 +6,6 @@ import { requerirSesion } from "@/lib/sesion";
 export default async function LayoutImpresion({ children }: { children: React.ReactNode }) {
   await requerirSesion();
 
-  return <main className="mx-auto w-full max-w-3xl bg-white px-6 py-8 print:max-w-none print:p-0">{children}</main>;
+  // Ancho cómodo para el vale y para las tablas de reporte, que llegan a nueve columnas (F-006, T028).
+  return <main className="mx-auto w-full max-w-5xl bg-white px-6 py-8 print:max-w-none print:p-0">{children}</main>;
 }

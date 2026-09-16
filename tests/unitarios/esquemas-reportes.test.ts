@@ -119,3 +119,35 @@ describe("esquemaReportePedidos (FR-013)", () => {
     }
   });
 });
+
+describe("línea de filtros de cada reporte (FR-006)", () => {
+  const rango = { etiqueta: "Del 01/09/2026 al 15/09/2026" };
+
+  it("compras: proveedor y anuladas", () => {
+    expect(textoDeFiltros([rango, { etiqueta: "Proveedor", valor: "Distribuidora Andina" }, { etiqueta: "Incluye anuladas" }])).toBe(
+      "Del 01/09/2026 al 15/09/2026 · Proveedor: Distribuidora Andina · Incluye anuladas",
+    );
+  });
+
+  it("distribuciones: representante y producto", () => {
+    expect(textoDeFiltros([rango, { etiqueta: "Representante", valor: "Quispe, Ana" }, { etiqueta: "Producto", valor: "Lavandina 1 L" }])).toBe(
+      "Del 01/09/2026 al 15/09/2026 · Representante: Quispe, Ana · Producto: Lavandina 1 L",
+    );
+  });
+
+  it("existencias: sin fechas, con categoría y bajo mínimo", () => {
+    expect(
+      textoDeFiltros([{ etiqueta: "Situación al momento de la emisión" }, { etiqueta: "Categoría", valor: "Limpieza" }, { etiqueta: "Solo bajo mínimo" }]),
+    ).toBe("Situación al momento de la emisión · Categoría: Limpieza · Solo bajo mínimo");
+  });
+
+  it("kardex: rango y unidad del producto", () => {
+    expect(textoDeFiltros([rango, { etiqueta: "Unidad", valor: "Bidón 5 L" }])).toBe("Del 01/09/2026 al 15/09/2026 · Unidad: Bidón 5 L");
+  });
+
+  it("pedidos: estado y representante", () => {
+    expect(textoDeFiltros([rango, { etiqueta: "Estado", valor: "Anulados" }, { etiqueta: "Representante", valor: "Mamani, Luis" }])).toBe(
+      "Del 01/09/2026 al 15/09/2026 · Estado: Anulados · Representante: Mamani, Luis",
+    );
+  });
+});
