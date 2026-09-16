@@ -2,7 +2,7 @@
 
 Toda decisión de diseño relevante se registra aquí con su fundamento (constitución, principio I).
 Las decisiones de alcance y de negocio están en
-[`especificacion/00-decisiones-y-alcance.md`](especificacion/00-decisiones-y-alcance.md) (D-01 a D-16).
+[`especificacion/00-decisiones-y-alcance.md`](especificacion/00-decisiones-y-alcance.md) (D-01 a D-20).
 
 **Formato de cada entrada:** fecha · decisión · fundamento · alternativas descartadas · enlace al
 detalle.
@@ -221,3 +221,4 @@ Decisiones tomadas durante la implementación que no estaban en el plan.
 | I-52 | 16/09 | El recorrido de F-007 usó el método de I-15: el histórico se cargó con el comando real sobre la base de pruebas, el paso 15 se probó con el redactor real sin clave y los informes guardados de los pasos 16 a 18 se crearon con un redactor de prueba marcado como tal; el gráfico y los 375 px se revisaron en el navegador integrado con la cookie de la sesión de prueba | Todavía no hay clave de API (Q-02) y no se escriben contraseñas en el navegador |
 | I-53 | 16/09 | Se implementó el resaltado de cifras (FR-025, P3) en `verificacion-cifras.ts`: cada número del texto se compara con todos los números de los datos —incluidos los de nombres y códigos—, se acepta el redondeo a un decimal y el valor sin signo, y se ignoran fechas, años y la numeración de listas | Quedaba tiempo antes del 21/09; la advertencia ayuda a verificar SC-007 sin bloquear el informe |
 | I-54 | 16/09 | SC-005 de F-006 se midió con el build de producción sobre la base de pruebas cargada con el generador de F-007, con 6 pedidos por reporte y descartando la primera carga en el cálculo de la mediana | `next dev` compila en la primera visita y mide otra cosa; la mediana muestra el tiempo habitual y el máximo, el peor caso |
+| I-55 | 16/09 | Los cinco representantes simulados son responsables de Emergencias, Internación, Laboratorio, Consulta externa y Odontología | Alinea el catálogo simulado con la definición de representante confirmada por Raymond (D-18); no cambia ninguna cantidad generada |

@@ -271,5 +271,5 @@ reglas críticas.
 
 ---
 
-No quedan marcas **NEEDS CLARIFICATION**. Pendiente externo: Q-04 (si el talonario reinicia su numeración
-cada año); si Raymond lo confirma, cambia RN-31 y el índice único, no el diseño.
+No quedan marcas **NEEDS CLARIFICATION**. Q-04 se resolvió el 16/09 (D-19): el vale es manual y no se
+repite, sin reinicio anual, tal como está implementado en RN-31 y el índice único.

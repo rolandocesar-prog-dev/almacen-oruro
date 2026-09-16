@@ -287,7 +287,7 @@ base; una prueba con la base simulada no las demostraría.
   contraseña de `CONTRASENA_INICIAL` y `debe_cambiar_contrasena = true` (RN-05). Es idempotente.
 
 **Fundamento**: la constitución exige levantar el sistema en local con PostgreSQL en Docker y un comando
-de semilla (pendiente Q-03).
+de semilla (confirmado el 16/09: D-17, Q-03 resuelta).
 
 ---
 

@@ -4,7 +4,7 @@
 **Autor del proyecto de grado:** Raymond Jesus Panozo Crespo
 **Desarrollo y asesoría técnica:** Rolando
 **Fuente:** Capítulo II del documento de grado (Word), diagrama de clases persistentes y base de datos `BDPROYECTOGRADO` (SQL Server, abril 2022)
-**Estado:** Borrador para afinar · Revisión 2 · 13/09/2026
+**Estado:** Borrador para afinar · Revisión 3 · 16/09/2026
 
 ---
 
@@ -40,6 +40,10 @@ Quedan **9 días calendario**, sin margen. El alcance de abajo está cortado par
 | D-14 | La base de 2022 se usa solo como **referencia del dominio**; sus defectos se corrigen (ver sección 4) | Pedido explícito de Raymond | 13/09 |
 | D-15 | "Eliminar" en el sistema significa **baja lógica** (desactivar), nunca borrado físico | Borrar un proveedor rompía el histórico de compras | 13/09 |
 | D-16 | Compras y distribuciones **no se editan: se anulan** con motivo, generando el movimiento inverso en el kardex | Documentos inmutables = kardex siempre cuadra. Explicable en una frase | 13/09 |
+| D-17 | El sistema corre **en local, con PostgreSQL en Docker**; solo generar un informe IA nuevo necesita internet | Raymond lo estudia y lo defiende en su computadora, sin depender de un servidor ni de la red (resuelve Q-03) | 16/09 |
+| D-18 | El **representante** es la persona responsable de un servicio o área del centro de salud (emergencias, internación, laboratorio…) que solicita los productos | Confirma S-01 (resuelve Q-04) | 16/09 |
+| D-19 | El **Nº de vale** lo escribe el usuario a partir del talonario físico y el sistema valida que **no se repita** entre las distribuciones vigentes, sin distinguir año; no hay numeración automática ni reinicio anual | Confirma S-02 y la regla implementada en F-005 (resuelve Q-04) | 16/09 |
+| D-20 | El catálogo es **simulado y verosímil, de 25 productos**, pensado para demostrar todas las funcionalidades (bajo mínimo, stock holgado, estacionalidad, anulaciones, pedidos en los cuatro estados) | No hay catálogo real disponible; lo carga el generador de F-007 (resuelve Q-05) | 16/09 |
 
 ---
 
@@ -110,11 +114,11 @@ El orden de corte está fijado **ahora**, para no discutirlo el sábado a median
 
 | # | Supuesto |
 |---|---|
-| S-01 | El **representante** es la persona responsable de un servicio o área del centro de salud (emergencias, internación, laboratorio…) que solicita los productos |
-| S-02 | El **Nº de vale** lo escribe el usuario (talonario físico) y el sistema valida que no se repita |
+| S-01 | El **representante** es la persona responsable de un servicio o área del centro de salud (emergencias, internación, laboratorio…) que solicita los productos. **Confirmado el 16/09 (D-18)** |
+| S-02 | El **Nº de vale** lo escribe el usuario (talonario físico) y el sistema valida que no se repita. **Confirmado el 16/09 (D-19)** |
 | S-03 | Las cantidades son **enteras**, en la unidad de presentación del producto (bidón, caja, unidad) |
 | S-04 | Una distribución siempre atiende **un pedido** existente; no hay salidas sin pedido (salvo anulación) |
-| S-05 | Volumen de la simulación: 1 centro de salud, 5 representantes, ~25 productos en ~6 categorías, 36 meses de histórico |
+| S-05 | Volumen de la simulación: 1 centro de salud, 5 representantes, 25 productos en 6 categorías, 36 meses de histórico. **Catálogo simulado confirmado el 16/09 (D-20)** |
 | S-06 | Estacionalidad simulada: mayor consumo en invierno (junio–agosto) por la temporada respiratoria, leve tendencia creciente y ruido aleatorio |
 | S-07 | La interfaz se usa en computadora de escritorio con Chrome o Edge |
 
@@ -126,7 +130,7 @@ El orden de corte está fijado **ahora**, para no discutirlo el sábado a median
 |---|---|---|---|---|
 | Q-01 | Objetivos general y específicos del Capítulo I, para verificar que la IA propuesta los cumple | Raymond | No, pero es urgente | Se asume D-06 |
 | Q-02 | **Cuenta y clave de API del modelo de lenguaje** para los informes redactados (quién la aporta y quién la paga) | Rolando / Raymond | **Sí, para F-007 el sábado 19/09** | Se desarrolla con la clave de la asesoría |
-| Q-03 | Despliegue: ¿dónde lo va a correr Raymond para estudiar y para la defensa? | Rolando | No | Propuesta: local, con PostgreSQL en Docker, sin depender de internet salvo para generar informes |
-| Q-04 | Confirmar S-01 (qué es un representante) y S-02 (vale manual o automático; si el talonario reinicia su numeración cada año) | Raymond | No | Se asumen; el vale es único en toda la historia (F-005) |
-| Q-05 | Catálogo real de productos, categorías y unidades, si existe | Raymond | No | Catálogo simulado verosímil |
+| Q-03 | Despliegue: ¿dónde lo va a correr Raymond para estudiar y para la defensa? | Rolando | — | ✅ **Resuelta el 16/09 → D-17**: local, con PostgreSQL en Docker |
+| Q-04 | Confirmar S-01 (qué es un representante) y S-02 (vale manual o automático; si el talonario reinicia su numeración cada año) | Raymond | — | ✅ **Resuelta el 16/09 → D-18 y D-19**: representante = responsable de un servicio; vale manual que no se repite |
+| Q-05 | Catálogo real de productos, categorías y unidades, si existe | Raymond | — | ✅ **Resuelta el 16/09 → D-20**: catálogo simulado verosímil de 25 productos |
 | Q-06 | Actualizar el Capítulo II del Word con los cambios de este documento (IA definida, un rol, baja lógica, anulación, kardex) | Raymond | No | Se entrega la lista de cambios junto con el sistema |

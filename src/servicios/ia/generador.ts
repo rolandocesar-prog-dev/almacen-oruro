@@ -95,12 +95,13 @@ const PROVEEDORES = [
   { razonSocial: "Insumos Bolivia S.A.", nit: "3067890031" },
 ] as const;
 
+/** Cada representante es el responsable de un servicio o área del centro de salud (D-18). */
 const REPRESENTANTES = [
-  { nombre: "María", apellido: "Quispe", ci: "4821507", servicio: "Enfermería" },
-  { nombre: "Jorge", apellido: "Mamani", ci: "3915482", servicio: "Laboratorio" },
-  { nombre: "Elena", apellido: "Choque", ci: "5203871", servicio: "Consulta externa" },
-  { nombre: "Rubén", apellido: "Colque", ci: "4409236", servicio: "Odontología" },
-  { nombre: "Silvia", apellido: "Apaza", ci: "6110394", servicio: "Farmacia" },
+  { nombre: "María", apellido: "Quispe", ci: "4821507", servicio: "Emergencias" },
+  { nombre: "Jorge", apellido: "Mamani", ci: "3915482", servicio: "Internación" },
+  { nombre: "Elena", apellido: "Choque", ci: "5203871", servicio: "Laboratorio" },
+  { nombre: "Rubén", apellido: "Colque", ci: "4409236", servicio: "Consulta externa" },
+  { nombre: "Silvia", apellido: "Apaza", ci: "6110394", servicio: "Odontología" },
 ] as const;
 
 const CENTRO_SALUD = "Centro de Salud Oruro Central";

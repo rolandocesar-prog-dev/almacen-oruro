@@ -28,8 +28,8 @@ principios III y IV · Defectos corregidos X-02, X-03, X-08 y X-09.
 ### Session 2026-09-13
 
 - Q: ¿El número de vale es único entre todas las distribuciones vigentes o solo dentro del mismo
-  año? → A: Entre todas las distribuciones REGISTRADAS, sin importar el año. Si Raymond confirma
-  que el talonario reinicia su numeración (pendiente Q-04), se revisa esta regla.
+  año? → A: Entre todas las distribuciones REGISTRADAS, sin importar el año. Confirmado el 16/09
+  (D-19, Q-04 resuelta): el vale lo escribe el usuario y no se repite; no hay reinicio anual.
 - Q: Si un pedido está ANULADO y una de sus distribuciones se registró mal, ¿se puede anular esa
   distribución? → A: Sí; se repone el stock, se descuenta lo entregado y el pedido sigue ANULADO,
   con más saldo anulado.

@@ -41,7 +41,7 @@ Alcance general fuera de la entrega: ver
 - Distribuciones sin pedido, que atiendan varios pedidos a la vez, y transporte o logística.
 - Confirmación de la recepción por el representante dentro del sistema.
 - Devoluciones parciales (hoy se anula la distribución y se registra de nuevo con lo correcto).
-- Vale generado por el sistema o numeración que reinicie cada año, si Raymond lo confirma (Q-04).
+- Vale generado por el sistema, si el almacén dejara el talonario físico (hoy el vale es manual y no se repite, D-19).
 - PDF del vale generado en el servidor (hoy se imprime desde el navegador).
 
 ## F-006 · Reportes
