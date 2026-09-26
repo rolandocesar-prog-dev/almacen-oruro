@@ -14,7 +14,7 @@ export default async function PaginaEditarPersonal({ params }: { params: Promise
 
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">
+      <h1 className="text-2xl font-bold sm:text-[28px]">
         Editar a {persona.nombre} {persona.apellido}
       </h1>
       <FormularioPersonal

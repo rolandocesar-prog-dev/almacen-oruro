@@ -28,9 +28,9 @@ export default async function PaginaExistencias({ searchParams }: { searchParams
     <section className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold">Existencias</h1>
+          <h1 className="text-2xl font-bold sm:text-[28px]">Existencias</h1>
           {/* SC-007: cuántos están bajo mínimo se ve sin buscar. */}
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-texto-suave">
             {existencias.total === 1 ? "1 producto" : `${existencias.total} productos`} ·{" "}
             <strong className={existencias.bajoMinimo > 0 ? "text-aviso" : ""}>{existencias.bajoMinimo} bajo mínimo</strong>
           </p>

@@ -114,7 +114,7 @@ export function FormularioProducto({ accion, categorias, unidades, valores = {},
             <p className="py-2 text-base">
               {edicion.stockActual} ({edicion.unidad})
             </p>
-            <p className="text-xs text-gray-600">Solo cambia con compras y distribuciones.</p>
+            <p className="text-xs text-texto-suave">Solo cambia con compras y distribuciones.</p>
           </div>
         )}
       </div>

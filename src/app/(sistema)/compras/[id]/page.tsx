@@ -36,7 +36,7 @@ export default async function PaginaDetalleCompra({
       {aviso === "registrada" && <Aviso tipo="exito">Compra registrada. El stock de sus productos se actualizó.</Aviso>}
 
       <div className="flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl font-semibold">Factura {compra.nroFactura}</h1>
+        <h1 className="text-2xl font-bold sm:text-[28px]">Factura {compra.nroFactura}</h1>
         <InsigniaDocumento estado={compra.estado} />
       </div>
 

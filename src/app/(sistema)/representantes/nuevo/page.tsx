@@ -11,7 +11,7 @@ export default async function PaginaNuevoRepresentante() {
 
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">Registrar representante</h1>
+      <h1 className="text-2xl font-bold sm:text-[28px]">Registrar representante</h1>
       <FormularioRepresentante accion={registrarRepresentanteAccion} centros={centros} textoBoton="Registrar" rutaCancelar="/representantes" />
     </section>
   );

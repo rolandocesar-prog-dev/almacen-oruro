@@ -19,8 +19,8 @@ export default async function PaginaVerificacion() {
       <Link href="/existencias" className="text-sm text-marca underline">
         ← Volver a existencias
       </Link>
-      <h1 className="text-2xl font-semibold">Verificación de consistencia del inventario</h1>
-      <p className="text-sm text-gray-600">
+      <h1 className="text-2xl font-bold sm:text-[28px]">Verificación de consistencia del inventario</h1>
+      <p className="text-sm text-texto-suave">
         Compara, para cada producto, el stock actual con la suma de todos sus movimientos del kardex (RN-50). Verificado el{" "}
         {formatearFechaHora(resultado.verificadoEn)}.
       </p>

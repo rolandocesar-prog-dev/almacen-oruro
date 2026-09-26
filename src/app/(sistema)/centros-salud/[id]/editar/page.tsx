@@ -15,7 +15,7 @@ export default async function PaginaEditarCentroSalud({ params }: { params: Prom
 
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">Editar {centro.nombre}</h1>
+      <h1 className="text-2xl font-bold sm:text-[28px]">Editar {centro.nombre}</h1>
       <FormularioCentroSalud
         accion={modificarCentroSaludAccion.bind(null, centro.id)}
         valores={centro}

@@ -9,7 +9,7 @@ export default async function PaginaNuevoCentroSalud() {
 
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">Registrar centro de salud</h1>
+      <h1 className="text-2xl font-bold sm:text-[28px]">Registrar centro de salud</h1>
       <FormularioCentroSalud accion={registrarCentroSaludAccion} textoBoton="Registrar" rutaCancelar="/centros-salud" />
     </section>
   );

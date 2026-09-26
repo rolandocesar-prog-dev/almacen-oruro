@@ -65,7 +65,7 @@ export function FormularioInforme({ desde: desdeInicial, hasta: hastaInicial }: 
           onChange={(evento) => setTipo(evento.target.value)}
           aria-invalid={Boolean(erroresTipo?.length)}
           aria-describedby={erroresTipo?.length ? "tipo-errores" : undefined}
-          className={`rounded-md border bg-white px-3 py-2 text-base ${erroresTipo?.length ? "border-error" : "border-borde"}`}
+          className={`rounded-md border bg-white px-3 py-2 text-base ${erroresTipo?.length ? "border-error" : "border-borde-campo"}`}
         >
           <option value="">Elige un tipo</option>
           <option value="COMPRAS">Informe IA de compras</option>
@@ -85,7 +85,7 @@ export function FormularioInforme({ desde: desdeInicial, hasta: hastaInicial }: 
         <Campo id="hasta" etiqueta="Hasta" type="date" value={hasta} onChange={(e) => setHasta(e.target.value)} errores={errores.hasta} />
       </div>
 
-      <p className="text-sm text-gray-600">
+      <p className="text-sm text-texto-suave">
         Generar un informe nuevo necesita conexión a internet; los informes ya guardados se consultan e imprimen sin ella. La redacción
         puede tardar hasta un minuto.
       </p>
@@ -99,7 +99,7 @@ export function FormularioInforme({ desde: desdeInicial, hasta: hastaInicial }: 
         </Link>
       </div>
       {generando && (
-        <p role="status" className="text-sm text-gray-600">
+        <p role="status" className="text-sm text-texto-suave">
           Calculando los datos del período y esperando la redacción. No cierres esta pantalla.
         </p>
       )}

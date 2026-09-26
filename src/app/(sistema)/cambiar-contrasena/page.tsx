@@ -10,7 +10,7 @@ export default async function PaginaCambiarContrasena() {
 
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">Cambiar mi contraseña</h1>
+      <h1 className="text-2xl font-bold sm:text-[28px]">Cambiar mi contraseña</h1>
       {usuario.debeCambiarContrasena && (
         <Aviso tipo="informacion">
           Debes definir una contraseña nueva antes de continuar. En &quot;Contraseña actual&quot; escribe la que usaste para ingresar.

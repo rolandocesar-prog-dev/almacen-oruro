@@ -11,15 +11,15 @@ export function Paginacion({ pagina, paginas, enlace }: { pagina: number; pagina
   return (
     <nav aria-label="Páginas" className="flex items-center gap-3 text-sm">
       {pagina > 1 && (
-        <Link href={enlace(pagina - 1)} className="text-marca underline">
+        <Link href={enlace(pagina - 1)} className="rounded-lg border border-borde bg-white px-3 py-1.5 font-medium text-marca hover:border-marca">
           ← Anterior
         </Link>
       )}
-      <span>
+      <span className="text-texto-suave">
         Página {pagina} de {paginas}
       </span>
       {pagina < paginas && (
-        <Link href={enlace(pagina + 1)} className="text-marca underline">
+        <Link href={enlace(pagina + 1)} className="rounded-lg border border-borde bg-white px-3 py-1.5 font-medium text-marca hover:border-marca">
           Siguiente →
         </Link>
       )}

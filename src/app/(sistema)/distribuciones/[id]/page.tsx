@@ -38,7 +38,7 @@ export default async function PaginaDetalleDistribucion({
       {aviso === "registrada" && <Aviso tipo="exito">Distribución registrada. El stock bajó y lo entregado del pedido se actualizó.</Aviso>}
 
       <div className="flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl font-semibold">Vale {distribucion.nroVale}</h1>
+        <h1 className="text-2xl font-bold sm:text-[28px]">Vale {distribucion.nroVale}</h1>
         <InsigniaDocumento estado={distribucion.estado} />
       </div>
 

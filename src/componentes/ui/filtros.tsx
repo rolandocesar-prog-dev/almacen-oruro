@@ -35,13 +35,13 @@ export function Filtros({
   }
 
   return (
-    <form method="get" action={accion} onSubmit={validarAntesDeEnviar} className="flex flex-col gap-3 rounded-md border border-borde bg-white p-4">
+    <form method="get" action={accion} onSubmit={validarAntesDeEnviar} className="flex flex-col gap-3 rounded-xl border border-borde bg-white p-4">
       <div className="flex flex-wrap items-end gap-3">
         {children}
-        <button type="submit" className="rounded-md bg-marca px-4 py-2 text-sm font-medium text-white hover:bg-marca-oscuro">
+        <button type="submit" className="min-h-10 rounded-lg bg-marca px-4 py-2 text-sm font-semibold text-white hover:bg-marca-oscuro">
           Aplicar
         </button>
-        <a href={accion} className="px-2 py-2 text-sm text-marca underline">
+        <a href={accion} className="px-2 py-2 text-sm font-medium text-marca underline-offset-2 hover:underline">
           Limpiar
         </a>
       </div>

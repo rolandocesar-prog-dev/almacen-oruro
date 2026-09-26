@@ -13,25 +13,25 @@ export function Tabla({
   vacio?: React.ReactNode;
 }) {
   return (
-    <div className="overflow-x-auto rounded-md border border-borde bg-white">
+    <div className="overflow-x-auto rounded-xl border border-borde bg-white">
       <table className="min-w-full text-left text-sm">
-        <thead className="bg-fondo">
+        <thead className="bg-marca-claro/60">
           <tr>
             {encabezados.map((encabezado) => (
-              <th key={encabezado} scope="col" className="whitespace-nowrap px-4 py-2 font-semibold">
+              <th key={encabezado} scope="col" className="whitespace-nowrap px-3 py-3 text-xs font-semibold uppercase tracking-wide text-texto-suave">
                 {encabezado}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-borde">{children}</tbody>
+        <tbody className="divide-y divide-borde [&>tr]:transition-colors [&>tr:hover]:bg-fondo">{children}</tbody>
       </table>
-      {vacio && <p className="px-4 py-6 text-center text-gray-600">{vacio}</p>}
+      {vacio && <p className="px-4 py-6 text-center text-texto-suave">{vacio}</p>}
     </div>
   );
 }
 
 /** Celda de una fila de la tabla. */
 export function Celda({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <td className={`whitespace-nowrap px-4 py-2 ${className}`}>{children}</td>;
+  return <td className={`whitespace-nowrap px-3 py-3 ${className}`}>{children}</td>;
 }

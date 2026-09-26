@@ -39,7 +39,7 @@ export default async function PaginaFichaCentroSalud({
       {aviso && <Aviso tipo="exito">{avisos[aviso]}</Aviso>}
 
       <div className="flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl font-semibold">{centro.nombre}</h1>
+        <h1 className="text-2xl font-bold sm:text-[28px]">{centro.nombre}</h1>
         <InsigniaActivo activo={centro.activo} />
       </div>
 

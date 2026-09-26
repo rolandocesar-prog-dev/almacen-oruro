@@ -15,7 +15,7 @@ export function CampoBusqueda({ valor, ayuda }: { valor?: string; ayuda: string 
         maxLength={60}
         defaultValue={valor ?? ""}
         placeholder={ayuda}
-        className="w-full min-w-0 rounded-md border border-borde px-3 py-2 sm:w-64"
+        className="w-full min-w-0 rounded-md border border-borde-campo px-3 py-2 sm:w-64"
       />
     </div>
   );
@@ -28,7 +28,7 @@ export function CampoEstado({ valor }: { valor: EstadoFiltro }) {
       <label htmlFor="estado" className="text-sm font-medium">
         Estado
       </label>
-      <select id="estado" name="estado" defaultValue={valor} className="rounded-md border border-borde px-3 py-2">
+      <select id="estado" name="estado" defaultValue={valor} className="rounded-md border border-borde-campo px-3 py-2">
         <option value="activos">Activos</option>
         <option value="inactivos">Inactivos</option>
         <option value="todos">Todos</option>

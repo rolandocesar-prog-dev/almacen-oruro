@@ -18,8 +18,8 @@ export default async function PaginaReportes() {
   return (
     <section className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-semibold">Reportes</h1>
-        <p className="text-sm text-gray-600">
+        <h1 className="text-2xl font-bold sm:text-[28px]">Reportes</h1>
+        <p className="text-sm text-texto-suave">
           Cada reporte se consulta en pantalla y se imprime (o se guarda como PDF) con su encabezado, los filtros aplicados y la fecha de
           emisión.
         </p>
@@ -29,7 +29,7 @@ export default async function PaginaReportes() {
           <li key={reporte.ruta}>
             <Link href={reporte.ruta} className="block rounded-lg border border-borde bg-white p-4 hover:border-marca">
               <span className="block font-semibold text-marca">{reporte.titulo}</span>
-              <span className="text-sm text-gray-600">{reporte.descripcion}</span>
+              <span className="text-sm text-texto-suave">{reporte.descripcion}</span>
             </Link>
           </li>
         ))}

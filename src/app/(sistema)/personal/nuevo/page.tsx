@@ -9,8 +9,8 @@ export default async function PaginaNuevoPersonal() {
 
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">Registrar personal</h1>
-      <p className="text-sm text-gray-600">La persona podrá ingresar al sistema con el usuario y la contraseña que indiques.</p>
+      <h1 className="text-2xl font-bold sm:text-[28px]">Registrar personal</h1>
+      <p className="text-sm text-texto-suave">La persona podrá ingresar al sistema con el usuario y la contraseña que indiques.</p>
       <FormularioPersonal modo="registro" accion={registrarPersonalAccion} rutaCancelar="/personal" />
     </section>
   );

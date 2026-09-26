@@ -11,7 +11,7 @@ export function FiltroAsociaciones({ proveedorId, valores }: { proveedorId: numb
         <label htmlFor="asociaciones" className="text-sm font-medium">
           Mostrar
         </label>
-        <select id="asociaciones" name="asociaciones" defaultValue={valores.asociaciones} className="rounded-md border border-borde px-3 py-2">
+        <select id="asociaciones" name="asociaciones" defaultValue={valores.asociaciones} className="rounded-md border border-borde-campo px-3 py-2">
           <option value="activas">Productos que ofrece</option>
           <option value="inactivas">Productos quitados</option>
         </select>

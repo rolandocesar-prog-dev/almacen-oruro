@@ -96,7 +96,7 @@ export default async function PaginaReporteDistribuciones({ searchParams }: { se
       <div className="flex flex-col gap-1">
         <h2 className="text-base font-semibold">Total entregado por producto (solo vigentes)</h2>
         {reporte.totales.porProducto.length === 0 ? (
-          <p className="text-sm text-gray-600">Sin entregas en el período.</p>
+          <p className="text-sm text-texto-suave">Sin entregas en el período.</p>
         ) : (
           <ul className="list-disc pl-5 text-sm">
             {reporte.totales.porProducto.map((producto) => (

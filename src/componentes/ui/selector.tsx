@@ -25,7 +25,7 @@ export function Selector({ id, etiqueta, opciones, textoVacio, ayuda, errores, c
 
   return (
     <div className="flex min-w-0 flex-col gap-1">
-      <label htmlFor={id} className="text-sm font-medium">
+      <label htmlFor={id} className="text-sm font-semibold">
         {etiqueta}
       </label>
       <select
@@ -33,7 +33,7 @@ export function Selector({ id, etiqueta, opciones, textoVacio, ayuda, errores, c
         name={resto.name ?? id}
         aria-invalid={tieneErrores}
         aria-describedby={descritoPor}
-        className={`w-full min-w-0 rounded-md border bg-white px-3 py-2 text-base ${tieneErrores ? "border-error" : "border-borde"} ${className}`}
+        className={`w-full min-w-0 rounded-lg border bg-white px-3 py-2 text-base ${tieneErrores ? "border-error" : "border-borde-campo"} ${className}`}
         {...resto}
       >
         <option value="">{textoVacio}</option>
@@ -44,7 +44,7 @@ export function Selector({ id, etiqueta, opciones, textoVacio, ayuda, errores, c
         ))}
       </select>
       {ayuda && (
-        <p id={idAyuda} className="text-xs text-gray-600">
+        <p id={idAyuda} className="text-xs text-texto-suave">
           {ayuda}
         </p>
       )}

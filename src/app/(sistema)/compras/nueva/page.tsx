@@ -18,8 +18,8 @@ export default async function PaginaNuevaCompra() {
       <Link href="/compras" className="text-sm text-marca underline">
         ← Volver a compras
       </Link>
-      <h1 className="text-2xl font-semibold">Registrar compra</h1>
-      <p className="text-sm text-gray-600">
+      <h1 className="text-2xl font-bold sm:text-[28px]">Registrar compra</h1>
+      <p className="text-sm text-texto-suave">
         Carga la compra con la factura en mano. Al guardar, el stock de cada producto sube y queda en su kardex. Una compra no se edita: si
         tiene un error, se anula y se vuelve a registrar.
       </p>

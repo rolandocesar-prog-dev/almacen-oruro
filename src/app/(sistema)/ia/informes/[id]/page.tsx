@@ -42,7 +42,7 @@ export default async function PaginaInforme({
       </div>
       {aviso === "generado" && <Aviso tipo="exito">Informe generado y guardado.</Aviso>}
 
-      <h1 className="text-2xl font-semibold">{TITULO_DEL_INFORME[informe.tipo]}</h1>
+      <h1 className="text-2xl font-bold sm:text-[28px]">{TITULO_DEL_INFORME[informe.tipo]}</h1>
       <dl className="grid gap-3 rounded-md border border-borde bg-white p-4 sm:grid-cols-2 lg:grid-cols-4">
         <Dato etiqueta="Período" valor={`Del ${formatearFecha(informe.desde)} al ${formatearFecha(informe.hasta)}`} />
         <Dato etiqueta="Generado el" valor={formatearFechaHora(informe.creadoEn)} />
@@ -55,7 +55,7 @@ export default async function PaginaInforme({
         <div className="flex flex-col gap-2 rounded-md border border-borde bg-white p-4">
           <h2 className="text-lg font-semibold">Texto del informe</h2>
           <TextoInforme texto={informe.texto} datos={informe.datosEntrada} />
-          <p className="mt-2 text-xs italic text-gray-600">{NOTA_TEXTO_REDACTADO}.</p>
+          <p className="mt-2 text-xs italic text-texto-suave">{NOTA_TEXTO_REDACTADO}.</p>
         </div>
         <div className="flex min-w-0 flex-col gap-2 overflow-x-auto rounded-md border border-borde bg-white p-4">
           <h2 className="text-lg font-semibold">Datos enviados al modelo</h2>

@@ -28,7 +28,7 @@ export default async function PaginaEditarPedido({ params }: { params: Promise<{
     return (
       <section className="flex flex-col gap-4">
         {volver}
-        <h1 className="text-2xl font-semibold">Editar pedido Nº {pedido.id}</h1>
+        <h1 className="text-2xl font-bold sm:text-[28px]">Editar pedido Nº {pedido.id}</h1>
         <Aviso tipo="informacion">Este pedido está {pedido.estado.toLowerCase()}: solo se editan pedidos pendientes.</Aviso>
       </section>
     );
@@ -43,8 +43,8 @@ export default async function PaginaEditarPedido({ params }: { params: Promise<{
   return (
     <section className="flex flex-col gap-4">
       {volver}
-      <h1 className="text-2xl font-semibold">Editar pedido Nº {pedido.id}</h1>
-      <p className="text-sm text-gray-600">El pedido conserva su número. Editarlo no mueve el stock.</p>
+      <h1 className="text-2xl font-bold sm:text-[28px]">Editar pedido Nº {pedido.id}</h1>
+      <p className="text-sm text-texto-suave">El pedido conserva su número. Editarlo no mueve el stock.</p>
       <FormularioPedido
         accion={editarPedidoAccion.bind(null, pedido.id)}
         representantes={representantes}

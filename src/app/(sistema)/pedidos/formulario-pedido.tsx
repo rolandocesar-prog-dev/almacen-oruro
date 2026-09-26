@@ -28,7 +28,7 @@ function nuevaLinea(productoId = "", cantidadSolicitada = ""): Linea {
   return { clave: siguienteClave, productoId, cantidadSolicitada };
 }
 
-const claseCampo = (error?: string[]) => `w-full min-w-0 rounded-md border bg-white px-3 py-2 text-base ${error?.length ? "border-error" : "border-borde"}`;
+const claseCampo = (error?: string[]) => `w-full min-w-0 rounded-md border bg-white px-3 py-2 text-base ${error?.length ? "border-error" : "border-borde-campo"}`;
 
 function Errores({ id, mensajes }: { id: string; mensajes?: string[] }) {
   if (!mensajes?.length) return null;
@@ -207,7 +207,7 @@ export function FormularioPedido({ accion, representantes, productos, hoy, valor
               <legend className="px-1 text-sm font-medium">Línea {indice + 1}</legend>
 
               <div className="flex min-w-0 flex-col gap-1">
-                <label htmlFor={id("producto")} className="text-xs text-gray-700">
+                <label htmlFor={id("producto")} className="text-xs text-texto-suave">
                   Producto
                 </label>
                 <select
@@ -228,7 +228,7 @@ export function FormularioPedido({ accion, representantes, productos, hoy, valor
                 </select>
                 {/* FR-005: el stock es solo información; el pedido registra lo que se necesita, no lo que hay. */}
                 {producto && (
-                  <p id={id("stock")} className="text-xs text-gray-600">
+                  <p id={id("stock")} className="text-xs text-texto-suave">
                     Stock actual: {producto.stockActual} {producto.abreviatura}
                   </p>
                 )}
@@ -236,7 +236,7 @@ export function FormularioPedido({ accion, representantes, productos, hoy, valor
               </div>
 
               <div className="flex min-w-0 flex-col gap-1">
-                <label htmlFor={id("cantidad")} className="text-xs text-gray-700">
+                <label htmlFor={id("cantidad")} className="text-xs text-texto-suave">
                   Cantidad solicitada
                 </label>
                 <input
@@ -272,7 +272,7 @@ export function FormularioPedido({ accion, representantes, productos, hoy, valor
         <Boton variante="secundario" onClick={() => setLineas((actuales) => [...actuales, nuevaLinea()])} className="self-start">
           Agregar producto
         </Boton>
-        <p className="text-xs text-gray-600">Registrar un pedido no mueve el stock: el stock sale al distribuir.</p>
+        <p className="text-xs text-texto-suave">Registrar un pedido no mueve el stock: el stock sale al distribuir.</p>
       </div>
 
       <div className="flex flex-wrap gap-3">

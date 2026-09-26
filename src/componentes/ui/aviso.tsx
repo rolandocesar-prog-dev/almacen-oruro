@@ -4,9 +4,9 @@ import type { EnlaceDeAviso } from "@/lib/errores";
 type Tipo = "exito" | "error" | "informacion";
 
 const estilosPorTipo: Record<Tipo, string> = {
-  exito: "border-exito bg-green-50 text-exito",
-  error: "border-error bg-red-50 text-error",
-  informacion: "border-marca bg-blue-50 text-marca",
+  exito: "border-exito/30 bg-exito-claro text-exito",
+  error: "border-error/30 bg-error-claro text-error",
+  informacion: "border-marca/30 bg-marca-claro text-marca",
 };
 
 /**
@@ -18,7 +18,7 @@ const estilosPorTipo: Record<Tipo, string> = {
  */
 export function Aviso({ tipo, enlace, children }: { tipo: Tipo; enlace?: EnlaceDeAviso; children: React.ReactNode }) {
   return (
-    <div role={tipo === "error" ? "alert" : "status"} className={`rounded-md border-l-4 px-4 py-3 text-sm ${estilosPorTipo[tipo]}`}>
+    <div role={tipo === "error" ? "alert" : "status"} className={`rounded-lg border px-4 py-3 text-sm ${estilosPorTipo[tipo]}`}>
       {children}
       {enlace && (
         <>

@@ -1,15 +1,32 @@
 @import "tailwindcss";
 
-/* Colores base con contraste suficiente para lectura prolongada (principio de accesibilidad). */
+/*
+ * Identidad visual de la Caja Nacional de Salud (008, decisiones I-56 a I-61).
+ * El verde y el gris salen del logo de la CNS; el resto son tonos neutros levemente verdosos para que
+ * todo combine. Cada par texto/fondo supera 4.5:1 y el borde de los campos, 3:1 (principio de
+ * accesibilidad). Las pantallas usan solo estos nombres: cambiar un color aquí cambia todo el sistema.
+ */
 @theme {
-  --color-marca: #1f4e79;
-  --color-marca-oscuro: #163a5a;
-  --color-fondo: #f5f7fa;
-  --color-texto: #1f2933;
-  --color-borde: #cbd2d9;
-  --color-exito: #1e7b34;
-  --color-error: #b3261e;
-  --color-aviso: #8a5a00;
+  --font-sans: var(--font-public-sans), "Segoe UI", system-ui, sans-serif;
+
+  --color-marca: #004b43;
+  --color-marca-oscuro: #00352f;
+  --color-marca-claro: #e3efec;
+  --color-marca-gris: #b0b0b0;
+  --color-marca-suave: #9fc4bc;
+
+  --color-fondo: #f4f6f5;
+  --color-texto: #1b2624;
+  --color-texto-suave: #52605d;
+  --color-borde: #d5dddb;
+  --color-borde-campo: #7f8c89;
+
+  --color-exito: #1e6b34;
+  --color-exito-claro: #e2f1e6;
+  --color-error: #a3261e;
+  --color-error-claro: #fbe7e5;
+  --color-aviso: #7a4f00;
+  --color-aviso-claro: #fdf1d8;
 }
 
 body {
@@ -17,10 +34,24 @@ body {
   color: var(--color-texto);
 }
 
-/* Foco visible para quien navega con teclado. */
-:focus-visible {
-  outline: 3px solid var(--color-marca);
-  outline-offset: 2px;
+@layer base {
+  /* Foco visible para quien navega con teclado. Va en la capa base para que una zona oscura, como el
+     menú lateral, pueda cambiar el color con una clase. */
+  :focus-visible {
+    outline: 3px solid var(--color-marca);
+    outline-offset: 2px;
+  }
+
+  /* Campos y selectores con la misma altura, para que las etiquetas de los filtros queden alineadas.
+     :where() no suma especificidad: cualquier clase de altura en un campo sigue mandando. */
+  :where(input:not([type="checkbox"], [type="radio"], [type="hidden"]), select) {
+    min-height: 2.625rem;
+  }
+}
+
+/* Franjas grises del logo de la CNS, usadas como fondo del encabezado del menú y del ingreso. */
+@utility franjas-cns {
+  background-image: repeating-linear-gradient(180deg, rgb(255 255 255 / 0.07) 0 6px, transparent 6px 14px);
 }
 
 /* Impresión de reportes y vales (F-006, Historia 6 · E2). Sin fondos ni sombras, con el encabezado de

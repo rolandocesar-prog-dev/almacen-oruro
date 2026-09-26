@@ -45,7 +45,7 @@ export function AccionesAsociacion({ asociacionId, activo, precioActual, cambiar
               defaultValue={precioActual}
               placeholder="Sin precio"
               aria-invalid={Boolean(errorPrecio)}
-              className={`w-28 rounded-md border px-2 py-1 ${errorPrecio ? "border-error" : "border-borde"}`}
+              className={`w-28 rounded-md border px-2 py-1 ${errorPrecio ? "border-error" : "border-borde-campo"}`}
             />
             <Boton type="submit" variante="secundario" disabled={guardando} className="px-3 py-1">
               {guardando ? "Guardando…" : "Guardar precio"}

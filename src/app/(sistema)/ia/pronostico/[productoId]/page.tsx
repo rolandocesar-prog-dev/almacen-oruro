@@ -26,7 +26,7 @@ export default async function PaginaGraficoProducto({ params }: { params: Promis
         ← Volver al pronóstico
       </Link>
       <div>
-        <h1 className="text-2xl font-semibold">
+        <h1 className="text-2xl font-bold sm:text-[28px]">
           {producto.codigo} · {producto.nombre}
         </h1>
         {!producto.activo && <p className="text-sm font-semibold text-aviso">Producto inactivo: no figura en la pantalla de pronóstico.</p>}
@@ -41,13 +41,13 @@ export default async function PaginaGraficoProducto({ params }: { params: Promis
       </dl>
 
       {serie.length === 0 ? (
-        <p className="rounded-md border border-borde bg-white p-4 text-gray-600">Este producto todavía no tiene consumo registrado: no hay nada que graficar.</p>
+        <p className="rounded-md border border-borde bg-white p-4 text-texto-suave">Este producto todavía no tiene consumo registrado: no hay nada que graficar.</p>
       ) : (
         <GraficoConsumo detalle={detalle} />
       )}
 
       {validacion.length === 0 && serie.length > 0 && (
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-texto-suave">
           Con menos de 30 meses de historia no se reservan meses de validación: el gráfico muestra solo el consumo y el pronóstico del mes.
         </p>
       )}

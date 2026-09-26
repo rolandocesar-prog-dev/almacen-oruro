@@ -154,7 +154,7 @@ export function GraficoConsumo({ detalle }: { detalle: DetalleDePronostico }) {
           )}
         </svg>
       </div>
-      <figcaption className="text-sm text-gray-600">
+      <figcaption className="text-sm text-texto-suave">
         Pasa el mouse sobre una barra o un punto para ver su valor. Los mismos números están en la tabla de abajo.
       </figcaption>
     </figure>

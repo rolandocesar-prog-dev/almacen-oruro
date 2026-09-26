@@ -36,7 +36,7 @@ export function AnularPedido({ accion, pedidoId }: Props) {
   return (
     <form onSubmit={confirmarYEnviar} noValidate className="flex max-w-2xl flex-col gap-3 rounded-lg border border-error/40 bg-white p-4">
       <h2 className="text-lg font-semibold">Anular pedido</h2>
-      <p className="text-sm text-gray-600">
+      <p className="text-sm text-texto-suave">
         Si el representante ya no necesita lo que pidió, anula el pedido indicando el motivo. Lo que ya se entregó se conserva y no se mueve
         el stock.
       </p>
@@ -57,7 +57,7 @@ export function AnularPedido({ accion, pedidoId }: Props) {
           onBlur={alSalirDelCampo}
           aria-invalid={Boolean(erroresMotivo)}
           aria-describedby={erroresMotivo ? "motivo-errores" : undefined}
-          className={`rounded-md border px-3 py-2 text-base ${erroresMotivo ? "border-error" : "border-borde"}`}
+          className={`rounded-md border px-3 py-2 text-base ${erroresMotivo ? "border-error" : "border-borde-campo"}`}
         />
         {erroresMotivo && (
           <ul id="motivo-errores" className="text-sm text-error">

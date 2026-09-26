@@ -11,7 +11,7 @@ export function FiltrosInformes({ valores }: { valores: FiltroInformes }) {
         <label htmlFor="tipo" className="text-sm font-medium">
           Tipo
         </label>
-        <select id="tipo" name="tipo" defaultValue={valores.tipo} className="min-w-0 max-w-full rounded-md border border-borde px-3 py-2">
+        <select id="tipo" name="tipo" defaultValue={valores.tipo} className="min-w-0 max-w-full rounded-md border border-borde-campo px-3 py-2">
           <option value="todos">Todos</option>
           <option value="COMPRAS">Informes de compras</option>
           <option value="DISTRIBUCIONES">Informes de distribuciones</option>

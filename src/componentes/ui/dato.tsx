@@ -2,7 +2,7 @@
 export function Dato({ etiqueta, valor }: { etiqueta: string; valor: React.ReactNode }) {
   return (
     <div>
-      <dt className="text-xs uppercase tracking-wide text-gray-600">{etiqueta}</dt>
+      <dt className="text-xs uppercase tracking-wide text-texto-suave">{etiqueta}</dt>
       <dd className="text-base">{valor === null || valor === undefined || valor === "" ? "—" : valor}</dd>
     </div>
   );

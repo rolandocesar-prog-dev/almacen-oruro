@@ -37,7 +37,7 @@ export function AnularCompra({ accion, nroFactura, cantidadProductos }: Props) {
   return (
     <form onSubmit={confirmarYEnviar} noValidate className="flex max-w-2xl flex-col gap-3 rounded-lg border border-error/40 bg-white p-4">
       <h2 className="text-lg font-semibold">Anular compra</h2>
-      <p className="text-sm text-gray-600">
+      <p className="text-sm text-texto-suave">
         Si la compra se registró con errores, anúlala indicando el motivo. Su stock se revierte en el kardex y la factura queda libre para
         registrarla bien.
       </p>
@@ -58,7 +58,7 @@ export function AnularCompra({ accion, nroFactura, cantidadProductos }: Props) {
           onBlur={alSalirDelCampo}
           aria-invalid={Boolean(erroresMotivo)}
           aria-describedby={erroresMotivo ? "motivo-errores" : undefined}
-          className={`rounded-md border px-3 py-2 text-base ${erroresMotivo ? "border-error" : "border-borde"}`}
+          className={`rounded-md border px-3 py-2 text-base ${erroresMotivo ? "border-error" : "border-borde-campo"}`}
         />
         {erroresMotivo && (
           <ul id="motivo-errores" className="text-sm text-error">

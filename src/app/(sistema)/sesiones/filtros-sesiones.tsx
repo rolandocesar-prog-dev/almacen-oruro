@@ -16,7 +16,7 @@ export function FiltrosSesiones({ valores, personas }: Props) {
         <label htmlFor="usuario" className="text-sm font-medium">
           Persona
         </label>
-        <select id="usuario" name="usuario" defaultValue={valores.usuario ?? ""} className="rounded-md border border-borde px-3 py-2">
+        <select id="usuario" name="usuario" defaultValue={valores.usuario ?? ""} className="rounded-md border border-borde-campo px-3 py-2">
           <option value="">Todas</option>
           {personas.map((persona) => (
             <option key={persona.id} value={persona.id}>
@@ -30,13 +30,13 @@ export function FiltrosSesiones({ valores, personas }: Props) {
         <label htmlFor="desde" className="text-sm font-medium">
           Desde
         </label>
-        <input id="desde" name="desde" type="date" defaultValue={valores.desde} className="rounded-md border border-borde px-3 py-2" />
+        <input id="desde" name="desde" type="date" defaultValue={valores.desde} className="rounded-md border border-borde-campo px-3 py-2" />
       </div>
       <div className="flex flex-col gap-1">
         <label htmlFor="hasta" className="text-sm font-medium">
           Hasta
         </label>
-        <input id="hasta" name="hasta" type="date" defaultValue={valores.hasta} className="rounded-md border border-borde px-3 py-2" />
+        <input id="hasta" name="hasta" type="date" defaultValue={valores.hasta} className="rounded-md border border-borde-campo px-3 py-2" />
       </div>
     </Filtros>
   );

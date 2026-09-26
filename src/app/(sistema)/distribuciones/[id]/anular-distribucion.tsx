@@ -38,7 +38,7 @@ export function AnularDistribucion({ accion, nroVale, pedidoId, cantidadProducto
   return (
     <form onSubmit={confirmarYEnviar} noValidate className="flex max-w-2xl flex-col gap-3 rounded-lg border border-error/40 bg-white p-4">
       <h2 className="text-lg font-semibold">Anular distribución</h2>
-      <p className="text-sm text-gray-600">
+      <p className="text-sm text-texto-suave">
         Si la distribución se registró con errores, anúlala indicando el motivo. El stock vuelve al almacén en el kardex y lo entregado del
         pedido se descuenta. Después puedes registrarla bien con el mismo Nº de vale.
       </p>
@@ -59,7 +59,7 @@ export function AnularDistribucion({ accion, nroVale, pedidoId, cantidadProducto
           onBlur={alSalirDelCampo}
           aria-invalid={Boolean(erroresMotivo)}
           aria-describedby={erroresMotivo ? "motivo-errores" : undefined}
-          className={`rounded-md border px-3 py-2 text-base ${erroresMotivo ? "border-error" : "border-borde"}`}
+          className={`rounded-md border px-3 py-2 text-base ${erroresMotivo ? "border-error" : "border-borde-campo"}`}
         />
         {erroresMotivo && (
           <ul id="motivo-errores" className="text-sm text-error">

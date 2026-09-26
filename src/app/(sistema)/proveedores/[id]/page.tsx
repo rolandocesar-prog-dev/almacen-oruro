@@ -58,7 +58,7 @@ export default async function PaginaFichaProveedor({
       {aviso && <Aviso tipo="exito">{aviso}</Aviso>}
 
       <div className="flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl font-semibold">{proveedor.razonSocial}</h1>
+        <h1 className="text-2xl font-bold sm:text-[28px]">{proveedor.razonSocial}</h1>
         <InsigniaActivo activo={proveedor.activo} />
       </div>
 

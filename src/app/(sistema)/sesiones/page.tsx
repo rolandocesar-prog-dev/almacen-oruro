@@ -34,7 +34,7 @@ export default async function PaginaSesiones({ searchParams }: { searchParams: P
 
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">Historial de sesiones</h1>
+      <h1 className="text-2xl font-bold sm:text-[28px]">Historial de sesiones</h1>
 
       <FiltrosSesiones valores={filtro} personas={personas} />
       {!validacion.success && (
@@ -43,7 +43,7 @@ export default async function PaginaSesiones({ searchParams }: { searchParams: P
         </Aviso>
       )}
 
-      <p className="text-sm text-gray-600">
+      <p className="text-sm text-texto-suave">
         {total} {total === 1 ? "sesión" : "sesiones"} en el período
       </p>
 

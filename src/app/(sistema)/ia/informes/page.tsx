@@ -23,8 +23,8 @@ export default async function PaginaInformes({ searchParams }: { searchParams: P
       </Link>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold">Informes IA</h1>
-          <p className="text-sm text-gray-600">
+          <h1 className="text-2xl font-bold sm:text-[28px]">Informes IA</h1>
+          <p className="text-sm text-texto-suave">
             Los informes guardados se consultan e imprimen sin internet. Cada uno conserva los datos con que se redactó.
           </p>
         </div>

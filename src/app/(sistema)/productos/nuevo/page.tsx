@@ -14,8 +14,8 @@ export default async function PaginaNuevoProducto() {
 
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">Registrar producto</h1>
-      <p className="text-sm text-gray-600">El producto empieza con stock 0: el stock sube con las compras y baja con las distribuciones.</p>
+      <h1 className="text-2xl font-bold sm:text-[28px]">Registrar producto</h1>
+      <p className="text-sm text-texto-suave">El producto empieza con stock 0: el stock sube con las compras y baja con las distribuciones.</p>
       {(categorias.length === 0 || unidades.length === 0) && (
         <Aviso tipo="informacion">
           Antes de registrar productos necesitas al menos una{" "}

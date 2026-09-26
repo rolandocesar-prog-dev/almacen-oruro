@@ -41,7 +41,7 @@ export default async function PaginaFichaRepresentante({
       {aviso && <Aviso tipo="exito">{avisos[aviso]}</Aviso>}
 
       <div className="flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl font-semibold">
+        <h1 className="text-2xl font-bold sm:text-[28px]">
           {representante.nombre} {representante.apellido}
         </h1>
         <InsigniaActivo activo={representante.activo} />

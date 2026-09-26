@@ -17,7 +17,7 @@ export function FiltrosProductos({ valores, categorias }: { valores: FiltroProdu
         <label htmlFor="categoria" className="text-sm font-medium">
           Categoría
         </label>
-        <select id="categoria" name="categoria" defaultValue={valores.categoria ?? ""} className="min-w-0 rounded-md border border-borde px-3 py-2">
+        <select id="categoria" name="categoria" defaultValue={valores.categoria ?? ""} className="min-w-0 rounded-md border border-borde-campo px-3 py-2">
           <option value="">Todas</option>
           {categorias.map((categoria) => (
             <option key={categoria.id} value={categoria.id}>

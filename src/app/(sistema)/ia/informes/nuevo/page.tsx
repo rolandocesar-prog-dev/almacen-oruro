@@ -15,8 +15,8 @@ export default async function PaginaNuevoInforme() {
         ← Volver a informes
       </Link>
       <div>
-        <h1 className="text-2xl font-semibold">Nuevo informe IA</h1>
-        <p className="text-sm text-gray-600">
+        <h1 className="text-2xl font-bold sm:text-[28px]">Nuevo informe IA</h1>
+        <p className="text-sm text-texto-suave">
           El sistema calcula los datos del período y un modelo de lenguaje los redacta en español. El texto se guarda junto a la tabla de datos
           que lo originó, para verificar cada cifra.
         </p>

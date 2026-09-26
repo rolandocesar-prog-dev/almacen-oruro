@@ -27,7 +27,7 @@ function subtotalCentavos(linea: Linea): number | null {
   return Number(linea.cantidad) * centavos;
 }
 
-const claseCampo = (error?: string[]) => `w-full min-w-0 rounded-md border bg-white px-3 py-2 text-base ${error?.length ? "border-error" : "border-borde"}`;
+const claseCampo = (error?: string[]) => `w-full min-w-0 rounded-md border bg-white px-3 py-2 text-base ${error?.length ? "border-error" : "border-borde-campo"}`;
 
 function Errores({ id, mensajes }: { id: string; mensajes?: string[] }) {
   if (!mensajes?.length) return null;
@@ -184,7 +184,7 @@ export function FormularioCompra({ proveedores, productos, hoy }: { proveedores:
             aria-describedby="nroFactura-ayuda nroFactura-errores"
             className={claseCampo(errores.nroFactura ?? (avisoFactura ? ["duplicada"] : undefined))}
           />
-          <p id="nroFactura-ayuda" className="text-xs text-gray-600">
+          <p id="nroFactura-ayuda" className="text-xs text-texto-suave">
             Solo dígitos, tal como figura en la factura
           </p>
           <Errores id="nroFactura-errores" mensajes={errores.nroFactura} />
@@ -249,7 +249,7 @@ export function FormularioCompra({ proveedores, productos, hoy }: { proveedores:
               <legend className="px-1 text-sm font-medium">Línea {indice + 1}</legend>
 
               <div className="flex min-w-0 flex-col gap-1">
-                <label htmlFor={id("producto")} className="text-xs text-gray-700">
+                <label htmlFor={id("producto")} className="text-xs text-texto-suave">
                   Producto
                 </label>
                 <select
@@ -272,7 +272,7 @@ export function FormularioCompra({ proveedores, productos, hoy }: { proveedores:
               </div>
 
               <div className="flex min-w-0 flex-col gap-1">
-                <label htmlFor={id("cantidad")} className="text-xs text-gray-700">
+                <label htmlFor={id("cantidad")} className="text-xs text-texto-suave">
                   Cantidad
                 </label>
                 <input
@@ -293,7 +293,7 @@ export function FormularioCompra({ proveedores, productos, hoy }: { proveedores:
               </div>
 
               <div className="flex min-w-0 flex-col gap-1">
-                <label htmlFor={id("precio")} className="text-xs text-gray-700">
+                <label htmlFor={id("precio")} className="text-xs text-texto-suave">
                   Precio unitario (Bs)
                 </label>
                 <input
@@ -312,7 +312,7 @@ export function FormularioCompra({ proveedores, productos, hoy }: { proveedores:
               </div>
 
               <div className="flex flex-col gap-1">
-                <span className="text-xs text-gray-700">Subtotal</span>
+                <span className="text-xs text-texto-suave">Subtotal</span>
                 <output aria-live="polite" className="py-2 text-right tabular-nums sm:min-w-28">
                   {subtotal == null ? "—" : formatearCentavos(subtotal)}
                 </output>
@@ -339,7 +339,7 @@ export function FormularioCompra({ proveedores, productos, hoy }: { proveedores:
             Total: <output className="font-semibold tabular-nums">{totalCentavos === null ? "—" : formatearCentavos(totalCentavos)}</output>
           </p>
         </div>
-        <p className="text-xs text-gray-600">Los subtotales y el total definitivos los calcula el sistema al guardar.</p>
+        <p className="text-xs text-texto-suave">Los subtotales y el total definitivos los calcula el sistema al guardar.</p>
       </div>
 
       <div className="flex flex-wrap gap-3">

@@ -27,8 +27,8 @@ export default async function PaginaNuevaDistribucion({ searchParams }: { search
         <Link href="/distribuciones" className="text-sm text-marca underline">
           ← Volver a distribuciones
         </Link>
-        <h1 className="text-2xl font-semibold">Registrar distribución</h1>
-        <p className="text-sm text-gray-600">Elige el pedido que vas a atender. Solo aparecen los pendientes y parciales.</p>
+        <h1 className="text-2xl font-bold sm:text-[28px]">Registrar distribución</h1>
+        <p className="text-sm text-texto-suave">Elige el pedido que vas a atender. Solo aparecen los pendientes y parciales.</p>
         <Tabla
           encabezados={["Nº", "Fecha", "Representante", "Servicio", "Productos", "% atendido", "Estado", "Acción"]}
           vacio={
@@ -83,7 +83,7 @@ export default async function PaginaNuevaDistribucion({ searchParams }: { search
     return (
       <section className="flex flex-col gap-4">
         {volverAlPedido}
-        <h1 className="text-2xl font-semibold">Registrar distribución</h1>
+        <h1 className="text-2xl font-bold sm:text-[28px]">Registrar distribución</h1>
         <Aviso tipo="informacion">
           El pedido Nº {pedido.id} está {pedido.estado.toLowerCase()}: solo se distribuyen pedidos pendientes o parciales.
         </Aviso>
@@ -95,8 +95,8 @@ export default async function PaginaNuevaDistribucion({ searchParams }: { search
   return (
     <section className="flex flex-col gap-4">
       {volverAlPedido}
-      <h1 className="text-2xl font-semibold">Distribuir el pedido Nº {pedido.id}</h1>
-      <p className="text-sm text-gray-600">
+      <h1 className="text-2xl font-bold sm:text-[28px]">Distribuir el pedido Nº {pedido.id}</h1>
+      <p className="text-sm text-texto-suave">
         {representante.apellido}, {representante.nombre}
         {representante.activo ? "" : " (inactivo)"} · {representante.servicio} · {representante.centroSalud} · pedido del{" "}
         {formatearFecha(pedido.fecha)}

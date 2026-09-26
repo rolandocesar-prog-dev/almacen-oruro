@@ -13,7 +13,7 @@ import { registrarDistribucionAccion, verificarValeAccion } from "./acciones";
 type PedidoParaDistribuir = NonNullable<Awaited<ReturnType<typeof obtenerPedidoParaDistribuir>>>;
 type Errores = Partial<Record<string, string[]>>;
 
-const claseCampo = (error?: string[]) => `w-full min-w-0 rounded-md border bg-white px-3 py-2 text-base ${error?.length ? "border-error" : "border-borde"}`;
+const claseCampo = (error?: string[]) => `w-full min-w-0 rounded-md border bg-white px-3 py-2 text-base ${error?.length ? "border-error" : "border-borde-campo"}`;
 
 function Errores({ id, mensajes }: { id: string; mensajes?: string[] }) {
   if (!mensajes?.length) return null;
@@ -134,7 +134,7 @@ export function FormularioDistribucion({ pedido, hoy }: { pedido: PedidoParaDist
             aria-describedby="nroVale-ayuda nroVale-errores"
             className={claseCampo(errores.nroVale ?? (avisoVale ? ["duplicado"] : undefined))}
           />
-          <p id="nroVale-ayuda" className="text-xs text-gray-600">
+          <p id="nroVale-ayuda" className="text-xs text-texto-suave">
             Solo dígitos, tal como figura en el talonario
           </p>
           <Errores id="nroVale-errores" mensajes={errores.nroVale} />
@@ -200,28 +200,28 @@ export function FormularioDistribucion({ pedido, hoy }: { pedido: PedidoParaDist
               <legend className="px-1 text-sm font-medium">Línea {indice + 1}</legend>
 
               <p className="min-w-0 text-sm">
-                <span className="block text-xs text-gray-600">{linea.codigo}</span>
+                <span className="block text-xs text-texto-suave">{linea.codigo}</span>
                 <span className="font-medium">{linea.nombre}</span>
                 {linea.productoActivo ? "" : " (inactivo)"}
               </p>
 
               <dl className="grid grid-cols-4 gap-2 text-sm tabular-nums">
                 <div>
-                  <dt className="text-xs text-gray-600">Solicitado</dt>
+                  <dt className="text-xs text-texto-suave">Solicitado</dt>
                   <dd>
                     {linea.solicitada} {linea.unidad}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-gray-600">Entregado</dt>
+                  <dt className="text-xs text-texto-suave">Entregado</dt>
                   <dd>{linea.entregada}</dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-gray-600">Pendiente</dt>
+                  <dt className="text-xs text-texto-suave">Pendiente</dt>
                   <dd>{linea.pendiente}</dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-gray-600">Stock</dt>
+                  <dt className="text-xs text-texto-suave">Stock</dt>
                   <dd>{linea.stockActual}</dd>
                 </div>
               </dl>
@@ -229,7 +229,7 @@ export function FormularioDistribucion({ pedido, hoy }: { pedido: PedidoParaDist
               {/* FR-002: las líneas completas o sin stock no admiten cantidad; el máximo es informativo (V-02). */}
               {linea.situacion === "entregable" ? (
                 <div className="flex min-w-0 flex-col gap-1">
-                  <label htmlFor={`${id}-cantidad`} className="text-xs text-gray-700">
+                  <label htmlFor={`${id}-cantidad`} className="text-xs text-texto-suave">
                     Cantidad a entregar
                   </label>
                   <input
@@ -246,18 +246,18 @@ export function FormularioDistribucion({ pedido, hoy }: { pedido: PedidoParaDist
                     aria-describedby={`${id}-maximo${erroresLinea.length > 0 ? ` ${id}-errores` : ""}`}
                     className={claseCampo(erroresLinea)}
                   />
-                  <p id={`${id}-maximo`} className="text-xs text-gray-600">
+                  <p id={`${id}-maximo`} className="text-xs text-texto-suave">
                     Máximo {linea.maximoEntregable}
                   </p>
                   <Errores id={`${id}-errores`} mensajes={erroresLinea} />
                 </div>
               ) : (
-                <p className="self-center text-sm font-medium text-gray-700">{linea.situacion === "completa" ? "Completa" : "Sin stock"}</p>
+                <p className="self-center text-sm font-medium text-texto-suave">{linea.situacion === "completa" ? "Completa" : "Sin stock"}</p>
               )}
             </fieldset>
           );
         })}
-        <p className="text-xs text-gray-600">
+        <p className="text-xs text-texto-suave">
           Al guardar, el stock baja y el kardex registra la salida. Una distribución no se edita: si tiene un error, se anula.
         </p>
       </div>

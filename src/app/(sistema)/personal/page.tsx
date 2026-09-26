@@ -19,7 +19,7 @@ export default async function PaginaPersonal({ searchParams }: { searchParams: P
   return (
     <section className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold">Personal</h1>
+        <h1 className="text-2xl font-bold sm:text-[28px]">Personal</h1>
         <Link href="/personal/nuevo" className="rounded-md bg-marca px-4 py-2 text-sm font-medium text-white hover:bg-marca-oscuro">
           Registrar personal
         </Link>

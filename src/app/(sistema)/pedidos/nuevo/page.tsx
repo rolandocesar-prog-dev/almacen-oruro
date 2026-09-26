@@ -19,8 +19,8 @@ export default async function PaginaNuevoPedido() {
       <Link href="/pedidos" className="text-sm text-marca underline">
         ← Volver a pedidos
       </Link>
-      <h1 className="text-2xl font-semibold">Registrar pedido</h1>
-      <p className="text-sm text-gray-600">
+      <h1 className="text-2xl font-bold sm:text-[28px]">Registrar pedido</h1>
+      <p className="text-sm text-texto-suave">
         Carga lo que pide el representante con la cantidad que necesita. El pedido queda pendiente hasta que se distribuya; mientras nada se
         entregue, se puede editar.
       </p>

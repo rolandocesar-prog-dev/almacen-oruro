@@ -37,21 +37,21 @@ export default async function PaginaEvaluacion() {
       </Link>
 
       <div>
-        <h1 className="text-2xl font-semibold">Evaluación del pronóstico</h1>
+        <h1 className="text-2xl font-bold sm:text-[28px]">Evaluación del pronóstico</h1>
         {etiquetaMejor ? (
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-texto-suave">
             Sobre {evaluables === 1 ? "1 producto evaluable" : `${evaluables} productos evaluables`}, el método con menor error promedio es{" "}
             <strong>{etiquetaMejor}</strong>.
           </p>
         ) : (
-          <p className="text-sm text-gray-600">Todavía no hay productos con historia suficiente para evaluar.</p>
+          <p className="text-sm text-texto-suave">Todavía no hay productos con historia suficiente para evaluar.</p>
         )}
       </div>
 
       {/* FR-023: el procedimiento se explica en la pantalla, sin leer el código. */}
       <div className="flex flex-col gap-2 rounded-md border border-borde bg-white p-4 text-sm">
         <p className="font-medium">Cómo se evalúa</p>
-        <ol className="list-decimal pl-5 text-gray-700">
+        <ol className="list-decimal pl-5 text-texto-suave">
           <li>
             De la serie de consumo de cada producto se reservan los <strong>últimos {MESES_DE_VALIDACION} meses</strong>: el método no los ve.
           </li>
@@ -61,11 +61,11 @@ export default async function PaginaEvaluacion() {
           </li>
           <li>Se compara cada pronóstico con lo que de verdad se consumió.</li>
         </ol>
-        <p className="text-gray-700">
+        <p className="text-texto-suave">
           Compiten tres métodos: <strong>Holt-Winters</strong> (el que usa el sistema), <strong>ingenuo estacional</strong> (&quot;lo mismo que
           el mismo mes del año pasado&quot;) y <strong>promedio móvil</strong> (&quot;el promedio de los últimos 3 meses&quot;).
         </p>
-        <p className="text-gray-700">
+        <p className="text-texto-suave">
           <strong>MAE</strong>: en promedio, cuántas unidades se equivoca por mes. <strong>WAPE</strong>: qué porcentaje de lo consumido fue
           error; sirve para comparar productos de distinto volumen. En los dos, <strong>menos es mejor</strong>. Se necesitan al menos 30
           meses (24 para ajustar y {MESES_DE_VALIDACION} para validar). Detalle paso a paso en{" "}

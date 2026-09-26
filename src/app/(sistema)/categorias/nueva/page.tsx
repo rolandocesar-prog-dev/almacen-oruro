@@ -9,7 +9,7 @@ export default async function PaginaNuevaCategoria() {
 
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">Registrar categoría</h1>
+      <h1 className="text-2xl font-bold sm:text-[28px]">Registrar categoría</h1>
       <FormularioCategoria accion={registrarCategoriaAccion} textoBoton="Registrar" rutaCancelar="/categorias" />
     </section>
   );

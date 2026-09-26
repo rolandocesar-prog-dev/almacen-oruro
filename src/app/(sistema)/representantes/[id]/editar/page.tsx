@@ -19,7 +19,7 @@ export default async function PaginaEditarRepresentante({ params }: { params: Pr
 
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">
+      <h1 className="text-2xl font-bold sm:text-[28px]">
         Editar a {representante.nombre} {representante.apellido}
       </h1>
       <FormularioRepresentante

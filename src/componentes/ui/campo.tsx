@@ -19,7 +19,7 @@ export function Campo({ id, etiqueta, ayuda, errores, className = "", ...resto }
 
   return (
     <div className="flex flex-col gap-1">
-      <label htmlFor={id} className="text-sm font-medium">
+      <label htmlFor={id} className="text-sm font-semibold">
         {etiqueta}
       </label>
       <input
@@ -27,11 +27,11 @@ export function Campo({ id, etiqueta, ayuda, errores, className = "", ...resto }
         name={resto.name ?? id}
         aria-invalid={tieneErrores}
         aria-describedby={descritoPor}
-        className={`rounded-md border px-3 py-2 text-base ${tieneErrores ? "border-error" : "border-borde"} ${className}`}
+        className={`rounded-lg border px-3 py-2 text-base ${tieneErrores ? "border-error" : "border-borde-campo"} ${className}`}
         {...resto}
       />
       {ayuda && (
-        <p id={idAyuda} className="text-xs text-gray-600">
+        <p id={idAyuda} className="text-xs text-texto-suave">
           {ayuda}
         </p>
       )}

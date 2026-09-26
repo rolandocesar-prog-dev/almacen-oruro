@@ -15,7 +15,7 @@ export default async function PaginaEditarUnidad({ params }: { params: Promise<{
 
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">Editar la unidad {unidad.nombre}</h1>
+      <h1 className="text-2xl font-bold sm:text-[28px]">Editar la unidad {unidad.nombre}</h1>
       <FormularioUnidad
         accion={modificarUnidadAccion.bind(null, unidad.id)}
         valores={unidad}

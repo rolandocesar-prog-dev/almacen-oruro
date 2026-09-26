@@ -48,7 +48,7 @@ export default async function PaginaFichaProducto({
       {aviso && <Aviso tipo="exito">{avisos[aviso]}</Aviso>}
 
       <div className="flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl font-semibold">
+        <h1 className="text-2xl font-bold sm:text-[28px]">
           {producto.codigo} · {producto.nombre}
         </h1>
         <InsigniaActivo activo={producto.activo} />

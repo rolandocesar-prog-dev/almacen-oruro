@@ -9,7 +9,7 @@ export default async function PaginaNuevoProveedor() {
 
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">Registrar proveedor</h1>
+      <h1 className="text-2xl font-bold sm:text-[28px]">Registrar proveedor</h1>
       <FormularioProveedor accion={registrarProveedorAccion} textoBoton="Registrar" rutaCancelar="/proveedores" />
     </section>
   );

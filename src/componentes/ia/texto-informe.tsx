@@ -25,7 +25,7 @@ export function TextoInforme({ texto, datos }: { texto: string; datos: unknown }
 
   return (
     <div className="flex min-w-0 flex-col gap-3 wrap-anywhere">
-      <p className={`text-xs ${noEncontradas > 0 ? "font-semibold text-aviso" : "text-gray-600"}`}>
+      <p className={`text-xs ${noEncontradas > 0 ? "font-semibold text-aviso" : "text-texto-suave"}`}>
         {noEncontradas === 0
           ? "Todas las cifras del texto están en la tabla de datos."
           : `${noEncontradas === 1 ? "1 cifra del texto no está" : `${noEncontradas} cifras del texto no están`} en la tabla de datos: se marcan con "${ADVERTENCIA_CIFRA}".`}

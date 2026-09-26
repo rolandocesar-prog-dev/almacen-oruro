@@ -14,7 +14,7 @@ export function FiltrosExistencias({ valores, categorias }: { valores: FiltroExi
         <label htmlFor="categoria" className="text-sm font-medium">
           Categoría
         </label>
-        <select id="categoria" name="categoria" defaultValue={valores.categoria ?? ""} className="min-w-0 rounded-md border border-borde px-3 py-2">
+        <select id="categoria" name="categoria" defaultValue={valores.categoria ?? ""} className="min-w-0 rounded-md border border-borde-campo px-3 py-2">
           <option value="">Todas</option>
           {categorias.map((categoria) => (
             <option key={categoria.id} value={categoria.id}>
@@ -27,7 +27,7 @@ export function FiltrosExistencias({ valores, categorias }: { valores: FiltroExi
         <label htmlFor="estado" className="text-sm font-medium">
           Estado
         </label>
-        <select id="estado" name="estado" defaultValue={valores.estado} className="rounded-md border border-borde px-3 py-2">
+        <select id="estado" name="estado" defaultValue={valores.estado} className="rounded-md border border-borde-campo px-3 py-2">
           <option value="habituales">Activos e inactivos con stock</option>
           <option value="inactivos">Inactivos</option>
           <option value="todos">Todos</option>

@@ -15,7 +15,7 @@ export default async function PaginaEditarProveedor({ params }: { params: Promis
 
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">Editar {proveedor.razonSocial}</h1>
+      <h1 className="text-2xl font-bold sm:text-[28px]">Editar {proveedor.razonSocial}</h1>
       <FormularioProveedor
         accion={modificarProveedorAccion.bind(null, proveedor.id)}
         valores={proveedor}

@@ -21,7 +21,7 @@ export function FiltrosPedidos({ valores, representantes }: { valores: FiltroPed
         <label htmlFor="estado" className="text-sm font-medium">
           Estado
         </label>
-        <select id="estado" name="estado" defaultValue={valores.estado} className="rounded-md border border-borde px-3 py-2">
+        <select id="estado" name="estado" defaultValue={valores.estado} className="rounded-md border border-borde-campo px-3 py-2">
           {Object.entries(etiquetasEstado).map(([valor, etiqueta]) => (
             <option key={valor} value={valor}>
               {etiqueta}
@@ -37,7 +37,7 @@ export function FiltrosPedidos({ valores, representantes }: { valores: FiltroPed
           id="representante"
           name="representante"
           defaultValue={valores.representante ?? ""}
-          className="min-w-0 max-w-full rounded-md border border-borde px-3 py-2"
+          className="min-w-0 max-w-full rounded-md border border-borde-campo px-3 py-2"
         >
           <option value="">Todos</option>
           {representantes.map((representante) => (
@@ -51,13 +51,13 @@ export function FiltrosPedidos({ valores, representantes }: { valores: FiltroPed
         <label htmlFor="desde" className="text-sm font-medium">
           Desde
         </label>
-        <input id="desde" name="desde" type="date" defaultValue={valores.desde ?? ""} className="rounded-md border border-borde px-3 py-2" />
+        <input id="desde" name="desde" type="date" defaultValue={valores.desde ?? ""} className="rounded-md border border-borde-campo px-3 py-2" />
       </div>
       <div className="flex flex-col gap-1">
         <label htmlFor="hasta" className="text-sm font-medium">
           Hasta
         </label>
-        <input id="hasta" name="hasta" type="date" defaultValue={valores.hasta ?? ""} className="rounded-md border border-borde px-3 py-2" />
+        <input id="hasta" name="hasta" type="date" defaultValue={valores.hasta ?? ""} className="rounded-md border border-borde-campo px-3 py-2" />
       </div>
     </Filtros>
   );

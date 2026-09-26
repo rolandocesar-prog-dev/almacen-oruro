@@ -15,7 +15,7 @@ export default async function PaginaEditarCategoria({ params }: { params: Promis
 
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">Editar la categoría {categoria.nombre}</h1>
+      <h1 className="text-2xl font-bold sm:text-[28px]">Editar la categoría {categoria.nombre}</h1>
       <FormularioCategoria
         accion={modificarCategoriaAccion.bind(null, categoria.id)}
         valores={categoria}

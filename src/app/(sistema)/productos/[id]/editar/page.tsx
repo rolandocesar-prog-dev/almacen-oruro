@@ -23,7 +23,7 @@ export default async function PaginaEditarProducto({ params }: { params: Promise
 
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">
+      <h1 className="text-2xl font-bold sm:text-[28px]">
         Editar {producto.codigo} · {producto.nombre}
       </h1>
       <FormularioProducto

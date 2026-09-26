@@ -27,7 +27,7 @@ export function RestablecerContrasena({ accion }: Props) {
     <form ref={formulario} onSubmit={alEnviar} noValidate className="flex max-w-2xl flex-col gap-4 rounded-lg border border-borde bg-white p-6">
       <div>
         <h2 className="text-lg font-semibold">Restablecer contraseña</h2>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-texto-suave">
           Comunica la contraseña temporal en persona; deberá cambiarla al ingresar.
         </p>
       </div>

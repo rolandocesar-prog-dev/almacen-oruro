@@ -4,7 +4,7 @@ type Variante = "principal" | "secundario" | "peligro";
 
 const estilosPorVariante: Record<Variante, string> = {
   principal: "bg-marca text-white hover:bg-marca-oscuro",
-  secundario: "bg-white text-marca border border-marca hover:bg-fondo",
+  secundario: "bg-white text-marca border border-marca hover:bg-marca-claro",
   peligro: "bg-error text-white hover:opacity-90",
 };
 
@@ -15,7 +15,7 @@ export function Boton({ variante = "principal", className = "", type = "button",
   return (
     <button
       type={type}
-      className={`inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50 ${estilosPorVariante[variante]} ${className}`}
+      className={`inline-flex min-h-10 items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${estilosPorVariante[variante]} ${className}`}
       {...resto}
     />
   );

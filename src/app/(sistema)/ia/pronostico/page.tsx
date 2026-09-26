@@ -27,8 +27,8 @@ export default async function PaginaPronostico({ searchParams }: { searchParams:
       </Link>
 
       <div>
-        <h1 className="text-2xl font-semibold">Pronóstico y reposición sugerida</h1>
-        <p className="text-sm text-gray-600">
+        <h1 className="text-2xl font-bold sm:text-[28px]">Pronóstico y reposición sugerida</h1>
+        <p className="text-sm text-texto-suave">
           Consumo pronosticado para <strong>{formatearMes(mesPronosticado)}</strong> ·{" "}
           {totales.productos === 1 ? "1 producto" : `${totales.productos} productos`} ·{" "}
           <strong>{totales.unidadesSugeridas.toLocaleString("es-BO")} unidades sugeridas para reponer</strong>
@@ -39,7 +39,7 @@ export default async function PaginaPronostico({ searchParams }: { searchParams:
       <div className="rounded-md border border-borde bg-white p-4 text-sm">
         <p className="font-medium">Cómo se calcula la reposición sugerida</p>
         <p className="mt-1 font-mono">Reposición = máx(0, ⌈pronóstico + stock mínimo − stock actual⌉)</p>
-        <p className="mt-2 text-gray-600">
+        <p className="mt-2 text-texto-suave">
           El pronóstico se calcula en este momento a partir del kardex, sin internet y sin guardar nada: si se registra un documento, la próxima
           consulta ya lo refleja. Con 24 meses de historia o más se usa Holt-Winters; con menos, un promedio de los últimos meses. El
           procedimiento completo está en <code className="rounded bg-gray-100 px-1">docs/metodo-pronostico.md</code> y su precisión, en{" "}

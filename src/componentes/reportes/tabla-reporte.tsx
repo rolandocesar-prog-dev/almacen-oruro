@@ -27,7 +27,7 @@ export function TablaReporte({
         </thead>
         <tbody className="divide-y divide-borde">{children}</tbody>
       </table>
-      {vacio && <p className="px-2 py-6 text-center text-gray-600">{vacio}</p>}
+      {vacio && <p className="px-2 py-6 text-center text-texto-suave">{vacio}</p>}
     </div>
   );
 }

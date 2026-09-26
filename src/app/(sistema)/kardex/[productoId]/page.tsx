@@ -39,10 +39,10 @@ export default async function PaginaKardex({
 
       <div className="flex flex-wrap items-baseline justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold">
+          <h1 className="text-2xl font-bold sm:text-[28px]">
             Kardex de {producto.codigo} · {producto.nombre}
           </h1>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-texto-suave">
             Unidad: {producto.unidadMedida.nombre} ({producto.unidadMedida.abreviatura}){producto.activo ? "" : " · Producto inactivo"}
           </p>
         </div>
@@ -62,17 +62,17 @@ export default async function PaginaKardex({
       {conRango && (
         <dl className="grid gap-4 rounded-lg border border-borde bg-white p-4 sm:grid-cols-2">
           <div>
-            <dt className="text-xs uppercase tracking-wide text-gray-600">Saldo anterior{filtro.desde ? ` al ${formatearFecha(filtro.desde)}` : ""}</dt>
+            <dt className="text-xs uppercase tracking-wide text-texto-suave">Saldo anterior{filtro.desde ? ` al ${formatearFecha(filtro.desde)}` : ""}</dt>
             <dd className="text-lg tabular-nums">{kardex.saldoAnterior}</dd>
           </div>
           <div>
-            <dt className="text-xs uppercase tracking-wide text-gray-600">Saldo final{filtro.hasta ? ` al ${formatearFecha(filtro.hasta)}` : ""}</dt>
+            <dt className="text-xs uppercase tracking-wide text-texto-suave">Saldo final{filtro.hasta ? ` al ${formatearFecha(filtro.hasta)}` : ""}</dt>
             <dd className="text-lg tabular-nums">{kardex.saldoFinal}</dd>
           </div>
         </dl>
       )}
 
-      <p className="text-sm text-gray-600">
+      <p className="text-sm text-texto-suave">
         Los movimientos se muestran en el orden en que se registraron; el saldo de cada fila no cambia aunque la fecha del documento sea
         anterior a la de otros movimientos.
       </p>

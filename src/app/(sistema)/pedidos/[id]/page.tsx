@@ -46,11 +46,11 @@ export default async function PaginaDetallePedido({
       {aviso && <Aviso tipo="exito">{avisos[aviso]}</Aviso>}
 
       <div className="flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl font-semibold">Pedido Nº {pedido.id}</h1>
+        <h1 className="text-2xl font-bold sm:text-[28px]">Pedido Nº {pedido.id}</h1>
         <InsigniaPedido estado={pedido.estado} />
       </div>
       {/* SC-007: la regla del estado a la vista, para explicar por qué el pedido tiene el que muestra (RN-41). */}
-      <p className="text-sm text-gray-600">
+      <p className="text-sm text-texto-suave">
         Pendiente: nada entregado · Parcial: algo entregado · Atendido: todo entregado · Anulado: lo anuló el encargado; lo entregado se
         conserva.
       </p>
@@ -116,7 +116,7 @@ export default async function PaginaDetallePedido({
 
       <h2 className="text-lg font-semibold">Distribuciones</h2>
       {pedido.distribuciones.length === 0 ? (
-        <p className="text-sm text-gray-600">Todavía no hay distribuciones para este pedido.</p>
+        <p className="text-sm text-texto-suave">Todavía no hay distribuciones para este pedido.</p>
       ) : (
         <Tabla encabezados={["Nº de vale", "Fecha", "Unidades", "Estado", "Acción"]}>
           {pedido.distribuciones.map((distribucion) => (

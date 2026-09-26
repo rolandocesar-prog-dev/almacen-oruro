@@ -9,7 +9,7 @@ export default async function PaginaNuevaUnidad() {
 
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">Registrar unidad de medida</h1>
+      <h1 className="text-2xl font-bold sm:text-[28px]">Registrar unidad de medida</h1>
       <FormularioUnidad accion={registrarUnidadAccion} textoBoton="Registrar" rutaCancelar="/unidades" />
     </section>
   );

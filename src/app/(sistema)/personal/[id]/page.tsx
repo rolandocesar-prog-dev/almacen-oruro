@@ -19,7 +19,7 @@ const avisos: Record<string, string> = {
 function Dato({ etiqueta, valor }: { etiqueta: string; valor: React.ReactNode }) {
   return (
     <div>
-      <dt className="text-xs uppercase tracking-wide text-gray-600">{etiqueta}</dt>
+      <dt className="text-xs uppercase tracking-wide text-texto-suave">{etiqueta}</dt>
       <dd className="text-base">{valor}</dd>
     </div>
   );
@@ -48,7 +48,7 @@ export default async function PaginaFichaPersonal({
       {aviso && avisos[aviso] && <Aviso tipo="exito">{avisos[aviso]}</Aviso>}
 
       <div className="flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl font-semibold">
+        <h1 className="text-2xl font-bold sm:text-[28px]">
           {persona.nombre} {persona.apellido}
         </h1>
         <InsigniaActivo activo={persona.activo} />

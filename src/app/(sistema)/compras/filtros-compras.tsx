@@ -12,19 +12,19 @@ export function FiltrosCompras({ valores, proveedores }: { valores: FiltroCompra
         <label htmlFor="desde" className="text-sm font-medium">
           Desde
         </label>
-        <input id="desde" name="desde" type="date" defaultValue={valores.desde} className="rounded-md border border-borde px-3 py-2" />
+        <input id="desde" name="desde" type="date" defaultValue={valores.desde} className="rounded-md border border-borde-campo px-3 py-2" />
       </div>
       <div className="flex flex-col gap-1">
         <label htmlFor="hasta" className="text-sm font-medium">
           Hasta
         </label>
-        <input id="hasta" name="hasta" type="date" defaultValue={valores.hasta} className="rounded-md border border-borde px-3 py-2" />
+        <input id="hasta" name="hasta" type="date" defaultValue={valores.hasta} className="rounded-md border border-borde-campo px-3 py-2" />
       </div>
       <div className="flex min-w-0 flex-col gap-1">
         <label htmlFor="proveedor" className="text-sm font-medium">
           Proveedor
         </label>
-        <select id="proveedor" name="proveedor" defaultValue={valores.proveedor ?? ""} className="min-w-0 rounded-md border border-borde px-3 py-2">
+        <select id="proveedor" name="proveedor" defaultValue={valores.proveedor ?? ""} className="min-w-0 rounded-md border border-borde-campo px-3 py-2">
           <option value="">Todos</option>
           {proveedores.map((proveedor) => (
             <option key={proveedor.id} value={proveedor.id}>
@@ -37,7 +37,7 @@ export function FiltrosCompras({ valores, proveedores }: { valores: FiltroCompra
         <label htmlFor="estado" className="text-sm font-medium">
           Estado
         </label>
-        <select id="estado" name="estado" defaultValue={valores.estado} className="rounded-md border border-borde px-3 py-2">
+        <select id="estado" name="estado" defaultValue={valores.estado} className="rounded-md border border-borde-campo px-3 py-2">
           <option value="todas">Todas</option>
           <option value="registradas">Registradas</option>
           <option value="anuladas">Anuladas</option>
@@ -54,7 +54,7 @@ export function FiltrosCompras({ valores, proveedores }: { valores: FiltroCompra
           maxLength={20}
           defaultValue={valores.factura ?? ""}
           placeholder="Empieza con…"
-          className="w-40 rounded-md border border-borde px-3 py-2"
+          className="w-40 rounded-md border border-borde-campo px-3 py-2"
         />
       </div>
     </Filtros>

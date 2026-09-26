@@ -29,13 +29,13 @@ export default async function PaginaIa() {
   return (
     <section className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-semibold">Inteligencia artificial</h1>
-        <p className="text-sm text-gray-600">
+        <h1 className="text-2xl font-bold sm:text-[28px]">Inteligencia artificial</h1>
+        <p className="text-sm text-texto-suave">
           El sistema calcula: la serie de consumo, el pronóstico, la evaluación y la reposición sugerida salen del kardex con un método
           escrito en el propio sistema, sin internet y sin guardar nada. El modelo de lenguaje solo redacta los informes a partir de datos ya
           calculados, que se muestran junto al texto.
         </p>
-        <p className="mt-2 text-sm text-gray-600">
+        <p className="mt-2 text-sm text-texto-suave">
           El procedimiento completo, paso a paso y con un ejemplo, está en{" "}
           <code className="rounded bg-gray-100 px-1">docs/metodo-pronostico.md</code>.
         </p>
@@ -45,7 +45,7 @@ export default async function PaginaIa() {
           <li key={pantalla.ruta}>
             <Link href={pantalla.ruta} className="block rounded-lg border border-borde bg-white p-4 hover:border-marca">
               <span className="block font-semibold text-marca">{pantalla.titulo}</span>
-              <span className="text-sm text-gray-600">{pantalla.descripcion}</span>
+              <span className="text-sm text-texto-suave">{pantalla.descripcion}</span>
             </Link>
           </li>
         ))}
