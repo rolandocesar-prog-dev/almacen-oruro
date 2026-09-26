@@ -4,7 +4,7 @@ import type { EstadoPedido } from "@/generado/prisma/client";
 // para que el estado se entienda sin distinguir colores.
 const estilos: Record<EstadoPedido, { texto: string; clases: string }> = {
   PENDIENTE: { texto: "Pendiente", clases: "bg-aviso-claro text-aviso" },
-  PARCIAL: { texto: "Parcial", clases: "bg-blue-100 text-blue-900" },
+  PARCIAL: { texto: "Parcial", clases: "bg-marca-claro text-marca" },
   ATENDIDO: { texto: "Atendido", clases: "bg-exito-claro text-exito" },
   ANULADO: { texto: "Anulado", clases: "bg-error-claro text-error" },
 };

@@ -65,7 +65,7 @@ export default async function PaginaGraficoProducto({ params }: { params: Promis
                 </Celda>
               </tr>
             ))}
-            <tr className="bg-amber-50 font-semibold">
+            <tr className="bg-aviso-claro font-semibold">
               <Celda>{formatearMes(detalle.mesPronosticado)} (pronóstico)</Celda>
               <Celda className="text-right">—</Celda>
               <Celda className="text-right tabular-nums">{formatearUnDecimal(detalle.pronostico)}</Celda>

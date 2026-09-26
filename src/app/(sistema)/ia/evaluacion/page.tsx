@@ -8,7 +8,7 @@ export const metadata = { title: "Evaluación del pronóstico · Almacén Region
 
 /** Celdas de MAE y WAPE de un método; el mejor lleva la marca "(mejor)" además del color (FR-009). */
 function CeldasDeMetodo({ mae, wape, esMejor }: { mae: number; wape: number | null; esMejor: boolean }) {
-  const estilo = esMejor ? "bg-green-50 font-semibold text-exito" : "";
+  const estilo = esMejor ? "bg-exito-claro font-semibold text-exito" : "";
   return (
     <>
       <Celda className={`text-right tabular-nums ${estilo}`}>
@@ -69,7 +69,7 @@ export default async function PaginaEvaluacion() {
           <strong>MAE</strong>: en promedio, cuántas unidades se equivoca por mes. <strong>WAPE</strong>: qué porcentaje de lo consumido fue
           error; sirve para comparar productos de distinto volumen. En los dos, <strong>menos es mejor</strong>. Se necesitan al menos 30
           meses (24 para ajustar y {MESES_DE_VALIDACION} para validar). Detalle paso a paso en{" "}
-          <code className="rounded bg-gray-100 px-1">docs/metodo-pronostico.md</code>.
+          <code className="rounded bg-marca-claro px-1">docs/metodo-pronostico.md</code>.
         </p>
       </div>
 

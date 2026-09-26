@@ -42,7 +42,7 @@ export default async function PaginaPronostico({ searchParams }: { searchParams:
         <p className="mt-2 text-texto-suave">
           El pronóstico se calcula en este momento a partir del kardex, sin internet y sin guardar nada: si se registra un documento, la próxima
           consulta ya lo refleja. Con 24 meses de historia o más se usa Holt-Winters; con menos, un promedio de los últimos meses. El
-          procedimiento completo está en <code className="rounded bg-gray-100 px-1">docs/metodo-pronostico.md</code> y su precisión, en{" "}
+          procedimiento completo está en <code className="rounded bg-marca-claro px-1">docs/metodo-pronostico.md</code> y su precisión, en{" "}
           <Link href="/ia/evaluacion" className="text-marca underline">
             Evaluación del pronóstico
           </Link>
@@ -60,7 +60,7 @@ export default async function PaginaPronostico({ searchParams }: { searchParams:
         vacio={filas.length === 0 ? "No hay productos activos para los filtros aplicados" : undefined}
       >
         {filas.map((fila) => (
-          <tr key={fila.productoId} className={fila.reposicionSugerida > 0 ? "bg-amber-50" : undefined}>
+          <tr key={fila.productoId} className={fila.reposicionSugerida > 0 ? "bg-aviso-claro" : undefined}>
             <Celda>{fila.codigo}</Celda>
             <Celda>{fila.nombre}</Celda>
             <Celda>{fila.unidad}</Celda>

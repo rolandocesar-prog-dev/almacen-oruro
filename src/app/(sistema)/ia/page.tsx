@@ -37,7 +37,7 @@ export default async function PaginaIa() {
         </p>
         <p className="mt-2 text-sm text-texto-suave">
           El procedimiento completo, paso a paso y con un ejemplo, está en{" "}
-          <code className="rounded bg-gray-100 px-1">docs/metodo-pronostico.md</code>.
+          <code className="rounded bg-marca-claro px-1">docs/metodo-pronostico.md</code>.
         </p>
       </div>
       <ul className="grid gap-4 sm:grid-cols-2">

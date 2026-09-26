@@ -55,7 +55,7 @@ export default async function PaginaExistencias({ searchParams }: { searchParams
       >
         {existencias.productos.map((producto) => (
           // La fila bajo mínimo se resalta con fondo y además con la insignia de texto: no depende solo del color.
-          <tr key={producto.id} className={producto.bajoMinimo ? "bg-amber-50" : undefined}>
+          <tr key={producto.id} className={producto.bajoMinimo ? "bg-aviso-claro" : undefined}>
             <Celda>{producto.codigo}</Celda>
             <Celda>{producto.nombre}</Celda>
             <Celda>{producto.categoria}</Celda>

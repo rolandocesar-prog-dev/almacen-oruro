@@ -6,7 +6,7 @@ function LineaVerificada({ texto, numeros }: { texto: string; numeros: number[] 
   return marcarCifras(texto, numeros).map((fragmento, indice) =>
     fragmento.noEncontrada ? (
       // Resaltado con fondo y, además, con la advertencia escrita: se entiende impreso en blanco y negro.
-      <mark key={indice} title={ADVERTENCIA_CIFRA} className="rounded bg-amber-100 px-0.5 font-semibold text-aviso">
+      <mark key={indice} title={ADVERTENCIA_CIFRA} className="rounded bg-aviso-claro px-0.5 font-semibold text-aviso">
         {fragmento.texto} <span className="text-xs font-normal">[{ADVERTENCIA_CIFRA}]</span>
       </mark>
     ) : (
