@@ -134,8 +134,17 @@ debe aparecer igual en la especificación, la base y el código.
 - Ante la duda entre completar una funcionalidad P1 o pulir una P3, gana la P1. Si el plazo
   aprieta, se recorta según el orden de `docs/especificacion/00-decisiones-y-alcance.md` §5
   **antes** de mover fechas.
+- **Después de la entrega**, solo entran al alcance las observaciones de quien defiende el
+  proyecto o de la tutora que el asesor apruebe. Cada una DEBE tratarse como una funcionalidad
+  nueva (F-009 en adelante), con su propia especificación y el ciclo completo de Spec Kit; las
+  demás ideas siguen yendo a `docs/trabajo-futuro.md`.
+- Si una observación contradice una decisión cerrada (D-xx), la decisión NO se borra: se marca
+  como revertida y se registra la que la reemplaza, con fecha y motivo.
 
-**Fundamento:** no hay días de margen; el orden de corte se fija antes de necesitarlo.
+**Fundamento:** no hay días de margen; el orden de corte se fija antes de necesitarlo. Tras la
+entrega, quien defiende el sistema lo estudia y detecta lo que no refleja la operación real del
+almacén; corregirlo por la misma vía que el resto mantiene la documentación alineada con el código,
+que también se defiende.
 
 ## Restricciones técnicas
 
@@ -153,7 +162,7 @@ debe aparecer igual en la especificación, la base y el código.
 ## Flujo de desarrollo
 
 - **Metodología:** Spec-Driven Development con GitHub Spec Kit (D-09). Por cada funcionalidad
-  (F-001 … F-007) se sigue el ciclo `specify` → `clarify` → `plan` → `tasks` → `analyze` →
+  (F-001 … F-007 y las posteriores a la entrega, principio XI) se sigue el ciclo `specify` → `clarify` → `plan` → `tasks` → `analyze` →
   `implement`, y cada una queda en `specs/00x-nombre/`.
 - **La especificación manda:** si durante la implementación aparece algo que la especificación
   no cubre, NO se improvisa en el código. Se corrige primero el `spec.md` (o
@@ -178,4 +187,4 @@ debe aparecer igual en la especificación, la base y el código.
   `/speckit-analyze` revisa la consistencia antes de implementar. Toda excepción DEBE quedar
   justificada en la sección de complejidad del plan.
 
-**Version**: 1.0.0 | **Ratified**: 2026-09-13 | **Last Amended**: 2026-09-13
+**Version**: 1.1.0 | **Ratified**: 2026-09-13 | **Last Amended**: 2026-09-26

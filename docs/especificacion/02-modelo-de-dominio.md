@@ -106,7 +106,7 @@ erDiagram
 | proveedor_id, producto_id | FK | par **único** |
 | precio_referencial | decimal(12,2) > 0 | opcional |
 
-**centro_salud** (requerimiento 9) — `nombre` texto(100), único · `telefono` texto(20) · `direccion` texto(150). En operación hay **uno** (D-11).
+**centro_salud** (requerimiento 9) — `nombre` texto(100), único · `telefono` texto(20) · `direccion` texto(150). Se opera con **varios**, los que atiende el almacén (D-21); cada uno tiene **como máximo un representante activo** (RN-18).
 
 **representante** (requerimiento 6)
 
@@ -115,9 +115,8 @@ erDiagram
 | nombre | texto(60) | obligatorio |
 | apellido | texto(60) | obligatorio |
 | ci | texto(15) | obligatorio, **único** (evita duplicados); dígitos, con complemento opcional tras guion. Ej. `4567890-1B` |
-| servicio | texto(60) | obligatorio; área que representa (S-01) |
 | telefono | texto(20) | opcional |
-| centro_salud_id | FK centro_salud | obligatorio, centro activo |
+| centro_salud_id | FK centro_salud | obligatorio, centro activo; el centro no puede tener otro representante activo (RN-18) |
 
 ### 2.3 Compras
 
@@ -229,11 +228,12 @@ erDiagram
 - **RN-10** Los campos únicos se comparan normalizados: sin espacios al inicio ni al final, espacios internos simples y sin distinguir mayúsculas. En los catálogos, la unicidad incluye los registros inactivos: el valor queda reservado y se ofrece reactivar el registro existente.
 - **RN-11** Un duplicado se informa nombrando el campo ("Ya existe un producto con el nombre 'Lavandina 1 L'").
 - **RN-12** Dar de baja no borra: marca `activo = falso`. Se puede reactivar.
-- **RN-13** No se puede dar de baja una categoría o unidad de medida con productos activos asociados, ni un centro de salud con representantes activos, ni un representante con pedidos PENDIENTE o PARCIAL, ni un producto con saldo pendiente en pedidos PENDIENTE o PARCIAL (un producto con stock sí se puede dar de baja, con aviso).
+- **RN-13** No se puede dar de baja una categoría o unidad de medida con productos activos asociados, ni un centro de salud con representantes activos, ni un producto con saldo pendiente en pedidos PENDIENTE o PARCIAL (un producto con stock sí se puede dar de baja, con aviso). Un representante con pedidos PENDIENTE o PARCIAL **sí** se puede dar de baja, con aviso: esos pedidos siguen a su nombre y se pueden distribuir y anular (F-009, D-22).
 - **RN-14** Los registros inactivos no aparecen en los selectores de documentos nuevos, pero sí en consultas, reportes e histórico.
 - **RN-15** `stock_actual` no se puede modificar desde el catálogo de productos.
 - **RN-16** La unidad de medida de un producto no se puede cambiar si el producto ya tiene movimientos de inventario: su stock y su histórico están expresados en esa unidad.
 - **RN-17** No se puede reactivar un registro cuyo registro padre está inactivo (producto con categoría o unidad inactiva; representante con centro de salud inactivo). Se reactiva primero el padre.
+- **RN-18** Un centro de salud tiene **como máximo un representante activo** (D-22). Se rechaza registrar, reactivar o cambiar de centro a un representante si el centro ya tiene otro activo, nombrándolo. Para reemplazar a la persona responsable se desactiva la anterior y se registra la nueva; los documentos conservan a quien los originó.
 
 ### Compras (RN-2x)
 - **RN-20** La compra se guarda completa (cabecera, detalle y movimientos de kardex) en **una transacción**, o no se guarda nada.
