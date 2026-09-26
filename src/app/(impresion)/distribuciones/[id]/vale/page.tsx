@@ -5,6 +5,7 @@ import { idDeRuta } from "@/lib/parametros";
 import { requerirSesion } from "@/lib/sesion";
 import { obtenerDistribucion } from "@/servicios/distribuciones";
 import { BotonImprimir } from "@/componentes/ui/boton-imprimir";
+import { LogoCns } from "@/componentes/marca/logo-cns";
 
 export const metadata = { title: "Vale de distribución · Almacén Regional Oruro" };
 
@@ -30,13 +31,17 @@ export default async function PaginaValeDistribucion({ params }: { params: Promi
         <BotonImprimir />
       </div>
 
-      <header className="flex flex-col gap-1 border-b-2 border-texto pb-3">
-        {/* El centro de salud es el del representante del pedido (spec, Supuestos). */}
-        <p className="text-sm font-semibold uppercase tracking-wide">{representante.centroSalud}</p>
-        <h1 className="text-2xl font-bold">Vale de distribución Nº {distribucion.nroVale}</h1>
-        <p className="text-sm">
-          Fecha: {formatearFecha(distribucion.fecha)} · Pedido Nº {pedido.id}
-        </p>
+      <header className="flex items-center gap-5 border-b-2 border-texto pb-3">
+        <LogoCns tamano={72} />
+        <div className="flex flex-col gap-1">
+          <p className="text-xs font-semibold uppercase tracking-wide text-marca print:text-texto">Caja Nacional de Salud · Almacén Regional Oruro</p>
+          {/* El centro de salud es el del representante del pedido (spec, Supuestos). */}
+          <p className="text-sm font-semibold uppercase tracking-wide">{representante.centroSalud}</p>
+          <h1 className="text-2xl font-bold">Vale de distribución Nº {distribucion.nroVale}</h1>
+          <p className="text-sm">
+            Fecha: {formatearFecha(distribucion.fecha)} · Pedido Nº {pedido.id}
+          </p>
+        </div>
       </header>
 
       {/* Historia 5 · E2: una distribución anulada lo dice de forma visible, también en blanco y negro. */}
