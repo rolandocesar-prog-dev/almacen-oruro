@@ -1,44 +1,49 @@
 import Link from "next/link";
+import { gruposMenu } from "@/componentes/navegacion/opciones";
 import { Aviso } from "@/componentes/ui/aviso";
+import { Icono } from "@/componentes/ui/icono";
 import { requerirSesion } from "@/lib/sesion";
 
 export const metadata = { title: "Inicio · Almacén Regional Oruro" };
-
-const modulos = [
-  { ruta: "/compras", titulo: "Compras", descripcion: "Registrar compras con factura y anularlas" },
-  { ruta: "/pedidos", titulo: "Pedidos", descripcion: "Registrar los pedidos de los representantes y ver qué falta entregar" },
-  { ruta: "/distribuciones", titulo: "Distribuciones", descripcion: "Entregar productos para atender los pedidos y anular entregas mal registradas" },
-  { ruta: "/reportes", titulo: "Reportes", descripcion: "Consultar e imprimir compras, distribuciones, existencias, kardex y pedidos" },
-  { ruta: "/ia", titulo: "Inteligencia artificial", descripcion: "Pronóstico de consumo, reposición sugerida e informes redactados" },
-  { ruta: "/existencias", titulo: "Existencias", descripcion: "Stock actual, bajo mínimo y kardex de cada producto" },
-  { ruta: "/productos", titulo: "Productos", descripcion: "Código, categoría, unidad, stock actual y stock mínimo" },
-  { ruta: "/categorias", titulo: "Categorías", descripcion: "Grupos para ordenar los productos" },
-  { ruta: "/unidades", titulo: "Unidades de medida", descripcion: "Cómo se cuenta cada producto" },
-  { ruta: "/proveedores", titulo: "Proveedores", descripcion: "A quiénes se compra y qué productos ofrecen" },
-  { ruta: "/centros-salud", titulo: "Centros de salud", descripcion: "Dónde trabajan los representantes" },
-  { ruta: "/representantes", titulo: "Representantes", descripcion: "Quiénes hacen los pedidos de cada servicio" },
-  { ruta: "/personal", titulo: "Personal", descripcion: "Registrar y mantener a quienes operan el sistema" },
-  { ruta: "/sesiones", titulo: "Sesiones", descripcion: "Consultar quién ingresó y cuándo" },
-] as const;
 
 export default async function PaginaInicio({ searchParams }: { searchParams: Promise<{ aviso?: string }> }) {
   const { usuario } = await requerirSesion();
   const { aviso } = await searchParams;
 
   return (
-    <section className="flex flex-col gap-6">
+    <section className="flex flex-col gap-7">
       {aviso === "contrasena" && <Aviso tipo="exito">Contraseña actualizada</Aviso>}
-      <h1 className="text-2xl font-semibold">Bienvenido, {usuario.nombre}</h1>
-      <ul className="grid gap-4 sm:grid-cols-2">
-        {modulos.map((modulo) => (
-          <li key={modulo.ruta}>
-            <Link href={modulo.ruta} className="block rounded-lg border border-borde bg-white p-4 hover:border-marca">
-              <span className="block font-semibold text-marca">{modulo.titulo}</span>
-              <span className="text-sm text-gray-600">{modulo.descripcion}</span>
-            </Link>
-          </li>
-        ))}
-      </ul>
+      <header className="flex flex-col gap-1">
+        <h1 className="text-2xl font-bold sm:text-[28px]">Bienvenido, {usuario.nombre}</h1>
+        <p className="text-texto-suave">Elige un módulo para empezar</p>
+      </header>
+
+      {/* Las mismas secciones y módulos del menú lateral (opciones.ts). */}
+      {gruposMenu.map((grupo, indice) => (
+        <section key={grupo.titulo} aria-labelledby={`grupo-${indice}`} className="flex flex-col gap-3">
+          <h2 id={`grupo-${indice}`} className="text-[13px] font-semibold uppercase tracking-wider text-texto-suave">
+            {grupo.titulo}
+          </h2>
+          <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            {grupo.opciones.map((opcion) => (
+              <li key={opcion.ruta}>
+                <Link
+                  href={opcion.ruta}
+                  className="flex h-full items-start gap-3.5 rounded-xl border border-borde bg-white p-4 transition hover:border-marca hover:shadow-sm"
+                >
+                  <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-marca-claro text-marca">
+                    <Icono nombre={opcion.icono} />
+                  </span>
+                  <span className="flex flex-col gap-0.5">
+                    <span className="font-semibold text-marca">{opcion.texto}</span>
+                    <span className="text-sm text-texto-suave">{opcion.descripcion}</span>
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
     </section>
   );
 }
