@@ -66,3 +66,10 @@ Alcance general fuera de la entrega: ver
 
 Se completa a medida que se implementan F-002 a F-007.
 
+
+## F-009 · Observaciones de Raymond
+
+- Restaurar un respaldo desde el sistema (hoy se hace con la guía de instalación, D-24).
+- Respaldos automáticos programados y copia en otra ubicación.
+- Registro de los respaldos generados (quién y cuándo).
+- Reemplazar al representante de un centro en una sola operación (hoy se desactiva y se registra, O-03).

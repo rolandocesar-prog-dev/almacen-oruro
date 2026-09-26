@@ -2,7 +2,7 @@
 
 Toda decisión de diseño relevante se registra aquí con su fundamento (constitución, principio I).
 Las decisiones de alcance y de negocio están en
-[`especificacion/00-decisiones-y-alcance.md`](especificacion/00-decisiones-y-alcance.md) (D-01 a D-20).
+[`especificacion/00-decisiones-y-alcance.md`](especificacion/00-decisiones-y-alcance.md) (D-01 a D-25).
 
 **Formato de cada entrada:** fecha · decisión · fundamento · alternativas descartadas · enlace al
 detalle.
@@ -236,3 +236,32 @@ antes una maqueta con las pantallas de ingreso, inicio, un listado, el celular y
 | I-59 | 26/09 | Menú lateral fijo agrupado por tarea (Operaciones, Inventario y análisis, Catálogos, Administración), con la opción de la página actual resaltada (`aria-current`); en pantallas chicas se abre con ☰, se cierra con Escape, con el fondo o al cambiar de página. Menú e inicio salen de una sola lista (`componentes/navegacion/opciones.ts`) | Las dos filas horizontales de 16 enlaces se leían como un bloque; agrupar ayuda a encontrar cada módulo. El componente es de cliente solo por el resaltado y la apertura: la sesión sigue en el servidor (FR-004) | Barra superior con menús desplegables; dos listas separadas para menú e inicio |
 | I-60 | 26/09 | El logo se importa como archivo estático (`componentes/marca/logo-cns.jpg`) con `next/image`, no desde `/public` | Next.js lo sirve bajo `/_next/`, que el proxy deja pasar sin sesión: se ve en la pantalla de ingreso sin tocar el `matcher` | Carpeta `public/` y ampliar el `matcher` del proxy |
 | I-61 | 26/09 | El logo y el nombre "Caja Nacional de Salud · Almacén Regional Oruro" van en el encabezado de los cinco reportes, del informe IA impreso y del vale de distribución | Una hoja suelta muestra de qué institución es; el nombre va también en texto, así que se entiende impreso en blanco y negro | Solo el texto, como antes |
+
+## Observaciones de Raymond (plan de F-009, 26/09/2026)
+
+Detalle completo en [`specs/009-observaciones-raymond/research.md`](../specs/009-observaciones-raymond/research.md).
+Las decisiones de negocio que motivan estas (D-21 a D-25, y D-11 y D-18 revertidas) están en
+[`especificacion/00-decisiones-y-alcance.md`](especificacion/00-decisiones-y-alcance.md).
+
+**Enmienda de la constitución 1.0.0 → 1.1.0 (26/09).** El principio XI fijaba la entrega del 21/09 y
+mandaba toda idea nueva a trabajo futuro. Se amplía para admitir, después de la entrega, las
+observaciones de quien defiende o de la tutora que apruebe el asesor, cada una como funcionalidad con
+su propia especificación, y para exigir que una decisión revertida se marque, no se borre. Motivo:
+Raymond estudió el sistema y detectó reglas que no reflejan la operación real del almacén.
+
+| # | Fecha | Decisión | Fundamento | Alternativas descartadas |
+|---|---|---|---|---|
+| O-01 | 26/09 | Índice único parcial `representante_centro_activo_unico` (`centro_salud_id` donde `activo = true`) declarado en el esquema; el servicio verifica antes y nombra al representante activo; P2002 da el mismo mensaje | Patrón de C-05: el servicio explica, la base decide ante la concurrencia (SC-001) | Solo el servicio, `SELECT … FOR UPDATE` del centro, trigger, `representante_activo_id` en el centro |
+| O-02 | 26/09 | Migración con guardia (`RAISE EXCEPTION` si un centro tiene varios activos), `DROP COLUMN servicio` e índice; sin conversión de datos: la demostración se recrea | No hay datos reales; la guardia da una instrucción clara en vez del error del índice | Desactivar representantes en la migración, convertir servicios en centros, conservar `servicio` opcional |
+| O-03 | 26/09 | Desactivar al representante ya no exige que no tenga pedidos por atender; la confirmación dice cuántos tiene | D-22; distribuir, anular y editar esos pedidos ya funciona con el representante inactivo | Operación de "reemplazo" en un paso, pasar los pedidos al nuevo |
+| O-04 | 26/09 | `etiquetaRepresentante` → "Apellido, Nombre · Centro de salud", en un solo lugar; los servicios devuelven `centroSalud` en vez de `servicio` | D-23 en quince lugares con un solo formato | Armar el texto en cada pantalla, un componente de React |
+| O-05 | 26/09 | Informe IA de distribuciones agrupado por representante con su centro; la tabla de un informe guardado muestra "Servicio" o "Centro de salud" según su formato | Conserva quién pidió si un centro cambió de persona; los informes guardados no se modifican (principio IV) | Agrupar solo por centro, migrar el JSON guardado |
+| O-06 | 26/09 | El selector de centros del formulario de representante ofrece solo los activos sin representante activo, más el actual | Evita el error antes de que ocurra | Ofrecer todos y fallar al guardar |
+| O-07 | 26/09 | El generador usa `CENTROS` (un centro por representante), con nombres provisorios evidentes hasta Q-07; la lógica de consumo no cambia | Con la misma semilla las cantidades son las mismas, y siguen valiendo las mediciones de F-006 y F-007 | Repartir productos entre centros, esperar a Q-07 para programar |
+| O-08 | 26/09 | Respaldo con `pg_dump` dentro del contenedor (`execFile`, argumentos fijos, SQL plano, `--no-owner --no-privileges`, sin contraseña, `maxBuffer` 200 MB, `timeout` 60 s); contenedor en `CONTENEDOR_BASE_DATOS` | Herramienta oficial, instantánea coherente (FR-016); medido 0,4 s y 536 KB con 36 meses | Exportación propia a JSON, `pg_dump` en Windows, formato `custom`, `PGPASSWORD` |
+| O-09 | 26/09 | El archivo se entrega con una Server Action (`ResultadoAccion<{ nombreArchivo, contenido }>`) y el cliente lo descarga; solo si `pg_dump` terminó bien | El proyecto no tiene manejadores de ruta (T-02); nunca se entrega un archivo cortado (FR-020) | `route.ts` con descarga directa, guardar en el servidor |
+| O-10 | 26/09 | Nombre `respaldo-almacen-oruro-AAAA-MM-DD-HHMM.sql` en hora de Oruro; mensajes distintos para Docker detenido, contenedor detenido, demora y otra falla | El encargado puede resolver los dos primeros solo (principio VI) | Mostrar el error técnico de `pg_dump` |
+| O-11 | 26/09 | Pantalla `/respaldo` en el grupo Administración, con la advertencia de datos personales | Junto a Personal y Sesiones; aparece en menú e inicio por la lista única (I-59) | Botón en inicio, dentro de Personal |
+| O-12 | 26/09 | Restauración documentada con `docker compose down -v`, `up -d`, `docker cp` y `psql -f`, sin `migrate deploy` ni semilla; verificada en una base vacía (conteos, kardex, contraseñas y secuencias) | Funciona en PowerShell 5.1, que no admite `<` y puede romper las tildes al usar tuberías | `psql < archivo`, `Get-Content \| docker exec`, `pg_dump --clean` |
+| O-13 | 26/09 | `CampoContrasena`, componente cliente con botón "Mostrar / Ocultar" (`aria-pressed`), un estado por campo, que se oculta al enviar; oculta el botón nativo de Edge | `Campo` sigue siendo de servidor; texto claro para todos y para lectores de pantalla | Propiedad en `Campo`, botón solo con ícono, seguir visible tras enviar |
+| O-14 | 26/09 | Pruebas de RN-18 (tres vías y concurrencia), RN-13 modificada, el centro en cada módulo, generador reducido y respaldo (ejecutor simulado y real que se salta sin contenedor); `CampoContrasena` en el recorrido manual | Principio IX: donde un error rompe datos o la defensa | Respaldo probado solo contra Docker, Testing Library para un componente |
