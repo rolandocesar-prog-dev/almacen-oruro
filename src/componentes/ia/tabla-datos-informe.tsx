@@ -123,7 +123,13 @@ const ESTADOS = [
   ["ANULADO", "Anulados"],
 ] as const;
 
+// Los informes guardados antes de F-009 agrupaban por representante y SERVICIO. Un informe guardado no se
+// modifica nunca (principio IV, research O-05), así que la tabla muestra la columna de su propio formato.
+type FilaPorRepresentante = { representante: string; unidades: number; centroSalud?: string; servicio?: string };
+
 function DatosDistribuciones({ datos }: { datos: DatosInformeDistribuciones }) {
+  const filas: FilaPorRepresentante[] = datos.porRepresentante;
+  const formatoAnterior = filas.some((fila) => fila.servicio !== undefined);
   return (
     <>
       <Periodo periodo={datos.periodo} />
@@ -137,12 +143,24 @@ function DatosDistribuciones({ datos }: { datos: DatosInformeDistribuciones }) {
           </tr>
         </TablaReporte>
       </Bloque>
-      <Bloque titulo="Unidades entregadas por representante">
-        <TablaReporte encabezados={["Representante", "Centro de salud", "Unidades"]} vacio={datos.porRepresentante.length === 0 ? VACIO : undefined}>
-          {datos.porRepresentante.map((fila) => (
-            <tr key={`${fila.representante}-${fila.centroSalud}`}>
-              <CeldaReporte>{fila.representante}</CeldaReporte>
-              <CeldaReporte>{fila.centroSalud}</CeldaReporte>
+      <Bloque titulo={formatoAnterior ? "Unidades entregadas por representante" : "Unidades entregadas por centro de salud"}>
+        <TablaReporte
+          encabezados={formatoAnterior ? ["Representante", "Servicio", "Unidades"] : ["Centro de salud", "Representante", "Unidades"]}
+          vacio={filas.length === 0 ? VACIO : undefined}
+        >
+          {filas.map((fila) => (
+            <tr key={`${fila.representante}-${fila.centroSalud ?? fila.servicio}`}>
+              {formatoAnterior ? (
+                <>
+                  <CeldaReporte>{fila.representante}</CeldaReporte>
+                  <CeldaReporte>{fila.servicio}</CeldaReporte>
+                </>
+              ) : (
+                <>
+                  <CeldaReporte>{fila.centroSalud}</CeldaReporte>
+                  <CeldaReporte>{fila.representante}</CeldaReporte>
+                </>
+              )}
               <CeldaReporte className={derecha}>{fila.unidades}</CeldaReporte>
             </tr>
           ))}

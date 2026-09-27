@@ -115,6 +115,18 @@ describe("generarHistorico (Historia 1)", () => {
     expect(meses).toEqual(["2026-03", "2026-04", "2026-05", "2026-06", "2026-07", "2026-08"]);
   });
 
+  it("cada centro de salud queda con exactamente un representante activo (F-009, RN-18, SC-006)", async () => {
+    await generarReducido();
+
+    const centros = await prisma.centroSalud.findMany({
+      select: { _count: { select: { representantes: { where: { activo: true } } } } },
+    });
+    expect(centros).toHaveLength(5);
+    expect(centros.every((centro) => centro._count.representantes === 1)).toBe(true);
+    // Con 3 productos no todos los centros reciben productos en la versión reducida; con los 25 de la
+    // demostración, los cinco hacen pedidos (verificado en quickstart §4).
+  });
+
   it("crea catálogo, entregas parciales, pedidos en los cuatro estados y anulaciones (H1 · E5)", async () => {
     const resumen = await generarReducido();
 

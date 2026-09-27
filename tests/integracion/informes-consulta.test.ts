@@ -76,3 +76,34 @@ describe("Consulta de informes guardados (Historia 6)", () => {
     expect(await prisma.informeIa.findMany({ orderBy: { id: "asc" } })).toEqual(antes);
   });
 });
+
+describe("Informes guardados antes de F-009 (research O-05, principio IV)", () => {
+  it("se siguen consultando tal como se guardaron, con \"servicio\" en lugar del centro de salud", async () => {
+    const datosAnteriores = {
+      periodo: { desde: "2026-07-01", hasta: "2026-07-31", anteriorDesde: "2026-06-01", anteriorHasta: "2026-06-30" },
+      porRepresentante: [{ representante: "Quispe, María", servicio: "Emergencias", unidades: 9 }],
+    };
+    const { id } = await prisma.informeIa.create({
+      data: {
+        tipo: "DISTRIBUCIONES",
+        desde: new Date("2026-07-01T00:00:00Z"),
+        hasta: new Date("2026-07-31T00:00:00Z"),
+        datosEntrada: datosAnteriores,
+        texto: "Informe anterior a F-009.",
+        modelo: "claude-opus-5",
+        usuarioId: usuario.id,
+      },
+      select: { id: true },
+    });
+
+    const informe = await obtenerInforme(id);
+    expect(informe?.datosEntrada).toEqual(datosAnteriores);
+  });
+
+  it("un informe nuevo de distribuciones agrupa con el centro de salud (FR-010)", async () => {
+    const informe = await obtenerInforme(ids.distribuciones);
+    const filas = (informe?.datosEntrada as { porRepresentante: Record<string, unknown>[] }).porRepresentante;
+    expect(filas.length).toBeGreaterThan(0);
+    expect(filas.every((fila) => typeof fila.centroSalud === "string" && !("servicio" in fila))).toBe(true);
+  });
+});
