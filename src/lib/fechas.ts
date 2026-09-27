@@ -19,6 +19,19 @@ export function fechaEnLaPaz(momento: Date): string {
   return formatoFecha.format(momento);
 }
 
+// "en-GB" con ciclo de 24 horas da HH:MM, siempre con dos dígitos (00 a 23).
+const formatoHora = new Intl.DateTimeFormat("en-GB", {
+  timeZone: ZONA_HORARIA,
+  hour: "2-digit",
+  minute: "2-digit",
+  hourCycle: "h23",
+});
+
+/** Hora y minutos (HHMM, sin separador) que corresponden a un momento en La Paz; por ejemplo "0715". */
+export function horaEnLaPaz(momento: Date): string {
+  return formatoHora.format(momento).replace(":", "");
+}
+
 /** Fecha de hoy en La Paz, en formato AAAA-MM-DD. */
 export function hoyEnLaPaz(ahora: Date = new Date()): string {
   return fechaEnLaPaz(ahora);

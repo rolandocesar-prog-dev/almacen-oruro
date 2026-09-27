@@ -60,6 +60,7 @@ export const gruposMenu: readonly GrupoMenu[] = [
     opciones: [
       { ruta: "/personal", texto: "Personal", icono: "personal", descripcion: "Registrar y mantener a quienes operan el sistema" },
       { ruta: "/sesiones", texto: "Sesiones", icono: "sesiones", descripcion: "Consultar quién ingresó y cuándo" },
+      { ruta: "/respaldo", texto: "Respaldo", icono: "respaldo", descripcion: "Descargar una copia de todos los datos del sistema" },
     ],
   },
 ];
