@@ -5,6 +5,7 @@ import { useValidacion } from "@/componentes/formularios/use-validacion";
 import { Aviso } from "@/componentes/ui/aviso";
 import { Boton } from "@/componentes/ui/boton";
 import { Campo } from "@/componentes/ui/campo";
+import { CampoContrasena } from "@/componentes/ui/campo-contrasena";
 import { esquemaIngreso } from "@/esquemas/acceso";
 import type { ResultadoAccion } from "@/lib/errores";
 import { ingresar } from "./acciones";
@@ -26,10 +27,9 @@ export function FormularioIngreso() {
         errores={errores.nombreUsuario}
         onBlur={alSalirDelCampo}
       />
-      <Campo
+      <CampoContrasena
         id="contrasena"
         etiqueta="Contraseña"
-        type="password"
         autoComplete="current-password"
         required
         errores={errores.contrasena}

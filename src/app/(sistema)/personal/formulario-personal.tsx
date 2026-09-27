@@ -6,6 +6,7 @@ import { useValidacion } from "@/componentes/formularios/use-validacion";
 import { Aviso } from "@/componentes/ui/aviso";
 import { Boton } from "@/componentes/ui/boton";
 import { Campo } from "@/componentes/ui/campo";
+import { CampoContrasena } from "@/componentes/ui/campo-contrasena";
 import { esquemaDatosPersonales, esquemaRegistroPersonal } from "@/esquemas/personal";
 import type { ResultadoAccion } from "@/lib/errores";
 
@@ -73,20 +74,18 @@ export function FormularioPersonal({ modo, accion, valores = {}, rutaCancelar }:
 
       {modo === "registro" && (
         <div className="grid gap-4 sm:grid-cols-2">
-          <Campo
+          <CampoContrasena
             id="contrasena"
             etiqueta="Contraseña inicial"
-            type="password"
             ayuda="Al menos 8 caracteres"
             autoComplete="new-password"
             required
             errores={errores.contrasena}
             onBlur={alSalirDelCampo}
           />
-          <Campo
+          <CampoContrasena
             id="confirmacion"
             etiqueta="Repite la contraseña"
-            type="password"
             autoComplete="new-password"
             required
             errores={errores.confirmacion}

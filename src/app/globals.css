@@ -47,6 +47,13 @@ body {
   :where(input:not([type="checkbox"], [type="radio"], [type="hidden"]), select) {
     min-height: 2.625rem;
   }
+
+  /* Edge agrega su propio botón para ver la contraseña; se oculta para que no aparezcan dos junto al
+     botón "Mostrar" del sistema (F-009, research O-13). */
+  input::-ms-reveal,
+  input::-ms-clear {
+    display: none;
+  }
 }
 
 /* Franjas grises del logo de la CNS, usadas como fondo del encabezado del menú y del ingreso. */

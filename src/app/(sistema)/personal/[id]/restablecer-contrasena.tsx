@@ -4,7 +4,7 @@ import { useActionState, useRef } from "react";
 import { useValidacion } from "@/componentes/formularios/use-validacion";
 import { Aviso } from "@/componentes/ui/aviso";
 import { Boton } from "@/componentes/ui/boton";
-import { Campo } from "@/componentes/ui/campo";
+import { CampoContrasena } from "@/componentes/ui/campo-contrasena";
 import { esquemaRestablecimiento } from "@/esquemas/personal";
 import type { ResultadoAccion } from "@/lib/errores";
 
@@ -33,21 +33,19 @@ export function RestablecerContrasena({ accion }: Props) {
       </div>
       {resultado && <Aviso tipo={resultado.ok ? "exito" : "error"}>{resultado.mensaje}</Aviso>}
       <div className="grid gap-4 sm:grid-cols-2">
-        <Campo
+        <CampoContrasena
           id="contrasenaTemporal"
           etiqueta="Contraseña temporal"
-          type="password"
           ayuda="Al menos 8 caracteres"
           autoComplete="new-password"
           required
           errores={errores.contrasenaTemporal}
           onBlur={alSalirDelCampo}
         />
-        <Campo
+        <CampoContrasena
           id="confirmacionTemporal"
           name="confirmacion"
           etiqueta="Repite la contraseña temporal"
-          type="password"
           autoComplete="new-password"
           required
           errores={errores.confirmacion}
