@@ -2,10 +2,11 @@
 
 **Rama**: `009-observaciones-raymond` | **Fecha**: 2026-09-26 | **Especificación**: [spec.md](spec.md)
 
-**Entrada**: especificación de `specs/009-observaciones-raymond/spec.md`, con 7 aclaraciones del 26/09
+**Entrada**: especificación de `specs/009-observaciones-raymond/spec.md`, con 9 aclaraciones del 26/09
 (varios centros reales, un representante activo a la vez, desactivar con pedidos por atender, el
 centro en todos los lugares, centros reales para la demostración, respaldo solo descargable y solo con
-los datos de la base).
+los datos de la base; y, en el clarify, filtros solo por representante y representantes anteriores
+sin fechas).
 
 ## Resumen
 
@@ -18,7 +19,7 @@ F-009 recoge las cuatro observaciones de Raymond tras recibir el sistema, despu�
   nueva.
 - **Demostración con los centros reales (P1):** el generador crea un centro por representante, con el
   mismo volumen y la misma semilla.
-- **El representante con su centro (P2):** "Apellido, Nombre · Centro de salud" en los quince lugares
+- **El representante con su centro (P2):** "Apellido, Nombre · Centro de salud", o el centro en su propio dato, en todos los lugares de FR-011
   donde aparece un representante; "Servicio" desaparece de pantallas e impresos.
 - **Respaldo (P2):** una pantalla en Administración genera y descarga todos los datos de la base; la
   restauración queda documentada y probada en la guía.
@@ -59,7 +60,7 @@ el respaldo nunca entrega un archivo incompleto (FR-020) ni se guarda en el serv
 incluye `.env` (FR-018); los informes IA guardados no se modifican (principio IV); mostrar la contraseña
 no cambia lo enviado (FR-026)
 
-**Escala**: 5 centros y 5 representantes simulados; unas 15 pantallas e impresos con el representante;
+**Escala**: 5 centros y 5 representantes simulados; las pantallas e impresos de FR-011 (unos 19 lugares si se cuentan por separado pantalla e impreso);
 8 campos de contraseña en 4 pantallas
 
 ## Verificación contra la constitución
@@ -176,7 +177,7 @@ no pertenece a ningún módulo de negocio; su pantalla vive en `(sistema)` como 
 | Recrear la base en el equipo de Raymond borra lo que haya cargado a mano | Pérdida de datos de práctica | Confirmar con él antes de actualizar. No hay conversión automática (O-02): lo que quiera conservar tendrá que volver a cargarlo. La versión anterior no tiene respaldo, y una copia del esquema viejo tampoco se podría restaurar sobre el nuevo |
 | El sistema corre donde no hay acceso a Docker | El respaldo falla | Mensaje claro (O-10); en la instalación actual (D-17) siempre hay Docker |
 | El archivo de respaldo circula con datos personales | Exposición de datos del personal y representantes | Advertencia en la pantalla (FR-019); las contraseñas van cifradas con bcrypt |
-| Tocar quince pantallas deja algún "Servicio" olvidado | SC-002 falla | Búsqueda de `servicio` en `src/` y `tests/` como verificación de cierre, más el recorrido del quickstart paso 9 y 10 |
+| Tocar todos los lugares de FR-011 deja algún "Servicio" olvidado | SC-002 falla | Búsqueda del campo `servicio` (patrón de la fase 2 de tasks.md) en `src/` y `tests/` como verificación de cierre, más el recorrido del quickstart paso 9 y 10 |
 
 ## Seguimiento de complejidad
 

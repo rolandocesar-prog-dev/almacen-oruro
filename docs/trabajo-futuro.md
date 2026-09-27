@@ -73,3 +73,4 @@ Se completa a medida que se implementan F-002 a F-007.
 - Respaldos automáticos programados y copia en otra ubicación.
 - Registro de los respaldos generados (quién y cuándo).
 - Reemplazar al representante de un centro en una sola operación (hoy se desactiva y se registra, O-03).
+- Filtrar pedidos, distribuciones y sus reportes por centro de salud, reuniendo a sus representantes actuales y anteriores (hoy se filtra por representante; aclaración de F-009 del 26/09).

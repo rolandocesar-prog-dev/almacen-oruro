@@ -75,6 +75,7 @@ Sin cambios de firma en las demás acciones de F-001 a F-007.
 |---|---|
 | `registrarRepresentante`, `modificarRepresentante`, `reactivarRepresentante` | Verifican RN-18 en la transacción; traducen P2002 de `representante_centro_activo_unico` al mismo mensaje |
 | `desactivarRepresentante` | Sin la verificación de pedidos por atender |
+| `desactivarCentroSalud` | El rechazo de RN-13 nombra al representante activo en lugar de contarlos (FR-027) |
 | Las funciones de la tabla §5 de [data-model.md](../data-model.md) | `servicio` → `centroSalud` |
 | Generador de F-007 | `CENTROS` en lugar de `REPRESENTANTES` y `CENTRO_SALUD` (research O-07) |
 

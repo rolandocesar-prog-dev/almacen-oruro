@@ -43,6 +43,12 @@ simulado) · Afecta los formularios de contraseña de F-001 · `docs/especificac
   restauración queda documentada en la guía de instalación y se hace fuera del sistema.
 - Q: ¿Qué incluye el respaldo? → A: **Todos los datos de la base**, sin el código (ya está en el
   repositorio) ni la configuración con secretos (clave del servicio de IA, contraseña de la base).
+- Q: ¿Los filtros de pedidos, distribuciones y sus reportes deben permitir filtrar por centro de
+  salud, además de por representante? → A: **No.** Siguen filtrando por representante, cuya etiqueta
+  ya muestra el centro; filtrar por centro queda como trabajo futuro.
+- Q: En la ficha del centro, ¿los representantes anteriores deben mostrar desde y hasta cuándo fueron
+  responsables? → A: **No.** Se muestran nombre y CI, sin fechas; no se agrega una fecha de baja al
+  modelo. Cuándo pidió cada uno ya se ve en sus pedidos.
 
 ## Escenarios de usuario y pruebas *(obligatorio)*
 
@@ -211,7 +217,7 @@ mismo que sin usar el botón.
   el registro de la siguiente). No aparece en el selector de pedidos nuevos porque no hay a quién
   asignarlo, y su ficha dice "Sin representante activo".
 - **Desactivar un centro de salud:** sigue la regla RN-13; se rechaza si tiene un representante
-  activo, nombrándolo.
+  activo, nombrándolo (FR-027).
 - **Reactivar un representante cuyo centro está inactivo:** sigue la regla RN-17; primero se
   reactiva el centro.
 - **Modificar los datos de un representante activo sin cambiar su centro:** se permite; la regla
@@ -248,21 +254,29 @@ mismo que sin usar el botón.
   centro de salud activo. El dato **servicio o área deja de existir**. Reemplaza FR-021 de F-002.
 - **FR-005**: El selector de centro de salud del formulario de representante DEBE ofrecer solo los
   centros activos sin representante activo, más el centro actual del representante que se está
-  modificando. Reemplaza la preselección de FR-022 de F-002.
+  modificando. Si queda un solo centro disponible, DEBE aparecer preseleccionado. Reemplaza FR-022
+  de F-002, que preseleccionaba el centro cuando había uno solo activo.
 - **FR-006**: El sistema DEBE permitir desactivar un representante aunque tenga pedidos PENDIENTE o
   PARCIAL, avisando antes cuántos son. Esos pedidos siguen a su nombre y se pueden seguir
   distribuyendo y anulando. Modifica RN-13 solo para representantes; para categorías, unidades,
   productos y centros de salud la regla no cambia.
 - **FR-007**: La ficha de un centro de salud DEBE mostrar su representante activo, o "Sin
-  representante activo", y la lista de sus representantes anteriores.
+  representante activo", y la lista de sus representantes anteriores con nombre y CI, ordenada por
+  apellido y sin fechas de alta ni de baja.
 - **FR-008**: Los pedidos, distribuciones y movimientos ya registrados DEBEN seguir mostrando el
   representante que los originó, aunque esté inactivo o su centro tenga hoy otro representante.
+- **FR-027**: Al rechazar la desactivación de un centro de salud con representante activo (RN-13),
+  el mensaje DEBE nombrar a ese representante ("No se puede desactivar: su representante activo es
+  'Quispe, María'"), en lugar de contar representantes activos, porque ahora puede haber como
+  máximo uno.
 
 **Demostración con centros reales (Historia 2)**
 
 - **FR-009**: El histórico simulado DEBE generarse con los centros de salud reales que provee
   Raymond, cada uno con un único representante activo ficticio, conservando el volumen actual (25
-  productos en 6 categorías y 36 meses) y la reproducibilidad por semilla.
+  productos en 6 categorías y 36 meses) y la reproducibilidad por semilla. Mientras Raymond no
+  envíe los nombres (Q-07), el generador usa nombres provisorios evidentes; este requisito y SC-006
+  se dan por cumplidos recién con la demostración regenerada con los nombres reales.
 - **FR-010**: El informe IA de distribuciones DEBE agrupar lo entregado por centro de salud y su
   representante, en lugar de por representante y servicio. El pronóstico, la evaluación y la
   reposición sugerida no cambian su método.
@@ -277,7 +291,8 @@ mismo que sin usar el botón.
   figura en su encabezado; el kardex y su reporte; y el informe IA de distribuciones.
 - **FR-012**: En los selectores y textos corridos el formato DEBE ser "Apellido, Nombre · Centro de
   salud", con la marca "(inactivo)" cuando corresponda. En tablas, el centro de salud PUEDE ir en su
-  propia columna.
+  propia columna, y en fichas e impresos que ya lo muestran en su propio dato, NO DEBE repetirse
+  junto al nombre.
 - **FR-013**: Toda columna o dato rotulado "Servicio" DEBE reemplazarse por "Centro de salud".
 
 **Respaldo (Historia 4)**
@@ -354,11 +369,15 @@ mismo que sin usar el botón.
 - **Los nombres de los centros de salud los provee Raymond** (pendiente). Si no indica otra
   cantidad, se usan cinco centros, igual que los cinco representantes actuales, para no cambiar el
   volumen de la simulación.
-- Hay un solo rol (Encargado de almacén, D-17): cualquier persona con sesión puede generar un
+- Hay un solo rol (Encargado de almacén, D-10): cualquier persona con sesión puede generar un
   respaldo.
 - La base de datos se ejecuta como indica la guía de instalación vigente.
+- **Los filtros no cambian de criterio:** pedidos, distribuciones y sus reportes siguen filtrando por
+  representante, ahora con su centro en la etiqueta (FR-011). Filtrar por centro de salud, reuniendo a
+  sus representantes actuales y anteriores, queda fuera de esta funcionalidad (trabajo futuro).
 - El código no forma parte del respaldo porque ya está en el repositorio; la configuración con
   secretos tampoco, porque quedaría en un archivo descargable.
-- Esta funcionalidad llega después de la entrega del 21/09. El principio XI de la constitución
-  ("Alcance cerrado") DEBE enmendarse antes de planificarla, y las decisiones D-11 y D-18 se
-  registran como revertidas en `docs/especificacion/00-decisiones-y-alcance.md`.
+- Esta funcionalidad llega después de la entrega del 21/09. Por eso se enmendó el principio XI de
+  la constitución ("Alcance cerrado") a la versión 1.1.0 antes de planificarla (26/09, commit
+  `ad235f9`), y las decisiones D-11 y D-18 quedaron registradas como revertidas, reemplazadas por
+  D-21 y D-22, en `docs/especificacion/00-decisiones-y-alcance.md`.

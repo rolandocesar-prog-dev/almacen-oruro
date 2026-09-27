@@ -94,7 +94,7 @@ del centro) y usan esa función donde arman texto. En las tablas, el centro va e
 **Fundamento**: el formato se escribe una sola vez; si Raymond pide otro orden, cambia un lugar. Es el
 mismo criterio que `nombreCompleto` (F-002) y `formatearFecha` (I-17).
 
-**Alternativas descartadas**: armar el texto en cada pantalla (quince lugares que podrían divergir);
+**Alternativas descartadas**: armar el texto en cada pantalla (todos los lugares de FR-011, que podrían divergir);
 un componente de React (el kardex y el informe IA arman el texto en el servidor, no en una vista).
 
 ---
