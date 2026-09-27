@@ -8,7 +8,8 @@ import { Dato } from "@/componentes/ui/dato";
 import { esquemaAvisoFicha } from "@/esquemas/comunes";
 import { idDeRuta } from "@/lib/parametros";
 import { requerirSesion } from "@/lib/sesion";
-import { obtenerRepresentante } from "@/servicios/catalogos/representantes";
+import { pluralizar } from "@/servicios/catalogos/comun";
+import { contarPedidosPorAtender, obtenerRepresentante } from "@/servicios/catalogos/representantes";
 import { desactivarRepresentanteAccion, reactivarRepresentanteAccion } from "../acciones";
 
 export const metadata = { title: "Ficha de representante · Almacén Regional Oruro" };
@@ -32,6 +33,12 @@ export default async function PaginaFichaRepresentante({
   if (!representante) notFound();
 
   const { centroSalud } = representante;
+  // FR-006: desactivar se permite aunque tenga pedidos por atender, pero se avisa antes cuántos son.
+  const pedidosPorAtender = representante.activo ? await contarPedidosPorAtender(representante.id) : 0;
+  const avisoPedidos =
+    pedidosPorAtender > 0
+      ? ` Tiene ${pluralizar(pedidosPorAtender, "pedido", "pedidos")} por atender: seguirán a su nombre y se podrán distribuir.`
+      : "";
 
   return (
     <section className="flex flex-col gap-4">
@@ -71,7 +78,7 @@ export default async function PaginaFichaRepresentante({
         </Link>
         <CambioDeEstado
           activo={representante.activo}
-          confirmacionDesactivar={`¿Desactivar a ${representante.nombre} ${representante.apellido}? Ya no podrá elegirse en pedidos nuevos.`}
+          confirmacionDesactivar={`¿Desactivar a ${representante.nombre} ${representante.apellido}?${avisoPedidos} Ya no podrá elegirse en pedidos nuevos.`}
           desactivar={desactivarRepresentanteAccion.bind(null, representante.id)}
           reactivar={reactivarRepresentanteAccion.bind(null, representante.id)}
         />

@@ -4,7 +4,8 @@ import type { DatosCentroSalud } from "@/esquemas/catalogos/centro-salud";
 import { ErrorDeNegocio } from "@/lib/errores";
 import { esErrorDeDuplicado, prisma } from "@/lib/prisma";
 import { coincideBusqueda, compararEnEspanol, normalizarTexto, recortarEspacios } from "@/lib/texto";
-import { errorDuplicado, pluralizar } from "./comun";
+import { errorDuplicado } from "./comun";
+import { compararPorApellido, nombreCompleto } from "./representantes";
 
 /** Verifica que ningún OTRO centro, activo o inactivo, tenga el mismo nombre normalizado (RN-11). */
 async function verificarNombreLibre(nombre: string, exceptoId?: number) {
@@ -69,8 +70,9 @@ export async function modificarCentroSalud(id: number, datos: DatosCentroSalud):
 }
 
 /**
- * Desactiva un centro. RN-13: no se puede mientras tenga representantes activos, porque quedarían
- * representantes que hacen pedidos para un centro que ya no se puede elegir.
+ * Desactiva un centro. RN-13: no se puede mientras tenga un representante activo, porque quedaría
+ * alguien haciendo pedidos para un centro que ya no se puede elegir. Como desde F-009 hay como máximo
+ * uno (RN-18), el mensaje lo nombra en lugar de contar (FR-027).
  */
 export async function desactivarCentroSalud(id: number): Promise<void> {
   await prisma.$transaction(async (tx) => {
@@ -78,12 +80,8 @@ export async function desactivarCentroSalud(id: number): Promise<void> {
     if (!centro) throw new ErrorDeNegocio("No existe el centro de salud indicado");
     if (!centro.activo) throw new ErrorDeNegocio("El centro de salud ya está inactivo");
 
-    const representantesActivos = await tx.representante.count({ where: { centroSaludId: id, activo: true } });
-    if (representantesActivos > 0) {
-      throw new ErrorDeNegocio(
-        `No se puede desactivar: ${pluralizar(representantesActivos, "representante activo pertenece", "representantes activos pertenecen")} a este centro`,
-      );
-    }
+    const activo = await tx.representante.findFirst({ where: { centroSaludId: id, activo: true }, select: { nombre: true, apellido: true } });
+    if (activo) throw new ErrorDeNegocio(`No se puede desactivar: su representante activo es '${nombreCompleto(activo)}'`);
     await tx.centroSalud.update({ where: { id }, data: { activo: false } });
   });
 }
@@ -125,15 +123,40 @@ export async function listarCentrosSalud({ q, estado }: FiltroCatalogo) {
 }
 
 /**
- * Opciones del selector de centro del representante. Solo activos (RN-14), más el actual marcado si
- * está inactivo (FR-003). Si devuelve uno solo, el formulario lo preselecciona (FR-022).
+ * Opciones del selector de centro del formulario de representante (FR-005, research O-06): los centros
+ * activos (RN-14) que no tienen representante activo (RN-18), más el centro actual del representante que
+ * se modifica, marcado si está inactivo (FR-003 de F-002). Ofrecer solo centros libres evita el error
+ * antes de que ocurra; la regla la siguen verificando el servicio y la base. Si queda uno solo, el
+ * formulario lo preselecciona.
  */
-export async function listarCentrosSaludParaSelector(idActual?: number) {
+export async function listarCentrosParaRepresentante(representanteId?: number) {
+  const actual = representanteId
+    ? await prisma.representante.findUnique({ where: { id: representanteId }, select: { centroSaludId: true } })
+    : null;
   const centros = await prisma.centroSalud.findMany({
-    where: { OR: [{ activo: true }, ...(idActual ? [{ id: idActual }] : [])] },
+    where: {
+      OR: [{ activo: true, representantes: { none: { activo: true } } }, ...(actual ? [{ id: actual.centroSaludId }] : [])],
+    },
     select: { id: true, nombre: true, activo: true },
   });
   return centros
     .sort((a, b) => compararEnEspanol(a.nombre, b.nombre))
     .map(({ id, nombre, activo }) => ({ id, etiqueta: activo ? nombre : `${nombre} (inactivo)`, activo }));
+}
+
+/**
+ * Representantes de la ficha del centro (FR-007): el activo, si hay, y los anteriores con nombre y CI,
+ * ordenados por apellido. Sin fechas: cuándo pidió cada uno ya se ve en sus pedidos (aclaración del 26/09).
+ */
+export async function obtenerRepresentantesDelCentro(centroSaludId: number) {
+  const representantes = await prisma.representante.findMany({
+    where: { centroSaludId },
+    select: { id: true, nombre: true, apellido: true, ci: true, activo: true },
+  });
+  const aFila = (r: (typeof representantes)[number]) => ({ id: r.id, nombreCompleto: nombreCompleto(r), ci: r.ci });
+  const activo = representantes.find((r) => r.activo);
+  return {
+    activo: activo ? aFila(activo) : null,
+    anteriores: representantes.filter((r) => !r.activo).sort(compararPorApellido).map(aFila),
+  };
 }

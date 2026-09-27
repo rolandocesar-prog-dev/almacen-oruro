@@ -1,5 +1,5 @@
 import { requerirSesion } from "@/lib/sesion";
-import { listarCentrosSaludParaSelector } from "@/servicios/catalogos/centros-salud";
+import { listarCentrosParaRepresentante } from "@/servicios/catalogos/centros-salud";
 import { registrarRepresentanteAccion } from "../acciones";
 import { FormularioRepresentante } from "../formulario-representante";
 
@@ -7,7 +7,8 @@ export const metadata = { title: "Registrar representante · Almacén Regional O
 
 export default async function PaginaNuevoRepresentante() {
   await requerirSesion();
-  const centros = await listarCentrosSaludParaSelector();
+  // Solo centros activos sin representante activo (FR-005, RN-18).
+  const centros = await listarCentrosParaRepresentante();
 
   return (
     <section className="flex flex-col gap-4">

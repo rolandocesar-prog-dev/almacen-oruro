@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { idDeRuta } from "@/lib/parametros";
 import { requerirSesion } from "@/lib/sesion";
-import { listarCentrosSaludParaSelector } from "@/servicios/catalogos/centros-salud";
+import { listarCentrosParaRepresentante } from "@/servicios/catalogos/centros-salud";
 import { obtenerRepresentante } from "@/servicios/catalogos/representantes";
 import { modificarRepresentanteAccion } from "../../acciones";
 import { FormularioRepresentante } from "../../formulario-representante";
@@ -14,8 +14,8 @@ export default async function PaginaEditarRepresentante({ params }: { params: Pr
   const representante = id ? await obtenerRepresentante(id) : null;
   if (!representante) notFound();
 
-  // Con el id actual, el selector incluye el centro del representante aunque esté inactivo (FR-003).
-  const centros = await listarCentrosSaludParaSelector(representante.centroSaludId);
+  // Centros libres más el actual del representante, aunque esté inactivo (FR-005; FR-003 de F-002).
+  const centros = await listarCentrosParaRepresentante(representante.id);
 
   return (
     <section className="flex flex-col gap-4">

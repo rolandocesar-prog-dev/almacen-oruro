@@ -8,7 +8,7 @@ import { Dato } from "@/componentes/ui/dato";
 import { esquemaAvisoFicha } from "@/esquemas/comunes";
 import { idDeRuta } from "@/lib/parametros";
 import { requerirSesion } from "@/lib/sesion";
-import { obtenerCentroSalud } from "@/servicios/catalogos/centros-salud";
+import { obtenerCentroSalud, obtenerRepresentantesDelCentro } from "@/servicios/catalogos/centros-salud";
 import { desactivarCentroSaludAccion, reactivarCentroSaludAccion } from "../acciones";
 
 export const metadata = { title: "Ficha de centro de salud · Almacén Regional Oruro" };
@@ -30,6 +30,8 @@ export default async function PaginaFichaCentroSalud({
   const { aviso } = esquemaAvisoFicha.parse(await searchParams);
   const centro = id ? await obtenerCentroSalud(id) : null;
   if (!centro) notFound();
+  // FR-007: un centro tiene como máximo un representante activo (RN-18) y conserva a los anteriores.
+  const { activo, anteriores } = await obtenerRepresentantesDelCentro(centro.id);
 
   return (
     <section className="flex flex-col gap-4">
@@ -46,8 +48,40 @@ export default async function PaginaFichaCentroSalud({
       <dl className="grid gap-4 rounded-lg border border-borde bg-white p-6 sm:grid-cols-2">
         <Dato etiqueta="Teléfono" valor={centro.telefono} />
         <Dato etiqueta="Dirección" valor={centro.direccion} />
-        <Dato etiqueta="Representantes activos" valor={centro.representantesActivos} />
+        <Dato
+          etiqueta="Representante"
+          valor={
+            activo ? (
+              <Link href={`/representantes/${activo.id}`} className="text-marca underline">
+                {activo.nombreCompleto}
+              </Link>
+            ) : (
+              "Sin representante activo"
+            )
+          }
+        />
       </dl>
+
+      {/* Sin fechas (aclaración del 26/09): cuándo pidió cada persona ya se ve en sus pedidos. */}
+      <section aria-labelledby="representantes-anteriores" className="flex flex-col gap-2 rounded-lg border border-borde bg-white p-6">
+        <h2 id="representantes-anteriores" className="text-lg font-semibold">
+          Representantes anteriores
+        </h2>
+        {anteriores.length === 0 ? (
+          <p className="text-sm text-texto-suave">Ninguno</p>
+        ) : (
+          <ul className="flex flex-col gap-1 text-sm">
+            {anteriores.map((representante) => (
+              <li key={representante.id}>
+                <Link href={`/representantes/${representante.id}`} className="text-marca underline">
+                  {representante.nombreCompleto}
+                </Link>{" "}
+                · CI {representante.ci}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       <div className="flex flex-wrap items-start gap-3">
         <EnlaceEditar ruta={`/centros-salud/${centro.id}/editar`} />

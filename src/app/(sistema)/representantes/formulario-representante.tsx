@@ -30,7 +30,7 @@ export function FormularioRepresentante({ accion, centros, valores = {}, textoBo
   const { errores, alEnviar, alSalirDelCampo } = useValidacion(esquemaRepresentante, resultado, enviar);
 
   const centrosActivos = centros.filter((centro) => centro.activo);
-  // FR-022: la Regional atiende normalmente un solo centro; si hay uno solo activo, ya viene elegido.
+  // FR-005: el selector trae solo centros sin representante activo; si queda uno solo, ya viene elegido.
   const centroInicial = valores.centroSaludId ?? (centrosActivos.length === 1 ? centrosActivos[0]?.id : undefined);
   const sinCentros = centros.length === 0;
 
@@ -43,7 +43,8 @@ export function FormularioRepresentante({ accion, centros, valores = {}, textoBo
       )}
       {sinCentros && (
         <Aviso tipo="informacion" enlace={{ texto: "Registrar centro de salud", ruta: "/centros-salud/nuevo" }}>
-          No hay centros de salud activos: registra o reactiva uno primero.
+          No hay centros de salud disponibles: cada centro activo ya tiene su representante (RN-18). Registra un centro
+          nuevo o, si cambió la persona responsable, desactiva primero a la anterior.
         </Aviso>
       )}
 
