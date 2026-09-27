@@ -93,8 +93,9 @@ Con el sistema levantado (`npm run build` y `npm start`) y la demostración rege
 11. **Administración → Respaldo**: se ve la advertencia de datos personales. Pulsar "Generar respaldo":
     el botón dice "Generando…" y en menos de 30 s se descarga
     `respaldo-almacen-oruro-AAAA-MM-DD-HHMM.sql`.
-12. Detener el contenedor (`docker compose stop`) y volver a pulsar: mensaje de base detenida, sin
-    descarga. Volver a levantarlo.
+12. Levantar el sistema con `CONTENEDOR_BASE_DATOS` apuntando a un contenedor que no existe y pulsar:
+    mensaje de base detenida, sin descarga. (Detener la base no sirve para esta prueba: sin base, el sistema
+    entero deja de responder antes de llegar al respaldo; ver `docs/decisiones.md`, I-70.)
 13. Restaurar el archivo siguiendo la sección nueva de `docs/instalacion.md` **en una copia**
     (otra carpeta del proyecto u otra máquina) y comparar: mismos conteos, kardex cuadrado (pantalla
     **Existencias → Verificación**) e ingreso con la misma contraseña.
@@ -109,4 +110,26 @@ Con el sistema levantado (`npm run build` y `npm start`) y la demostración rege
 
 ## 4. Estado de la validación
 
-Pendiente: se completa al cerrar la implementación.
+Recorrido del 26/09/2026 (T041), con el build de producción sobre una **copia aislada** de la base de
+demostración y un usuario de revisión; la base de desarrollo no se tocó. El navegador **no descargó**
+archivos: la descarga del respaldo se interceptó en la página para medir nombre, tamaño y contenido.
+
+| Paso | Resultado |
+|---|---|
+| 1 | Ficha del centro: representante activo con enlace y "Representantes anteriores: Ninguno" ✅ |
+| 2 | Formulario de representante sin centros libres: aviso y ningún centro para elegir ✅ |
+| 3 | Desactivar a una representante con 12 pedidos por atender: la confirmación avisa los 12 ✅ |
+| 4 | Registrar a la persona nueva: el formulario ofrece solo ese centro, preseleccionado ✅; la ficha del centro muestra a la nueva como activa y a la anterior en la lista ✅ |
+| 5 | Reactivar a la anterior: rechazo que nombra a la persona activa ✅. Desactivar el centro: rechazo que nombra a su representante (FR-027) ✅ |
+| 6 | Distribuir un pedido de la representante inactiva: se registra; el detalle muestra el centro una sola vez, el vale lo lleva en el encabezado y el kardex dice "Vale N · Apellido, Nombre · Centro" ✅ |
+| 7 | Pronóstico: 25 productos y 838 unidades sugeridas, **idéntico a antes de F-009**; evaluación sobre 25 productos, Holt-Winters mejor (SC-006, con nombres provisorios) ✅ |
+| 8 | Informe guardado con el formato anterior: tabla "por representante" con columna "Servicio" ✅ |
+| 9–10 | 24 pantallas e impresos responden 200 y ninguna muestra "Servicio"; selectores y encabezados de reportes con el centro (SC-002) ✅ |
+| 11 | Respaldo: "Generando…" y botón deshabilitado mientras corre; 361 ms, 536 KB, 19 tablas, nombre con fecha y hora de Oruro (SC-003) ✅ |
+| 12 | Contenedor mal configurado: mensaje en español, ningún archivo; el detalle técnico queda en el registro del servidor ✅ |
+| 13 | Restauración con los comandos de la guía en PowerShell sobre una base vacía: mismos conteos en todas las tablas, kardex cuadrado, marca de demostración, índice RN-18, tildes y secuencias; ingreso con la misma contraseña (SC-004) ✅ |
+| 14–16 | Ocho botones "Mostrar" con nombres distintos; cada campo por separado; se ocultan al enviar con error; Tab y Enter funcionan; el ingreso funciona con la contraseña visible (SC-005) ✅ |
+| 375 px | Sin desplazamiento horizontal en respaldo, ficha del centro, representantes, pedidos y cambiar contraseña; el botón "Mostrar" cabe en el espacio del campo (T039) ✅ |
+
+**Queda pendiente:** regenerar la demostración con los nombres reales de los centros (T021, Q-07). No se
+pudo comprobar el botón nativo de Edge (`::-ms-reveal`) porque el navegador de pruebas es Chromium.

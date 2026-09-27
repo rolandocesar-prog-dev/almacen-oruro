@@ -48,7 +48,8 @@ copy .env.example .env
 ```
 
 Abrir `.env` con el Bloc de notas y cambiar la línea `CONTRASENA_INICIAL` por una contraseña de al menos
-8 caracteres. Es la que usará el usuario `admin` la primera vez.
+8 caracteres. Es la que usará el usuario `admin` la primera vez. La línea `CONTENEDOR_BASE_DATOS` (el
+contenedor donde se genera el respaldo) no hace falta cambiarla.
 
 **3. Levantar la base de datos** (con Docker Desktop abierto):
 
@@ -115,16 +116,23 @@ pedirá definir una contraseña nueva antes de continuar: en "Contraseña actual
 **4. Registrar al personal** desde el menú **Personal → Registrar personal**. Cada persona podrá ingresar
 con el usuario y la contraseña que se le asignen.
 
-**5. Cargar los catálogos** desde la fila **Catálogos** del menú, en este orden, porque cada uno usa
+**5. Cargar los catálogos** desde la sección **Catálogos** del menú, en este orden, porque cada uno usa
 los anteriores:
 
 1. **Categorías** (por ejemplo, Desinfectantes) y **Unidades** (por ejemplo, Bidón 5 L).
 2. **Productos**, eligiendo su categoría y unidad. Empiezan con stock 0: el stock solo cambia con
    compras y distribuciones.
 3. **Proveedores** y, en la ficha de cada uno, los productos que ofrece con su precio referencial.
-4. **Centros de salud** y después **Representantes**.
+4. **Centros de salud** y después **Representantes**. Cada centro tiene **un solo representante activo**:
+   la persona que pide los productos para ese centro. Al registrar un representante, el sistema ofrece
+   solo los centros que todavía no tienen uno.
 
 Nada se borra: un registro que ya no se usa se **desactiva** desde su ficha y se puede reactivar.
+
+**Si cambia la persona responsable de un centro**, se desactiva al representante anterior desde su
+ficha y se registra a la persona nueva en el mismo centro. Si el anterior tenía pedidos por atender, el
+sistema avisa cuántos son antes de desactivarlo: esos pedidos siguen a su nombre y se pueden distribuir
+igual. La ficha del centro muestra quién es su representante y quiénes lo fueron antes.
 
 **6. Registrar compras y consultar el inventario**
 
@@ -205,6 +213,17 @@ Nada se borra: un registro que ya no se usa se **desactiva** desde su ficha y se
 - Los informes guardados se consultan e **imprimen sin internet**.
 - El procedimiento de cálculo, paso a paso, está en [`metodo-pronostico.md`](metodo-pronostico.md).
 
+**11. Respaldo de los datos**
+
+- **Administración → Respaldo → Generar respaldo** descarga un archivo
+  `respaldo-almacen-oruro-AAAA-MM-DD-HHMM.sql` con **todos los datos** del sistema en ese momento. Tarda
+  menos de un segundo con los datos de demostración.
+- Conviene generarlo con frecuencia (por ejemplo, cada viernes) y guardarlo **fuera de la computadora**,
+  en una memoria USB que no quede en el almacén: el archivo trae datos personales y las contraseñas
+  cifradas del personal.
+- No incluye el código, que está en su repositorio, ni el archivo `.env` con las claves.
+- Restaurar un respaldo **no** se hace desde el sistema: está en la sección 6 de esta guía.
+
 Para detener el sistema, presionar `Ctrl + C` en la ventana de PowerShell. La base de datos sigue
 guardada: la próxima vez basta con abrir Docker Desktop, ejecutar `docker compose up -d` y `npm start`.
 
@@ -221,6 +240,10 @@ guardada: la próxima vez basta con abrir Docker Desktop, ejecutar `docker compo
 | "Tu sesión expiró. Ingresa nuevamente" | Es normal: la sesión dura 8 horas desde el ingreso |
 | `El generador solo se ejecuta sobre una base sin compras, pedidos ni distribuciones` | La base ya tiene documentos: para regenerar el histórico, recrearla como dice el paso 6 de la sección 2 |
 | "No se pudo generar el informe: sin conexión con el servicio de redacción" | Revisar la conexión a internet y la línea `ANTHROPIC_API_KEY` de `.env` (paso 7 de la sección 2); los informes ya guardados se siguen consultando |
+| "No se pudo generar el respaldo: Docker Desktop no está en funcionamiento…" | Abrir Docker Desktop, esperar a que diga que está en funcionamiento y volver a pulsar **Generar respaldo** |
+| "No se pudo generar el respaldo: la base de datos no está en funcionamiento…" | Ejecutar `docker compose up -d` y volver a intentar. Si se cambió `container_name` en `docker-compose.yml`, poner el mismo nombre en `CONTENEDOR_BASE_DATOS` de `.env` |
+| "El respaldo tardó demasiado y no se generó" | Volver a intentar; si se repite, reiniciar Docker Desktop |
+| "Esta base tiene centros de salud con varios representantes activos (modelo anterior a F-009)…" al ejecutar `npx prisma migrate deploy` | La base es de una versión anterior: seguir la sección 7 |
 
 ---
 
@@ -232,3 +255,84 @@ guardada: la próxima vez basta con abrir Docker Desktop, ejecutar `docker compo
 | `npm test` | Ejecuta las pruebas automatizadas (necesita Docker Desktop abierto) |
 | `npm run lint` y `npm run typecheck` | Revisan el código |
 | `npx prisma studio` | Abre una pantalla para ver las tablas de la base de datos |
+
+---
+
+## 6. Restaurar un respaldo
+
+Restaurar **reemplaza todos los datos** por los del archivo. Se usa, por ejemplo, si se cambia de
+computadora o si la base se dañó. El respaldo debe haberse generado con la misma versión del sistema.
+
+**1. Detener el sistema** con `Ctrl + C` en la ventana de PowerShell donde corre `npm start`.
+
+**2. Dejar la base vacía** (borra lo que hay ahora):
+
+```bash
+docker compose down -v
+```
+
+```bash
+docker compose up -d
+```
+
+Esperar unos segundos a que el contenedor arranque. **No** ejecutar `npx prisma migrate deploy` ni la
+semilla: el respaldo ya trae las tablas, los datos y el registro de migraciones.
+
+**3. Copiar el archivo al contenedor** (cambiar el nombre por el del respaldo que se va a restaurar,
+con la ruta de la memoria USB si está ahí):
+
+```bash
+docker cp respaldo-almacen-oruro-2026-09-26-0715.sql almacen-oruro-postgres:/tmp/respaldo.sql
+```
+
+**4. Restaurar:**
+
+```bash
+docker exec almacen-oruro-postgres psql -U almacen -d almacen_oruro -v ON_ERROR_STOP=1 -f /tmp/respaldo.sql
+```
+
+Si termina sin la palabra `ERROR`, la restauración se completó. Se usan `docker cp` y `psql -f` porque
+PowerShell no admite `<` y, al pasar el archivo por una tubería, puede estropear las tildes.
+
+**5. Comprobar** con `npm start`: ingresar con la contraseña de siempre, y en **Existencias →
+Verificar consistencia** confirmar que no hay diferencias.
+
+---
+
+## 7. Actualizar a F-009
+
+F-009 recoge las observaciones de Raymond: **varios centros de salud con un solo representante activo
+cada uno** (el dato "servicio" del representante desaparece), el centro junto al representante en todas
+las pantallas, el respaldo de la sección 6 y el botón para ver la contraseña al escribirla.
+
+La base de una versión anterior tiene un centro con cinco representantes activos, uno por servicio, y
+**no se convierte**: se recrea. **Todo lo cargado a mano en ella se pierde** y el usuario `admin` vuelve a
+la contraseña de `CONTRASENA_INICIAL`. Con el código nuevo en la carpeta del proyecto:
+
+```bash
+npm install
+```
+
+```bash
+docker compose down -v
+```
+
+```bash
+docker compose up -d
+```
+
+```bash
+npx prisma migrate deploy
+```
+
+```bash
+npx prisma db seed
+```
+
+```bash
+npm run datos:simulados -- --semilla 20260915
+```
+
+Si se ejecuta `npx prisma migrate deploy` **sin** recrear la base, la migración se detiene con el mensaje
+"Esta base tiene centros de salud con varios representantes activos (modelo anterior a F-009)" y no
+cambia nada. Basta con seguir los pasos de arriba desde `docker compose down -v`.

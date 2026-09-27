@@ -65,7 +65,7 @@ Sin cambios de firma en las demás acciones de F-001 a F-007.
 | `generarRespaldo(ejecutar = ejecutarPgDump)` | `src/servicios/respaldo.ts` | `{ nombreArchivo, contenido }` o `ErrorDeNegocio` con el mensaje de O-10. El ejecutor se inyecta para las pruebas (O-14) |
 | `nombreArchivoRespaldo(fecha: Date)` | `src/servicios/respaldo.ts` | `respaldo-almacen-oruro-AAAA-MM-DD-HHMM.sql`, en hora de Oruro |
 | `etiquetaRepresentante({ apellido, nombre, centroSalud })` | `src/servicios/catalogos/representantes.ts` | "Apellido, Nombre · Centro de salud" |
-| `listarCentrosParaRepresentante(idActual?)` | `src/servicios/catalogos/centros-salud.ts` | `{ id, nombre }[]` (research O-06) |
+| `listarCentrosParaRepresentante(representanteId?)` | `src/servicios/catalogos/centros-salud.ts` | `{ id, etiqueta, activo }[]`, como el selector anterior, al que reemplaza (research O-06, I-63) |
 | `contarPedidosPorAtender(representanteId)` | `src/servicios/catalogos/representantes.ts` | número de pedidos PENDIENTE o PARCIAL, para el aviso de baja |
 | `obtenerRepresentantesDelCentro(centroId)` | `src/servicios/catalogos/centros-salud.ts` | `{ activo: … \| null, anteriores: …[] }` para la ficha del centro |
 

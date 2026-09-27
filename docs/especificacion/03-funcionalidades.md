@@ -54,6 +54,8 @@ Roles y permisos diferenciados, recuperación de contraseña por correo, bloqueo
 
 ## F-002 · Catálogos
 
+> **Cambio posterior a la entrega (F-009, 26/09):** se opera con **varios centros de salud, cada uno con un solo representante activo**, y el representante ya no tiene "servicio" (D-21, D-22, RN-18). El texto de abajo es el que se especificó para la entrega. Detalle en `specs/009-observaciones-raymond/`.
+
 ### Texto para `/speckit-specify`
 
 > Gestión de los catálogos que usan las compras, pedidos y distribuciones: categorías de productos, unidades de medida, productos de limpieza, proveedores, qué productos ofrece cada proveedor, centros de salud y representantes de los centros de salud. Para cada catálogo el encargado puede registrar, modificar, listar con búsqueda, desactivar y reactivar. Eliminar significa desactivar: el registro deja de aparecer para elegir en documentos nuevos, pero se conserva en el histórico. El sistema impide duplicados: nombre de categoría, nombre de unidad, código y nombre de producto, NIT de proveedor, nombre de centro de salud y CI de representante. El producto muestra su stock actual, pero no se puede modificar desde aquí: solo cambia con compras y distribuciones. Cada producto tiene un stock mínimo. Se opera con un único centro de salud, al que pertenecen los representantes (responsables de un servicio o área). Motivo: en 2022 los borrados rompían el histórico de compras y no había validación consistente de duplicados.
@@ -112,6 +114,8 @@ Orden de compra previa, aprobación, pago y cuentas por pagar, ajustes manuales 
 ---
 
 ## F-004 · Pedidos
+
+> **Cambio posterior a la entrega (F-009, 26/09):** el representante se muestra con su centro de salud ("Apellido, Nombre · Centro", D-23), y se puede desactivar aunque tenga pedidos por atender, que siguen a su nombre (RN-13 modificada).
 
 ### Texto para `/speckit-specify`
 
@@ -185,6 +189,8 @@ Distribuciones sin pedido, transporte y logística, confirmación de recepción 
 | R-4 | Kardex | Producto (obligatorio), fechas | Fecha, tipo, documento, entrada, salida, saldo | Saldo inicial y final del período | P3 |
 | R-5 | Pedidos | Fechas (obligatorio), estado, representante | Fecha, representante, Nº ítems, % atendido, estado | Nº por estado | P3 |
 
+> **Cambio posterior a la entrega (F-009, 26/09):** en R-2 y R-5 la columna "servicio" pasó a ser "centro de salud", y el filtro de representante del encabezado lleva su centro (D-23).
+
 ### Criterios de aceptación clave
 - El total de R-1 coincide con la suma de las compras vigentes del período filtrado.
 - En R-4, el saldo final coincide con el stock actual cuando el rango termina hoy.
@@ -217,7 +223,7 @@ Exportar a Excel o PDF descargable (se imprime o guarda como PDF desde el navega
 
 **Informe IA de compras** — datos enviados: total gastado y Nº de compras en el período y en el período anterior de igual duración; gasto por proveedor; los 10 productos con más gasto; productos bajo mínimo; reposición sugerida.
 
-**Informe IA de distribuciones** — datos enviados: cantidad entregada por representante y servicio; los 10 productos más distribuidos; pedidos por estado; comparación con el período anterior; pronóstico del mes en curso de los 10 productos principales.
+**Informe IA de distribuciones** — datos enviados: cantidad entregada por representante y servicio (desde F-009, por centro de salud y representante); los 10 productos más distribuidos; pedidos por estado; comparación con el período anterior; pronóstico del mes en curso de los 10 productos principales.
 
 **Reglas del informe.**
 - Al modelo se le indica que no invente cifras, que use solo los datos entregados, y que responda con secciones fijas: *Resumen*, *Hallazgos*, *Alertas*, *Recomendaciones*.

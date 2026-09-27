@@ -93,7 +93,7 @@ principio IV); la tabla de datos muestra la columna según el formato que encuen
 ### Selector de centros para el formulario de representante (research O-06)
 
 ```text
-listarCentrosParaRepresentante(idActual?) → { id, nombre }[]
+listarCentrosParaRepresentante(representanteId?) → { id, etiqueta, activo }[]   (I-63)
   = centros activos sin representante activo
   + el centro actual del representante idActual (al modificar)
 ```

@@ -1,5 +1,7 @@
 // F-009 · Historia 4: respaldo de la base (FR-015 a FR-020, research O-08 a O-10).
 import { execFileSync } from "node:child_process";
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { ErrorDeNegocio } from "@/lib/errores";
 import { prisma } from "@/lib/prisma";
@@ -84,5 +86,28 @@ describe("generarRespaldo real con pg_dump en el contenedor", () => {
 
     expect(contenido).toContain("PostgreSQL database dump");
     for (const { table_name } of tablas) expect(contenido).toContain(`COPY public.${table_name} `);
+  });
+});
+
+describe("invariantes de seguridad del respaldo (constitución, principio VII; research O-08)", () => {
+  const leer = (ruta: string) => readFileSync(path.join(process.cwd(), ruta), "utf8");
+  const servicio = leer("src/servicios/respaldo.ts");
+
+  it("la página y la acción exigen sesión como primera instrucción", () => {
+    for (const ruta of ["src/app/(sistema)/respaldo/page.tsx", "src/app/(sistema)/respaldo/acciones.ts"]) {
+      // La firma ocupa una línea que termina en "{"; el tipo de retorno puede tener llaves adentro.
+      const cuerpo = leer(ruta).split(/export (?:default )?async function [^\n]*\{\n/)[1] ?? "";
+      expect(cuerpo.trimStart().startsWith("await requerirSesion()"), ruta).toBe(true);
+    }
+  });
+
+  it("el servicio ejecuta pg_dump con execFile y argumentos fijos, sin intérprete de comandos", () => {
+    expect(servicio).toContain('execFile(\n      "docker",');
+    expect(servicio).not.toMatch(/\bexec\(|execSync|spawn\(|shell:\s*true/);
+  });
+
+  it("no pasa la contraseña de la base ni escribe el respaldo en disco (FR-017)", () => {
+    expect(servicio).not.toMatch(/PGPASSWORD|password/i);
+    expect(servicio).not.toMatch(/writeFile|createWriteStream|node:fs/);
   });
 });

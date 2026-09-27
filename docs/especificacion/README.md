@@ -105,4 +105,10 @@ Las especificaciones de las 7 funcionalidades se escriben **juntas al inicio**, 
 | Dom | 20/09 | Prueba de punta a punta, `/speckit-analyze`, correcciones, `docs/decisiones.md`, guía de instalación | Versión candidata |
 | Lun | 21/09 | **Entrega a Raymond** | Sistema, especificaciones y documento de decisiones |
 
+### Después de la entrega (constitución 1.1.0, principio XI)
+
+| Fecha | Trabajo | Resultado |
+|---|---|---|
+| 26/09 | F-009 · Observaciones de Raymond: `specify`, `clarify`, `plan`, `tasks`, `analyze` e implementación | Un representante activo por centro, el centro junto al representante, respaldo de la base y contraseñas visibles |
+
 **No hay días de margen.** Si un día se atrasa, se aplica el orden de corte de `00-decisiones-y-alcance.md` §5 **antes** de mover las fechas.

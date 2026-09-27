@@ -41,9 +41,10 @@ export function FormularioRepresentante({ accion, centros, valores = {}, textoBo
           {resultado.mensaje}
         </Aviso>
       )}
+      {/* RN-18: un representante activo por centro, así que puede no quedar ningún centro libre. */}
       {sinCentros && (
         <Aviso tipo="informacion" enlace={{ texto: "Registrar centro de salud", ruta: "/centros-salud/nuevo" }}>
-          No hay centros de salud disponibles: cada centro activo ya tiene su representante (RN-18). Registra un centro
+          No hay centros de salud disponibles: cada centro activo ya tiene su representante. Registra un centro
           nuevo o, si cambió la persona responsable, desactiva primero a la anterior.
         </Aviso>
       )}
