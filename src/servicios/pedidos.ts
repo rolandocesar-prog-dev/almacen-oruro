@@ -184,7 +184,7 @@ export async function obtenerPedido(id: number) {
   const pedido = await prisma.pedido.findUnique({
     where: { id },
     include: {
-      representante: { select: { id: true, nombre: true, apellido: true, servicio: true, activo: true, centroSalud: { select: { nombre: true } } } },
+      representante: { select: { id: true, nombre: true, apellido: true, activo: true, centroSalud: { select: { nombre: true } } } },
       usuario: { select: { nombre: true, apellido: true } },
       anuladaPor: { select: { nombre: true, apellido: true } },
       distribuciones: { orderBy: { id: "asc" }, select: { id: true, nroVale: true, fecha: true, estado: true, lineas: { select: { cantidad: true } } } },
@@ -205,7 +205,6 @@ export async function obtenerPedido(id: number) {
       id: pedido.representante.id,
       nombre: pedido.representante.nombre,
       apellido: pedido.representante.apellido,
-      servicio: pedido.representante.servicio,
       activo: pedido.representante.activo,
       centroSalud: pedido.representante.centroSalud.nombre,
     },
@@ -286,7 +285,7 @@ export async function listarPedidos(filtro: {
       skip: (filtro.pagina - 1) * PEDIDOS_POR_PAGINA,
       take: PEDIDOS_POR_PAGINA,
       include: {
-        representante: { select: { nombre: true, apellido: true, servicio: true } },
+        representante: { select: { nombre: true, apellido: true, centroSalud: { select: { nombre: true } } } },
         _count: { select: { lineas: true } },
       },
     }),
@@ -310,7 +309,7 @@ export async function listarPedidos(filtro: {
         fecha: textoDeFechaDocumento(pedido.fecha),
         representante: `${pedido.representante.apellido}, ${pedido.representante.nombre}`,
         representanteId: pedido.representanteId,
-        servicio: pedido.representante.servicio,
+        centroSalud: pedido.representante.centroSalud.nombre,
         productos: pedido._count.lineas,
         porcentajeAtendido: porcentajeAtendido(suma?.cantidadEntregada ?? 0, suma?.cantidadSolicitada ?? 0),
         estado: pedido.estado,

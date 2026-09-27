@@ -50,7 +50,7 @@ export default async function PaginaDistribuciones({ searchParams }: { searchPar
 
       <FiltrosDistribuciones
         valores={filtro}
-        representantes={representantes.map((r) => ({ id: r.id, etiqueta: `${r.nombreCompleto} · ${r.servicio}${r.activo ? "" : " (inactivo)"}` }))}
+        representantes={representantes.map((r) => ({ id: r.id, etiqueta: `${r.etiqueta}${r.activo ? "" : " (inactivo)"}` }))}
         productos={productos.map((p) => ({ id: p.id, etiqueta: `${p.codigo} · ${p.nombre}${p.activo ? "" : " (inactivo)"}` }))}
       />
       {!validacion.success && (
@@ -58,7 +58,7 @@ export default async function PaginaDistribuciones({ searchParams }: { searchPar
       )}
 
       <Tabla
-        encabezados={["Fecha", "Nº de vale", "Pedido", "Representante", "Servicio", "Productos", "Unidades", "Estado", "Acción"]}
+        encabezados={["Fecha", "Nº de vale", "Pedido", "Representante", "Centro de salud", "Productos", "Unidades", "Estado", "Acción"]}
         vacio={distribuciones.length === 0 ? "No hay distribuciones para los filtros aplicados" : undefined}
       >
         {distribuciones.map((distribucion) => (
@@ -71,7 +71,7 @@ export default async function PaginaDistribuciones({ searchParams }: { searchPar
               </Link>
             </Celda>
             <Celda>{distribucion.representante}</Celda>
-            <Celda>{distribucion.servicio}</Celda>
+            <Celda>{distribucion.centroSalud}</Celda>
             <Celda className="text-right tabular-nums">{distribucion.productos}</Celda>
             <Celda className="text-right tabular-nums">{distribucion.unidades}</Celda>
             <Celda>

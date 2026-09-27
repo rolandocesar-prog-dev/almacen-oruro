@@ -28,7 +28,7 @@ export default async function PaginaRepresentantes({ searchParams }: { searchPar
       />
       <FiltrosRepresentantes valores={filtro} />
       <Tabla
-        encabezados={["Nombre completo", "CI", "Servicio", "Centro de salud", "Estado", ""]}
+        encabezados={["Nombre completo", "CI", "Centro de salud", "Estado", ""]}
         vacio={
           representantes.length === 0 ? (
             <MensajeVacio q={filtro.q} rutaLimpiar={`/representantes?estado=${filtro.estado}`} sinRegistros="No hay representantes para los filtros aplicados" />
@@ -39,7 +39,6 @@ export default async function PaginaRepresentantes({ searchParams }: { searchPar
           <tr key={representante.id}>
             <Celda>{representante.nombreCompleto}</Celda>
             <Celda>{representante.ci}</Celda>
-            <Celda>{representante.servicio}</Celda>
             <Celda>{representante.centroSalud}</Celda>
             <Celda>
               <InsigniaActivo activo={representante.activo} />

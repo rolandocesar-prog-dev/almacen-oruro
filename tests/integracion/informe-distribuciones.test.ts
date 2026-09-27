@@ -6,7 +6,7 @@ import { anularDistribucion } from "@/servicios/distribuciones";
 import { datosInformeDistribuciones, generarInforme, MENSAJES_INFORME } from "@/servicios/ia/informes";
 import { anularPedido, registrarPedido } from "@/servicios/pedidos";
 import { crearUsuarioDePrueba, vaciarTablas } from "../ayudantes/base-de-datos";
-import { crearRepresentanteDePrueba } from "../ayudantes/catalogos";
+import { crearCentroSaludDePrueba, crearRepresentanteDePrueba } from "../ayudantes/catalogos";
 import { distribuir, productoConStock } from "../ayudantes/consumo";
 import { CLAVES_PROHIBIDAS, clavesEnProfundidad, redactorQueFalla, redactorQueResponde } from "../ayudantes/redactor-falso";
 
@@ -24,8 +24,10 @@ describe("Informe IA de distribuciones (Historia 5)", () => {
   beforeAll(async () => {
     await vaciarTablas();
     usuarioId = (await crearUsuarioDePrueba()).usuario.id;
-    const quispe = await crearRepresentanteDePrueba({ nombre: "María", apellido: "Quispe", servicio: "Enfermería", ci: "4821507" });
-    const mamani = await crearRepresentanteDePrueba({ nombre: "Jorge", apellido: "Mamani", servicio: "Laboratorio" });
+    const norte = await crearCentroSaludDePrueba({ nombre: "Policlínico Norte" });
+    const sur = await crearCentroSaludDePrueba({ nombre: "Policlínico Sur" });
+    const quispe = await crearRepresentanteDePrueba({ nombre: "María", apellido: "Quispe", ci: "4821507", centroSaludId: norte.id });
+    const mamani = await crearRepresentanteDePrueba({ nombre: "Jorge", apellido: "Mamani", centroSaludId: sur.id });
     ciDeQuispe = quispe.ci;
     const lavandina = await productoConStock(usuarioId, 100, { nombre: "Lavandina 1 L" });
     const guantes = await productoConStock(usuarioId, 100, { nombre: "Guantes de nitrilo" });
@@ -57,8 +59,8 @@ describe("Informe IA de distribuciones (Historia 5)", () => {
     expect(datos.periodo).toEqual({ desde: "2026-08-01", hasta: "2026-08-31", anteriorDesde: "2026-07-01", anteriorHasta: "2026-07-31" });
     expect(datos.totales).toEqual({ unidadesEntregadas: 13, unidadesEntregadasAnterior: 5, variacionPorcentual: 160 });
     expect(datos.porRepresentante).toEqual([
-      { representante: "Quispe, María", servicio: "Enfermería", unidades: 9 },
-      { representante: "Mamani, Jorge", servicio: "Laboratorio", unidades: 4 },
+      { representante: "Quispe, María", centroSalud: "Policlínico Norte", unidades: 9 },
+      { representante: "Mamani, Jorge", centroSalud: "Policlínico Sur", unidades: 4 },
     ]);
     expect(datos.topProductos.map(({ producto, unidades }) => ({ producto, unidades }))).toEqual([
       { producto: "Lavandina 1 L", unidades: 10 },

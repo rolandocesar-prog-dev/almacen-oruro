@@ -16,6 +16,9 @@ src/generado/
 .env.*
 !.env.example
 
+# Respaldos de la base (F-009): traen datos personales y contraseñas cifradas
+respaldo-*.sql
+
 # Datos locales de Claude Code (puede contener credenciales)
 .claude/settings.local.json
 

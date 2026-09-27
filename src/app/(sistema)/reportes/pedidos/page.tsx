@@ -48,7 +48,7 @@ export default async function PaginaReportePedidos({ searchParams }: { searchPar
 
       <FiltrosReportePedidos
         valores={filtro}
-        representantes={representantes.map((r) => ({ id: r.id, etiqueta: `${r.nombreCompleto} · ${r.servicio}${r.activo ? "" : " (inactivo)"}` }))}
+        representantes={representantes.map((r) => ({ id: r.id, etiqueta: `${r.etiqueta}${r.activo ? "" : " (inactivo)"}` }))}
       />
       {!validacion.success && (
         <Aviso tipo="error">{validacion.error.issues[0]?.message ?? "Filtros inválidos"}. Se muestra el mes en curso.</Aviso>
@@ -67,7 +67,7 @@ export default async function PaginaReportePedidos({ searchParams }: { searchPar
       />
 
       <TablaReporte
-        encabezados={["Nº", "Fecha", "Representante", "Servicio", "Productos", "% atendido", "Estado"]}
+        encabezados={["Nº", "Fecha", "Representante", "Centro de salud", "Productos", "% atendido", "Estado"]}
         vacio={reporte.filas.length === 0 ? SIN_RESULTADOS : undefined}
       >
         {reporte.filas.map((fila) => (
@@ -75,7 +75,7 @@ export default async function PaginaReportePedidos({ searchParams }: { searchPar
             <CeldaReporte className="tabular-nums">{fila.id}</CeldaReporte>
             <CeldaReporte>{formatearFecha(fila.fecha)}</CeldaReporte>
             <CeldaReporte>{fila.representante}</CeldaReporte>
-            <CeldaReporte>{fila.servicio}</CeldaReporte>
+            <CeldaReporte>{fila.centroSalud}</CeldaReporte>
             <CeldaReporte className="text-right tabular-nums">{fila.productos}</CeldaReporte>
             <CeldaReporte className="text-right tabular-nums">{fila.porcentajeAtendido} %</CeldaReporte>
             <CeldaReporte>

@@ -50,7 +50,7 @@ export default async function PaginaImprimirReportePedidos({ searchParams }: { s
       />
 
       <TablaReporte
-        encabezados={["Nº", "Fecha", "Representante", "Servicio", "Productos", "% atendido", "Estado"]}
+        encabezados={["Nº", "Fecha", "Representante", "Centro de salud", "Productos", "% atendido", "Estado"]}
         vacio={reporte.filas.length === 0 ? SIN_RESULTADOS : undefined}
       >
         {reporte.filas.map((fila) => (
@@ -58,7 +58,7 @@ export default async function PaginaImprimirReportePedidos({ searchParams }: { s
             <CeldaReporte className="tabular-nums">{fila.id}</CeldaReporte>
             <CeldaReporte>{formatearFecha(fila.fecha)}</CeldaReporte>
             <CeldaReporte>{fila.representante}</CeldaReporte>
-            <CeldaReporte>{fila.servicio}</CeldaReporte>
+            <CeldaReporte>{fila.centroSalud}</CeldaReporte>
             <CeldaReporte className="text-right tabular-nums">{fila.productos}</CeldaReporte>
             <CeldaReporte className="text-right tabular-nums">{fila.porcentajeAtendido} %</CeldaReporte>
             <CeldaReporte>{fila.estado === "ANULADO" ? "ANULADO" : `${fila.estado[0]}${fila.estado.slice(1).toLowerCase()}`}</CeldaReporte>

@@ -30,14 +30,13 @@ describe("esquemaCentroSalud (FR-009)", () => {
 });
 
 describe("esquemaRepresentante (FR-010, FR-022)", () => {
-  const datosValidos = { nombre: "Ana", apellido: "Quispe", ci: " 4567890-1b ", servicio: "Enfermería", telefono: "", centroSaludId: "1" };
+  const datosValidos = { nombre: "Ana", apellido: "Quispe", ci: " 4567890-1b ", telefono: "", centroSaludId: "1" };
 
   it("acepta datos válidos y pasa el CI a mayúsculas", () => {
     expect(esquemaRepresentante.parse(datosValidos)).toEqual({
       nombre: "Ana",
       apellido: "Quispe",
       ci: "4567890-1B",
-      servicio: "Enfermería",
       centroSaludId: 1,
     });
     expect(esquemaRepresentante.parse({ ...datosValidos, ci: "4567890" }).ci).toBe("4567890");
@@ -47,11 +46,15 @@ describe("esquemaRepresentante (FR-010, FR-022)", () => {
     expect(erroresDe(esquemaRepresentante, { ...datosValidos, ci }).ci).toEqual([MENSAJE_CI]);
   });
 
-  it("exige nombre, apellido y servicio hasta 60 caracteres", () => {
-    const errores = erroresDe(esquemaRepresentante, { ...datosValidos, nombre: "", apellido: "a".repeat(61), servicio: " " });
+  it("exige nombre y apellido hasta 60 caracteres", () => {
+    const errores = erroresDe(esquemaRepresentante, { ...datosValidos, nombre: "", apellido: "a".repeat(61) });
     expect(errores.nombre).toEqual(["Escribe el nombre"]);
     expect(errores.apellido).toEqual(["El apellido admite hasta 60 caracteres"]);
-    expect(errores.servicio).toEqual(["Escribe el servicio"]);
+  });
+
+  it("ya no tiene servicio: si llega, se descarta (F-009, D-22)", () => {
+    const datos = esquemaRepresentante.parse({ ...datosValidos, servicio: "Enfermería" });
+    expect(datos).not.toHaveProperty("servicio");
   });
 
   it("exige elegir el centro de salud", () => {

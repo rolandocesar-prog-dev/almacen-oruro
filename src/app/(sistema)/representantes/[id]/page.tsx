@@ -49,7 +49,6 @@ export default async function PaginaFichaRepresentante({
 
       <dl className="grid gap-4 rounded-lg border border-borde bg-white p-6 sm:grid-cols-2">
         <Dato etiqueta="CI" valor={representante.ci} />
-        <Dato etiqueta="Servicio" valor={representante.servicio} />
         <Dato etiqueta="Teléfono" valor={representante.telefono} />
         <Dato
           etiqueta="Centro de salud"

@@ -1,4 +1,5 @@
-// Representantes de los servicios del centro de salud (F-002, Historia 4).
+// Representantes de los centros de salud (F-002, Historia 4): cada centro tiene como máximo uno
+// activo, la persona responsable de pedir los productos para ese centro (F-009, RN-18, D-22).
 // Nunca se borran: se desactivan (FR-002, principio V).
 import { condicionDeEstado, type FiltroCatalogo } from "@/esquemas/comunes";
 import type { DatosRepresentante } from "@/esquemas/catalogos/representante";
@@ -45,7 +46,6 @@ function prepararDatos(datos: DatosRepresentante) {
     nombre: recortarEspacios(datos.nombre),
     apellido: recortarEspacios(datos.apellido),
     ci: datos.ci,
-    servicio: recortarEspacios(datos.servicio),
     telefono: datos.telefono ?? null,
     centroSaludId: datos.centroSaludId,
   };
@@ -54,6 +54,14 @@ function prepararDatos(datos: DatosRepresentante) {
 /** "Quispe, Ana": así se ordena y se busca en listas largas de personas. */
 function nombreCompleto(representante: { nombre: string; apellido: string }) {
   return `${representante.apellido}, ${representante.nombre}`;
+}
+
+/**
+ * "Quispe, Ana · Policlínico Norte": cómo se muestra un representante en selectores y textos (D-23,
+ * research O-04). El formato se escribe solo aquí; si cambia, cambia en todo el sistema.
+ */
+export function etiquetaRepresentante(representante: { nombre: string; apellido: string; centroSalud: string }) {
+  return `${nombreCompleto(representante)} · ${representante.centroSalud}`;
 }
 
 function compararPorApellido(a: { nombre: string; apellido: string }, b: { nombre: string; apellido: string }) {
@@ -126,7 +134,7 @@ export function obtenerRepresentante(id: number) {
 }
 
 /**
- * Listado con filtro de estado y búsqueda por nombre, apellido, CI o servicio, en memoria
+ * Listado con filtro de estado y búsqueda por nombre, apellido, CI o centro de salud, en memoria
  * (research C-01). Ordenado por apellido y nombre.
  */
 export async function listarRepresentantes({ q, estado }: FiltroCatalogo) {
@@ -135,29 +143,30 @@ export async function listarRepresentantes({ q, estado }: FiltroCatalogo) {
     include: { centroSalud: { select: { nombre: true } } },
   });
   return representantes
-    .filter((r) => coincideBusqueda(q, r.nombre, r.apellido, r.ci, r.servicio))
+    .filter((r) => coincideBusqueda(q, r.nombre, r.apellido, r.ci, r.centroSalud.nombre))
     .sort(compararPorApellido)
     .map((r) => ({
       id: r.id,
       nombreCompleto: nombreCompleto(r),
+      // Para los filtros de pedidos, distribuciones y reportes: el formato sale de un solo lugar (D-23).
+      etiqueta: etiquetaRepresentante({ ...r, centroSalud: r.centroSalud.nombre }),
       ci: r.ci,
-      servicio: r.servicio,
       centroSalud: r.centroSalud.nombre,
       activo: r.activo,
     }));
 }
 
 /**
- * Opciones del selector de representantes de F-004: "Quispe, Ana · Enfermería". Solo activos (RN-14),
+ * Opciones del selector de representantes de F-004: "Quispe, Ana · Policlínico Norte". Solo activos (RN-14),
  * más el actual marcado si está inactivo (FR-003).
  */
 export async function listarRepresentantesParaSelector(idActual?: number) {
   const representantes = await prisma.representante.findMany({
     where: { OR: [{ activo: true }, ...(idActual ? [{ id: idActual }] : [])] },
-    select: { id: true, nombre: true, apellido: true, servicio: true, activo: true },
+    select: { id: true, nombre: true, apellido: true, activo: true, centroSalud: { select: { nombre: true } } },
   });
   return representantes.sort(compararPorApellido).map((r) => {
-    const etiqueta = `${nombreCompleto(r)} · ${r.servicio}`;
+    const etiqueta = etiquetaRepresentante({ ...r, centroSalud: r.centroSalud.nombre });
     return { id: r.id, etiqueta: r.activo ? etiqueta : `${etiqueta} (inactivo)`, activo: r.activo };
   });
 }

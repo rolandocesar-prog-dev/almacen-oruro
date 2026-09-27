@@ -68,11 +68,6 @@ describe("centros de salud", () => {
       "No se puede desactivar: 1 representante activo pertenece a este centro",
     );
 
-    await crearRepresentanteDePrueba({ centroSaludId: centro.id });
-    expect((await errorDe(desactivarCentroSalud(centro.id))).message).toBe(
-      "No se puede desactivar: 2 representantes activos pertenecen a este centro",
-    );
-
     await prisma.representante.updateMany({ where: { centroSaludId: centro.id }, data: { activo: false } });
     await desactivarCentroSalud(centro.id);
     await reactivarCentroSalud(centro.id);
@@ -94,7 +89,7 @@ describe("centros de salud", () => {
 describe("representantes", () => {
   beforeEach(vaciarTablas);
 
-  const datosBase = { nombre: "Ana", apellido: "Quispe", ci: "4567890", servicio: "Enfermería" };
+  const datosBase = { nombre: "Ana", apellido: "Quispe", ci: "4567890" };
 
   it("registra y rechaza un CI repetido, con enlace si el existente está inactivo", async () => {
     const centro = await crearCentroSaludDePrueba();
@@ -155,20 +150,22 @@ describe("representantes", () => {
     expect((await prisma.representante.findUniqueOrThrow({ where: { id: representante.id } })).activo).toBe(true);
   });
 
-  it("el selector solo ofrece activos como 'Apellido, Nombre · Servicio' y el listado ordena por apellido", async () => {
+  it("el selector solo ofrece activos como 'Apellido, Nombre · Centro de salud' y el listado ordena por apellido", async () => {
+    // Un representante activo por centro (RN-18); el inactivo puede compartir centro.
     const centro = await crearCentroSaludDePrueba({ nombre: "Hospital General" });
-    const ana = await crearRepresentanteDePrueba({ nombre: "Ana", apellido: "Quispe", servicio: "Enfermería", centroSaludId: centro.id });
-    const luis = await crearRepresentanteDePrueba({ nombre: "Luis", apellido: "Álvarez", servicio: "Pediatría", centroSaludId: centro.id });
+    const policlinico = await crearCentroSaludDePrueba({ nombre: "Policlínico Norte" });
+    const ana = await crearRepresentanteDePrueba({ nombre: "Ana", apellido: "Quispe", centroSaludId: centro.id });
+    const luis = await crearRepresentanteDePrueba({ nombre: "Luis", apellido: "Álvarez", centroSaludId: policlinico.id });
     await crearRepresentanteDePrueba({ apellido: "Inactivo", activo: false, centroSaludId: centro.id });
 
     expect(await listarRepresentantesParaSelector()).toEqual([
-      { id: luis.id, etiqueta: "Álvarez, Luis · Pediatría", activo: true },
-      { id: ana.id, etiqueta: "Quispe, Ana · Enfermería", activo: true },
+      { id: luis.id, etiqueta: "Álvarez, Luis · Policlínico Norte", activo: true },
+      { id: ana.id, etiqueta: "Quispe, Ana · Hospital General", activo: true },
     ]);
     expect((await listarRepresentantes({ estado: "activos" }))[0]).toMatchObject({
       nombreCompleto: "Álvarez, Luis",
-      servicio: "Pediatría",
-      centroSalud: "Hospital General",
+      etiqueta: "Álvarez, Luis · Policlínico Norte",
+      centroSalud: "Policlínico Norte",
     });
   });
 });

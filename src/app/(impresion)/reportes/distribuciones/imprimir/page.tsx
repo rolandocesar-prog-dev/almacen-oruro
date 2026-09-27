@@ -52,7 +52,7 @@ export default async function PaginaImprimirReporteDistribuciones({ searchParams
       />
 
       <TablaReporte
-        encabezados={["Fecha", "Nº de vale", "Representante", "Servicio", "Código", "Producto", "Unidad", "Cantidad", "Estado"]}
+        encabezados={["Fecha", "Nº de vale", "Representante", "Centro de salud", "Código", "Producto", "Unidad", "Cantidad", "Estado"]}
         vacio={reporte.filas.length === 0 ? SIN_RESULTADOS : undefined}
       >
         {reporte.filas.map((fila) => (
@@ -60,7 +60,7 @@ export default async function PaginaImprimirReporteDistribuciones({ searchParams
             <CeldaReporte>{formatearFecha(fila.fecha)}</CeldaReporte>
             <CeldaReporte>{fila.nroVale}</CeldaReporte>
             <CeldaReporte>{fila.representante}</CeldaReporte>
-            <CeldaReporte>{fila.servicio}</CeldaReporte>
+            <CeldaReporte>{fila.centroSalud}</CeldaReporte>
             <CeldaReporte>{fila.codigo}</CeldaReporte>
             <CeldaReporte>{fila.producto}</CeldaReporte>
             <CeldaReporte>{fila.unidad}</CeldaReporte>

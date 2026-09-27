@@ -121,7 +121,8 @@ describe("generarHistorico (Historia 1)", () => {
     expect(await prisma.producto.count()).toBe(3);
     expect(await prisma.representante.count()).toBe(5);
     expect(await prisma.proveedor.count()).toBe(3);
-    expect(await prisma.centroSalud.count()).toBe(1);
+    // Un centro por representante (F-009, RN-18).
+    expect(await prisma.centroSalud.count()).toBe(5);
 
     const estados = await prisma.pedido.groupBy({ by: ["estado"], _count: true });
     expect(new Set(estados.map((fila) => fila.estado))).toEqual(new Set(["PENDIENTE", "PARCIAL", "ATENDIDO", "ANULADO"]));

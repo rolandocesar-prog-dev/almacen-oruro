@@ -64,7 +64,7 @@ export default async function PaginaDetallePedido({
               <Link href={`/representantes/${representante.id}`} className="text-marca underline">
                 {representante.apellido}, {representante.nombre}
               </Link>
-              {representante.activo ? "" : " (inactivo)"} · {representante.servicio}
+              {representante.activo ? "" : " (inactivo)"}
             </>
           }
         />

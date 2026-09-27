@@ -69,7 +69,7 @@ export function crearCentroSaludDePrueba(datos: Opciones<{ nombre: string }> = {
 }
 
 export async function crearRepresentanteDePrueba(
-  datos: Opciones<{ nombre: string; apellido: string; ci: string; servicio: string; centroSaludId: number }> = {},
+  datos: Opciones<{ nombre: string; apellido: string; ci: string; centroSaludId: number }> = {},
 ) {
   const numero = siguiente();
   const centroSaludId = datos.centroSaludId ?? (await crearCentroSaludDePrueba()).id;
@@ -78,11 +78,16 @@ export async function crearRepresentanteDePrueba(
       nombre: datos.nombre ?? "Ana",
       apellido: datos.apellido ?? `Prueba ${numero}`,
       ci: datos.ci ?? `100${numero}`,
-      servicio: datos.servicio ?? "Pediatría",
       centroSaludId,
       activo: datos.activo ?? true,
     },
   });
+}
+
+/** Nombre del centro de salud de un representante, para comparar con lo que devuelven los servicios (F-009). */
+export async function nombreDelCentro(representante: { centroSaludId: number }): Promise<string> {
+  const centro = await prisma.centroSalud.findUniqueOrThrow({ where: { id: representante.centroSaludId }, select: { nombre: true } });
+  return centro.nombre;
 }
 
 /**

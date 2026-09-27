@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "@/lib/prisma";
 import { obtenerDistribucion, registrarDistribucion } from "@/servicios/distribuciones";
 import { crearUsuarioDePrueba, vaciarTablas } from "../ayudantes/base-de-datos";
-import { crearRepresentanteDePrueba } from "../ayudantes/catalogos";
+import { crearRepresentanteDePrueba, nombreDelCentro } from "../ayudantes/catalogos";
 import { datosDistribucion, prepararPedidoConStock } from "../ayudantes/distribuciones";
 
 describe("obtenerDistribucion", () => {
@@ -26,7 +26,7 @@ describe("obtenerDistribucion", () => {
       observacion: "Entregado en ventanilla",
       estado: "REGISTRADA",
       pedido: { id: pedido.id, fecha: "2026-09-01", estado: "PARCIAL" },
-      representante: { id: representante.id, nombre: representante.nombre, apellido: representante.apellido, servicio: representante.servicio },
+      representante: { id: representante.id, nombre: representante.nombre, apellido: representante.apellido, centroSalud: await nombreDelCentro(representante) },
       registradaPor: `${usuario.nombre} ${usuario.apellido}`,
       motivoAnulacion: null,
       anuladaPor: null,

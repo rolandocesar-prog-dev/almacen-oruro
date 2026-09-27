@@ -95,16 +95,18 @@ const PROVEEDORES = [
   { razonSocial: "Insumos Bolivia S.A.", nit: "3067890031" },
 ] as const;
 
-/** Cada representante es el responsable de un servicio o área del centro de salud (D-18). */
-const REPRESENTANTES = [
-  { nombre: "María", apellido: "Quispe", ci: "4821507", servicio: "Emergencias" },
-  { nombre: "Jorge", apellido: "Mamani", ci: "3915482", servicio: "Internación" },
-  { nombre: "Elena", apellido: "Choque", ci: "5203871", servicio: "Laboratorio" },
-  { nombre: "Rubén", apellido: "Colque", ci: "4409236", servicio: "Consulta externa" },
-  { nombre: "Silvia", apellido: "Apaza", ci: "6110394", servicio: "Odontología" },
+/**
+ * Centros de salud que atiende el almacén, cada uno con su único representante activo (D-21, D-22,
+ * research O-07). Los representantes son personas ficticias.
+ */
+// Q-07: nombres provisorios hasta que Raymond envíe los centros reales.
+const CENTROS = [
+  { centro: "Centro de salud provisorio 1", representante: { nombre: "María", apellido: "Quispe", ci: "4821507" } },
+  { centro: "Centro de salud provisorio 2", representante: { nombre: "Jorge", apellido: "Mamani", ci: "3915482" } },
+  { centro: "Centro de salud provisorio 3", representante: { nombre: "Elena", apellido: "Choque", ci: "5203871" } },
+  { centro: "Centro de salud provisorio 4", representante: { nombre: "Rubén", apellido: "Colque", ci: "4409236" } },
+  { centro: "Centro de salud provisorio 5", representante: { nombre: "Silvia", apellido: "Apaza", ci: "6110394" } },
 ] as const;
-
-const CENTRO_SALUD = "Centro de Salud Oruro Central";
 
 /** Cuánto se compra respecto del consumo del mes: normal y con stock de sobra. */
 const HOLGURA_NORMAL = 1.9;
@@ -118,12 +120,12 @@ const MOTIVOS_ANULACION_COMPRA = [
 
 const MOTIVOS_ANULACION_DISTRIBUCION = [
   "Vale registrado por duplicado",
-  "El vale correspondía a otro servicio",
+  "El vale correspondía a otro centro de salud",
   "Cantidades mal anotadas en el vale",
 ] as const;
 
 const MOTIVOS_ANULACION_PEDIDO = [
-  "El servicio retiró el pedido",
+  "El centro de salud retiró el pedido",
   "Pedido repetido por error",
 ] as const;
 
@@ -210,16 +212,19 @@ async function crearCatalogo(cantidadDeProductos: number) {
     proveedores.push(creado.id);
   }
 
-  const centro = await prisma.centroSalud.create({
-    data: { nombre: CENTRO_SALUD, nombreNormalizado: normalizarTexto(CENTRO_SALUD), activo: true },
-  });
-
+  // Un centro por representante: así la demostración cumple RN-18 (un representante activo por centro).
   const representantes: number[] = [];
-  for (const representante of REPRESENTANTES) {
-    const creado = await prisma.representante.create({
-      data: { ...representante, centroSaludId: centro.id, activo: true },
+  for (const { centro, representante } of CENTROS) {
+    const creado = await prisma.centroSalud.create({
+      data: {
+        nombre: centro,
+        nombreNormalizado: normalizarTexto(centro),
+        activo: true,
+        representantes: { create: { ...representante, activo: true } },
+      },
+      select: { representantes: { select: { id: true } } },
     });
-    representantes.push(creado.id);
+    representantes.push(creado.representantes[0]!.id);
   }
 
   return { productos, proveedores, representantes };
@@ -336,7 +341,7 @@ export async function generarHistorico(opciones: OpcionesGenerador): Promise<Res
       resumen.comprasAnuladas += 1;
     }
 
-    // 3. Un pedido por representante. Cada producto lo pide un solo servicio, por su consumo del mes: así
+    // 3. Un pedido por representante. Cada producto lo pide un solo centro de salud, por su consumo del mes: así
     //    lo distribuido sigue la forma del consumo objetivo (estación, tendencia y ruido).
     const disponible = await stockPorProducto(idsDeProductos);
     const pedidosDelMes: { id: number; representanteIndice: number }[] = [];
@@ -413,7 +418,7 @@ export async function generarHistorico(opciones: OpcionesGenerador): Promise<Res
 
     // 6. Pedidos adicionales que no forman parte del consumo del mes:
     //    - cada semestre, uno cargado dos veces se anula (ANULADO);
-    //    - en el último mes, dos servicios hicieron un pedido que todavía no se atendió (PENDIENTE).
+    //    - en el último mes, dos centros de salud hicieron un pedido que todavía no se atendió (PENDIENTE).
     const producto = elegirDe(aleatorio, catalogo.productos);
     if (indiceDelMes % 6 === 4) {
       const { id } = await registrarPedido(

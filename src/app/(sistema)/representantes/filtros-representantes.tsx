@@ -8,7 +8,7 @@ import { esquemaFiltroCatalogo, type FiltroCatalogo } from "@/esquemas/comunes";
 export function FiltrosRepresentantes({ valores }: { valores: FiltroCatalogo }) {
   return (
     <Filtros esquema={esquemaFiltroCatalogo} accion="/representantes">
-      <CampoBusqueda valor={valores.q} ayuda="Nombre, apellido, CI o servicio" />
+      <CampoBusqueda valor={valores.q} ayuda="Nombre, apellido, CI o centro de salud" />
       <CampoEstado valor={valores.estado} />
     </Filtros>
   );

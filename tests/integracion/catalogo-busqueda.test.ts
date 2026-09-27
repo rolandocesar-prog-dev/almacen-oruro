@@ -34,8 +34,10 @@ beforeAll(async () => {
   await crearProveedorDePrueba({ razonSocial: "Química Oruro", nit: "7778889" });
 
   const centro = await crearCentroSaludDePrueba({ nombre: "Hospital San Juan de Dios" });
-  await crearRepresentanteDePrueba({ nombre: "Ana", apellido: "Quispe", servicio: "Enfermería", centroSaludId: centro.id });
-  await crearRepresentanteDePrueba({ nombre: "Luis", apellido: "Mamani", servicio: "Pediatría", centroSaludId: centro.id });
+  // Un representante activo por centro (RN-18): cada uno en el suyo.
+  const policlinico = await crearCentroSaludDePrueba({ nombre: "Policlínico Pediátrico" });
+  await crearRepresentanteDePrueba({ nombre: "Ana", apellido: "Quispe", centroSaludId: centro.id });
+  await crearRepresentanteDePrueba({ nombre: "Luis", apellido: "Mamani", centroSaludId: policlinico.id });
 });
 
 describe("búsqueda sin mayúsculas ni tildes en los seis listados", () => {
@@ -75,9 +77,10 @@ describe("búsqueda sin mayúsculas ni tildes en los seis listados", () => {
     expect(await listarCentrosSalud({ q: "san juan", estado: "activos" })).toHaveLength(1);
   });
 
-  it("representantes: por servicio, apellido y nombre", async () => {
-    expect((await listarRepresentantes({ q: "enferm", estado: "activos" })).map((r) => r.nombreCompleto)).toEqual(["Quispe, Ana"]);
+  it("representantes: por centro de salud, apellido y nombre", async () => {
+    expect((await listarRepresentantes({ q: "san juan", estado: "activos" })).map((r) => r.nombreCompleto)).toEqual(["Quispe, Ana"]);
     expect((await listarRepresentantes({ q: "mamani", estado: "activos" })).map((r) => r.nombreCompleto)).toEqual(["Mamani, Luis"]);
-    expect(await listarRepresentantes({ q: "pediatria", estado: "inactivos" })).toEqual([]);
+    expect((await listarRepresentantes({ q: "pediatrico", estado: "activos" })).map((r) => r.nombreCompleto)).toEqual(["Mamani, Luis"]);
+    expect(await listarRepresentantes({ q: "pediatrico", estado: "inactivos" })).toEqual([]);
   });
 });

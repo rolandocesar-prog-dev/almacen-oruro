@@ -138,11 +138,11 @@ function DatosDistribuciones({ datos }: { datos: DatosInformeDistribuciones }) {
         </TablaReporte>
       </Bloque>
       <Bloque titulo="Unidades entregadas por representante">
-        <TablaReporte encabezados={["Representante", "Servicio", "Unidades"]} vacio={datos.porRepresentante.length === 0 ? VACIO : undefined}>
+        <TablaReporte encabezados={["Representante", "Centro de salud", "Unidades"]} vacio={datos.porRepresentante.length === 0 ? VACIO : undefined}>
           {datos.porRepresentante.map((fila) => (
-            <tr key={`${fila.representante}-${fila.servicio}`}>
+            <tr key={`${fila.representante}-${fila.centroSalud}`}>
               <CeldaReporte>{fila.representante}</CeldaReporte>
-              <CeldaReporte>{fila.servicio}</CeldaReporte>
+              <CeldaReporte>{fila.centroSalud}</CeldaReporte>
               <CeldaReporte className={derecha}>{fila.unidades}</CeldaReporte>
             </tr>
           ))}

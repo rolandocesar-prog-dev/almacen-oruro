@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "@/lib/prisma";
 import { listarPedidos, PEDIDOS_POR_PAGINA } from "@/servicios/pedidos";
 import { crearUsuarioDePrueba, vaciarTablas } from "../ayudantes/base-de-datos";
-import { crearProductoDePrueba, crearRepresentanteDePrueba } from "../ayudantes/catalogos";
+import { crearCentroSaludDePrueba, crearProductoDePrueba, crearRepresentanteDePrueba } from "../ayudantes/catalogos";
 import { fechaDeDocumento } from "../ayudantes/inventario";
 import { crearPedidoDePrueba } from "../ayudantes/pedidos";
 
@@ -14,8 +14,8 @@ describe("listarPedidos", () => {
   beforeEach(vaciarTablas);
 
   async function preparar() {
-    const quispe = await crearRepresentanteDePrueba({ nombre: "Ana", apellido: "Quispe", servicio: "Emergencias" });
-    const mamani = await crearRepresentanteDePrueba({ nombre: "Luis", apellido: "Mamani", servicio: "Pediatría" });
+    const quispe = await crearRepresentanteDePrueba({ nombre: "Ana", apellido: "Quispe" });
+    const mamani = await crearRepresentanteDePrueba({ nombre: "Luis", apellido: "Mamani", centroSaludId: (await crearCentroSaludDePrueba({ nombre: "Policlínico Sur" })).id });
     const a = await crearProductoDePrueba();
     const b = await crearProductoDePrueba();
 
@@ -40,7 +40,7 @@ describe("listarPedidos", () => {
       fecha: "2026-09-02",
       representante: "Mamani, Luis",
       representanteId: mamani.id,
-      servicio: "Pediatría",
+      centroSalud: "Policlínico Sur",
       productos: 2,
       porcentajeAtendido: 40,
       estado: "PARCIAL",

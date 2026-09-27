@@ -58,10 +58,6 @@ export default async function PaginaValeDistribucion({ params }: { params: Promi
             {representante.nombre} {representante.apellido}
           </dd>
         </div>
-        <div>
-          <dt className="font-semibold">Servicio</dt>
-          <dd>{representante.servicio}</dd>
-        </div>
       </dl>
 
       <table className="w-full border-collapse text-left text-sm">

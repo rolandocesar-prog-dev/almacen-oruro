@@ -59,7 +59,7 @@ export async function obtenerPedidoParaDistribuir(pedidoId: number) {
   const pedido = await prisma.pedido.findUnique({
     where: { id: pedidoId },
     include: {
-      representante: { select: { id: true, nombre: true, apellido: true, servicio: true, activo: true, centroSalud: { select: { nombre: true } } } },
+      representante: { select: { id: true, nombre: true, apellido: true, activo: true, centroSalud: { select: { nombre: true } } } },
       lineas: {
         orderBy: { id: "asc" },
         include: {
@@ -78,7 +78,6 @@ export async function obtenerPedidoParaDistribuir(pedidoId: number) {
       id: pedido.representante.id,
       nombre: pedido.representante.nombre,
       apellido: pedido.representante.apellido,
-      servicio: pedido.representante.servicio,
       activo: pedido.representante.activo,
       centroSalud: pedido.representante.centroSalud.nombre,
     },
@@ -313,7 +312,7 @@ export async function listarDistribuciones(filtro: {
       skip: (filtro.pagina - 1) * DISTRIBUCIONES_POR_PAGINA,
       take: DISTRIBUCIONES_POR_PAGINA,
       include: {
-        pedido: { select: { id: true, representante: { select: { nombre: true, apellido: true, servicio: true } } } },
+        pedido: { select: { id: true, representante: { select: { nombre: true, apellido: true, centroSalud: { select: { nombre: true } } } } } },
         _count: { select: { lineas: true } },
       },
     }),
@@ -336,7 +335,7 @@ export async function listarDistribuciones(filtro: {
       nroVale: distribucion.nroVale,
       pedidoId: distribucion.pedido.id,
       representante: `${distribucion.pedido.representante.apellido}, ${distribucion.pedido.representante.nombre}`,
-      servicio: distribucion.pedido.representante.servicio,
+      centroSalud: distribucion.pedido.representante.centroSalud.nombre,
       productos: distribucion._count.lineas,
       unidades: unidadesPorDistribucion.get(distribucion.id) ?? 0,
       estado: distribucion.estado,
@@ -354,7 +353,7 @@ export async function obtenerDistribucion(id: number) {
           id: true,
           fecha: true,
           estado: true,
-          representante: { select: { id: true, nombre: true, apellido: true, servicio: true, activo: true, centroSalud: { select: { nombre: true } } } },
+          representante: { select: { id: true, nombre: true, apellido: true, activo: true, centroSalud: { select: { nombre: true } } } },
         },
       },
       usuario: { select: { nombre: true, apellido: true } },
@@ -383,7 +382,6 @@ export async function obtenerDistribucion(id: number) {
       id: representante.id,
       nombre: representante.nombre,
       apellido: representante.apellido,
-      servicio: representante.servicio,
       activo: representante.activo,
       centroSalud: representante.centroSalud.nombre,
     },

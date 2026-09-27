@@ -52,7 +52,7 @@ export default async function PaginaReporteDistribuciones({ searchParams }: { se
 
       <FiltrosReporteDistribuciones
         valores={filtro}
-        representantes={representantes.map((r) => ({ id: r.id, etiqueta: `${r.nombreCompleto} · ${r.servicio}${r.activo ? "" : " (inactivo)"}` }))}
+        representantes={representantes.map((r) => ({ id: r.id, etiqueta: `${r.etiqueta}${r.activo ? "" : " (inactivo)"}` }))}
         productos={productos.map((p) => ({ id: p.id, etiqueta: `${p.codigo} · ${p.nombre}${p.activo ? "" : " (inactivo)"}` }))}
       />
       {!validacion.success && (
@@ -72,7 +72,7 @@ export default async function PaginaReporteDistribuciones({ searchParams }: { se
       />
 
       <TablaReporte
-        encabezados={["Fecha", "Nº de vale", "Representante", "Servicio", "Código", "Producto", "Unidad", "Cantidad", "Estado"]}
+        encabezados={["Fecha", "Nº de vale", "Representante", "Centro de salud", "Código", "Producto", "Unidad", "Cantidad", "Estado"]}
         vacio={reporte.filas.length === 0 ? SIN_RESULTADOS : undefined}
       >
         {reporte.filas.map((fila) => (
@@ -80,7 +80,7 @@ export default async function PaginaReporteDistribuciones({ searchParams }: { se
             <CeldaReporte>{formatearFecha(fila.fecha)}</CeldaReporte>
             <CeldaReporte>{fila.nroVale}</CeldaReporte>
             <CeldaReporte>{fila.representante}</CeldaReporte>
-            <CeldaReporte>{fila.servicio}</CeldaReporte>
+            <CeldaReporte>{fila.centroSalud}</CeldaReporte>
             <CeldaReporte>{fila.codigo}</CeldaReporte>
             <CeldaReporte>{fila.producto}</CeldaReporte>
             <CeldaReporte>{fila.unidad}</CeldaReporte>

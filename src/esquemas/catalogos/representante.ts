@@ -6,6 +6,7 @@ import { idObligatorio, telefonoOpcional, textoObligatorio } from "../comunes";
 const REGLA_CI = /^[0-9]+(-[0-9A-Z]+)?$/;
 const MENSAJE_CI = "Usa dígitos y, si tiene complemento, un guion: 4567890-1B";
 
+// Sin "servicio": desde F-009 el representante se identifica por su nombre y su centro (D-22).
 export const esquemaRepresentante = z.object({
   nombre: textoObligatorio("el nombre", "El nombre", 60),
   apellido: textoObligatorio("el apellido", "El apellido", 60),
@@ -16,7 +17,6 @@ export const esquemaRepresentante = z.object({
     .min(1, { error: "Escribe el CI", abort: true })
     .max(15, { error: MENSAJE_CI, abort: true })
     .regex(REGLA_CI, { error: MENSAJE_CI }),
-  servicio: textoObligatorio("el servicio", "El servicio", 60),
   telefono: telefonoOpcional(),
   centroSaludId: idObligatorio("Elige un centro de salud"),
 });

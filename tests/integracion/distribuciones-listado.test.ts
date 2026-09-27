@@ -5,6 +5,7 @@ import { DISTRIBUCIONES_POR_PAGINA, listarDistribuciones, registrarDistribucion 
 import { vaciarTablas } from "../ayudantes/base-de-datos";
 import { datosDistribucion, prepararPedidoConStock } from "../ayudantes/distribuciones";
 import { fechaDeDocumento } from "../ayudantes/inventario";
+import { nombreDelCentro } from "../ayudantes/catalogos";
 
 const filtroBase = { desde: "2026-09-01", hasta: "2026-09-30", estado: "todas" as const, pagina: 1 };
 
@@ -40,7 +41,7 @@ describe("listarDistribuciones", () => {
       nroVale: "510",
       pedidoId: quispe.pedido.id,
       representante: `${quispe.representante.apellido}, ${quispe.representante.nombre}`,
-      servicio: quispe.representante.servicio,
+      centroSalud: await nombreDelCentro(quispe.representante),
       productos: 2,
       unidades: 5,
       estado: "REGISTRADA",

@@ -30,7 +30,7 @@ export default async function PaginaNuevaDistribucion({ searchParams }: { search
         <h1 className="text-2xl font-bold sm:text-[28px]">Registrar distribución</h1>
         <p className="text-sm text-texto-suave">Elige el pedido que vas a atender. Solo aparecen los pendientes y parciales.</p>
         <Tabla
-          encabezados={["Nº", "Fecha", "Representante", "Servicio", "Productos", "% atendido", "Estado", "Acción"]}
+          encabezados={["Nº", "Fecha", "Representante", "Centro de salud", "Productos", "% atendido", "Estado", "Acción"]}
           vacio={
             pedidos.length === 0 ? (
               <>
@@ -47,7 +47,7 @@ export default async function PaginaNuevaDistribucion({ searchParams }: { search
               <Celda className="tabular-nums">{pedido.id}</Celda>
               <Celda>{formatearFecha(pedido.fecha)}</Celda>
               <Celda>{pedido.representante}</Celda>
-              <Celda>{pedido.servicio}</Celda>
+              <Celda>{pedido.centroSalud}</Celda>
               <Celda className="text-right tabular-nums">{pedido.productos}</Celda>
               <Celda className="text-right tabular-nums">{pedido.porcentajeAtendido} %</Celda>
               <Celda>
@@ -98,7 +98,7 @@ export default async function PaginaNuevaDistribucion({ searchParams }: { search
       <h1 className="text-2xl font-bold sm:text-[28px]">Distribuir el pedido Nº {pedido.id}</h1>
       <p className="text-sm text-texto-suave">
         {representante.apellido}, {representante.nombre}
-        {representante.activo ? "" : " (inactivo)"} · {representante.servicio} · {representante.centroSalud} · pedido del{" "}
+        {representante.activo ? "" : " (inactivo)"} · {representante.centroSalud} · pedido del{" "}
         {formatearFecha(pedido.fecha)}
       </p>
       <FormularioDistribucion pedido={pedido} hoy={hoyEnLaPaz()} />

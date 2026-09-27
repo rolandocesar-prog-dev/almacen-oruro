@@ -217,7 +217,6 @@ model Representante {
   apellido      String   @db.VarChar(60)
   // Se guarda en mayúsculas; dígitos con complemento opcional tras guion
   ci            String   @unique @db.VarChar(15)
-  servicio      String   @db.VarChar(60)
   telefono      String?  @db.VarChar(20)
   centroSaludId Int      @map("centro_salud_id")
   activo        Boolean  @default(true)
@@ -228,6 +227,9 @@ model Representante {
   pedidos     Pedido[]
 
   @@index([centroSaludId])
+  // Un centro de salud tiene como máximo un representante ACTIVO (RN-18, D-22, research O-01).
+  // Los inactivos no cuentan: así el centro conserva el historial de las personas que tuvo.
+  @@unique([centroSaludId], where: raw("activo = true"), map: "representante_centro_activo_unico")
   @@map("representante")
 }
 

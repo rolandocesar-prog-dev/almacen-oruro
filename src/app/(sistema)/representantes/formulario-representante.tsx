@@ -17,7 +17,6 @@ type Props = {
     nombre?: string;
     apellido?: string;
     ci?: string;
-    servicio?: string;
     telefono?: string | null;
     centroSaludId?: number;
   };
@@ -61,16 +60,6 @@ export function FormularioRepresentante({ accion, centros, valores = {}, textoBo
           defaultValue={valores.ci}
           required
           errores={errores.ci}
-          onBlur={alSalirDelCampo}
-        />
-        <Campo
-          id="servicio"
-          etiqueta="Servicio"
-          ayuda="Por ejemplo: Enfermería, Pediatría"
-          maxLength={60}
-          defaultValue={valores.servicio}
-          required
-          errores={errores.servicio}
           onBlur={alSalirDelCampo}
         />
         <Campo

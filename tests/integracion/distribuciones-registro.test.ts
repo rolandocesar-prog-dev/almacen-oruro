@@ -194,7 +194,7 @@ describe("consultas del registro", () => {
       id: pedido.id,
       fecha: "2026-09-01",
       estado: "PENDIENTE",
-      representante: { id: representante.id, nombre: representante.nombre, apellido: representante.apellido, servicio: representante.servicio, activo: true },
+      representante: { id: representante.id, nombre: representante.nombre, apellido: representante.apellido, activo: true },
     });
     expect(datos?.representante.centroSalud).toEqual(expect.any(String));
     expect(datos?.lineas).toEqual([

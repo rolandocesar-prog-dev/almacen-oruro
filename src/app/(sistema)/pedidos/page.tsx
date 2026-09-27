@@ -50,14 +50,14 @@ export default async function PaginaPedidos({ searchParams }: { searchParams: Pr
 
       <FiltrosPedidos
         valores={filtro}
-        representantes={representantes.map((r) => ({ id: r.id, etiqueta: `${r.nombreCompleto} · ${r.servicio}${r.activo ? "" : " (inactivo)"}` }))}
+        representantes={representantes.map((r) => ({ id: r.id, etiqueta: `${r.etiqueta}${r.activo ? "" : " (inactivo)"}` }))}
       />
       {!validacion.success && (
         <Aviso tipo="error">{validacion.error.issues[0]?.message ?? "Filtros inválidos"}. Se muestran los pedidos por atender.</Aviso>
       )}
 
       <Tabla
-        encabezados={["Nº", "Fecha", "Representante", "Servicio", "Productos", "% atendido", "Estado", "Acción"]}
+        encabezados={["Nº", "Fecha", "Representante", "Centro de salud", "Productos", "% atendido", "Estado", "Acción"]}
         vacio={pedidos.length === 0 ? textoVacio : undefined}
       >
         {pedidos.map((pedido) => (
@@ -65,7 +65,7 @@ export default async function PaginaPedidos({ searchParams }: { searchParams: Pr
             <Celda className="tabular-nums">{pedido.id}</Celda>
             <Celda>{formatearFecha(pedido.fecha)}</Celda>
             <Celda>{pedido.representante}</Celda>
-            <Celda>{pedido.servicio}</Celda>
+            <Celda>{pedido.centroSalud}</Celda>
             <Celda className="text-right tabular-nums">{pedido.productos}</Celda>
             <Celda className="text-right tabular-nums">{pedido.porcentajeAtendido} %</Celda>
             <Celda>

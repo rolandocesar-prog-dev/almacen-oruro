@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { registrarCompra } from "@/servicios/compras";
 import { listarProductosParaPedido, obtenerPedido, registrarPedido } from "@/servicios/pedidos";
 import { crearUsuarioDePrueba, vaciarTablas } from "../ayudantes/base-de-datos";
-import { crearProductoDePrueba, crearProveedorDePrueba, crearRepresentanteDePrueba } from "../ayudantes/catalogos";
+import { crearProductoDePrueba, crearProveedorDePrueba, crearRepresentanteDePrueba, nombreDelCentro } from "../ayudantes/catalogos";
 
 async function errorDe(promesa: Promise<unknown>) {
   const error = await promesa.catch((e: unknown) => e);
@@ -120,9 +120,9 @@ describe("consultas del registro", () => {
     expect(productos).toEqual([{ id: activo.id, etiqueta: "LIM-001 · Lavandina 1 L", stockActual: 7, abreviatura: unidad.abreviatura }]);
   });
 
-  it("obtenerPedido trae cabecera, representante con servicio, registrado por y líneas con pendiente", async () => {
+  it("obtenerPedido trae cabecera, representante con su centro, registrado por y líneas con pendiente", async () => {
     const { usuario } = await crearUsuarioDePrueba({ nombre: "Rosa", apellido: "Mamani" });
-    const representante = await crearRepresentanteDePrueba({ nombre: "Ana", apellido: "Quispe", servicio: "Emergencias" });
+    const representante = await crearRepresentanteDePrueba({ nombre: "Ana", apellido: "Quispe" });
     const producto = await crearProductoDePrueba({ codigo: "LIM-002", nombre: "Detergente" });
     const { id } = await registrarPedido(pedido(representante.id, [{ productoId: producto.id, cantidadSolicitada: 8 }]), usuario.id);
 
@@ -132,10 +132,9 @@ describe("consultas del registro", () => {
       fecha: "2026-09-10",
       observacion: null,
       estado: "PENDIENTE",
-      representante: { id: representante.id, nombre: "Ana", apellido: "Quispe", servicio: "Emergencias", activo: true },
+      representante: { id: representante.id, nombre: "Ana", apellido: "Quispe", activo: true, centroSalud: await nombreDelCentro(representante) },
       registradoPor: "Rosa Mamani",
     });
-    expect(detalle?.representante.centroSalud).toEqual(expect.any(String));
     expect(detalle?.registradoEn).toBeInstanceOf(Date);
     expect(detalle?.lineas).toEqual([
       expect.objectContaining({ productoId: producto.id, codigo: "LIM-002", nombre: "Detergente", solicitada: 8, entregada: 0, pendiente: 8 }),

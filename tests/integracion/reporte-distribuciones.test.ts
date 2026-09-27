@@ -4,6 +4,7 @@ import { anularDistribucion, registrarDistribucion } from "@/servicios/distribuc
 import { reporteDistribuciones } from "@/servicios/reportes";
 import { vaciarTablas } from "../ayudantes/base-de-datos";
 import { datosDistribucion, prepararPedidoConStock } from "../ayudantes/distribuciones";
+import { nombreDelCentro } from "../ayudantes/catalogos";
 
 const rango = { desde: "2026-09-01", hasta: "2026-09-30", incluirAnulados: false, pagina: 1 };
 
@@ -38,7 +39,7 @@ describe("reporteDistribuciones", () => {
       fecha: "2026-09-03",
       nroVale: "10",
       representante: `${quispe.representante.apellido}, ${quispe.representante.nombre}`,
-      servicio: quispe.representante.servicio,
+      centroSalud: await nombreDelCentro(quispe.representante),
       producto: "Lavandina 1 L",
       cantidad: 6,
       estado: "REGISTRADA",

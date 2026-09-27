@@ -179,13 +179,13 @@ export async function datosInformeDistribuciones(periodo: Periodo) {
   const [actuales, previas, lineas, distribuidos, pedidos, pronostico] = await Promise.all([
     unidadesEntregadas(periodo),
     unidadesEntregadas(periodoAnterior(periodo)),
-    // Solo nombre, apellido y servicio del representante: nunca su CI (A-10).
+    // Solo nombre, apellido y centro del representante: nunca su CI (A-10, F-009).
     prisma.distribucionDetalle.findMany({
       where: { distribucion: { fecha: entre(periodo), estado: "REGISTRADA" } },
       select: {
         cantidad: true,
         distribucion: {
-          select: { pedido: { select: { representante: { select: { id: true, nombre: true, apellido: true, servicio: true } } } } },
+          select: { pedido: { select: { representante: { select: { id: true, nombre: true, apellido: true, centroSalud: { select: { nombre: true } } } } } } },
         },
       },
     }),
@@ -194,12 +194,12 @@ export async function datosInformeDistribuciones(periodo: Periodo) {
     pronosticoDeProductos(),
   ]);
 
-  const porRepresentante = new Map<number, { representante: string; servicio: string; unidades: number }>();
+  const porRepresentante = new Map<number, { representante: string; centroSalud: string; unidades: number }>();
   for (const linea of lineas) {
     const { representante } = linea.distribucion.pedido;
     const acumulado = porRepresentante.get(representante.id) ?? {
       representante: `${representante.apellido}, ${representante.nombre}`,
-      servicio: representante.servicio,
+      centroSalud: representante.centroSalud.nombre,
       unidades: 0,
     };
     acumulado.unidades += linea.cantidad;
