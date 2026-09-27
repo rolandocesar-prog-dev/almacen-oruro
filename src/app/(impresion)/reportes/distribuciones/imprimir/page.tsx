@@ -27,7 +27,8 @@ export default async function PaginaImprimirReporteDistribuciones({ searchParams
     listarProductos({ estado: "todos" }),
     obtenerConfiguracion(),
   ]);
-  const nombreRepresentante = representantes.find((r) => r.id === filtro.representante)?.nombreCompleto;
+  // El encabezado dice a quién corresponde la hoja, con su centro de salud (FR-011, D-23).
+  const representanteDelFiltro = representantes.find((r) => r.id === filtro.representante)?.etiqueta;
   const nombreProducto = productos.find((p) => p.id === filtro.producto)?.nombre;
 
   return (
@@ -43,7 +44,7 @@ export default async function PaginaImprimirReporteDistribuciones({ searchParams
         titulo="Reporte de distribuciones"
         filtros={textoDeFiltros([
           { etiqueta: `Del ${formatearFecha(filtro.desde)} al ${formatearFecha(filtro.hasta)}` },
-          { etiqueta: "Representante", valor: nombreRepresentante },
+          { etiqueta: "Representante", valor: representanteDelFiltro },
           { etiqueta: "Producto", valor: nombreProducto },
           ...(filtro.incluirAnulados ? [{ etiqueta: "Incluye anuladas" }] : []),
         ])}

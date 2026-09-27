@@ -32,9 +32,15 @@ describe("obtenerKardex", () => {
       ["SALIDA_DISTRIBUCION", null, 3, 7],
     ]);
     expect(kardex?.movimientos[0]?.documento).toEqual({ ruta: `/compras/${compraId}`, texto: expect.stringMatching(/^Factura \d+ · Distribuidora Andina$/) });
+    // FR-011 (F-009): el representante va con su centro de salud, con el formato de etiquetaRepresentante.
+    const { pedido } = await prisma.distribucion.findUniqueOrThrow({
+      where: { id: distribucion.id },
+      select: { pedido: { select: { representante: { select: { nombre: true, apellido: true, centroSalud: { select: { nombre: true } } } } } } },
+    });
+    const { representante } = pedido;
     expect(kardex?.movimientos[1]?.documento).toEqual({
       ruta: `/distribuciones/${distribucion.id}`,
-      texto: expect.stringMatching(new RegExp(`^Vale ${distribucion.nroVale} · .+, .+$`)),
+      texto: `Vale ${distribucion.nroVale} · ${representante.apellido}, ${representante.nombre} · ${representante.centroSalud.nombre}`,
     });
     expect(kardex?.movimientos[0]?.fechaDocumento).toBe("2026-09-01");
 

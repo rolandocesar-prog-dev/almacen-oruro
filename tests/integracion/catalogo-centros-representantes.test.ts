@@ -162,6 +162,13 @@ describe("representantes", () => {
       { id: luis.id, etiqueta: "Álvarez, Luis · Policlínico Norte", activo: true },
       { id: ana.id, etiqueta: "Quispe, Ana · Hospital General", activo: true },
     ]);
+    // Al editar un pedido de un representante inactivo, se ofrece con su centro y la marca.
+    const ines = await crearRepresentanteDePrueba({ nombre: "Inés", apellido: "Condori", activo: false, centroSaludId: policlinico.id });
+    expect((await listarRepresentantesParaSelector(ines.id)).find((opcion) => opcion.id === ines.id)).toEqual({
+      id: ines.id,
+      etiqueta: "Condori, Inés · Policlínico Norte (inactivo)",
+      activo: false,
+    });
     expect((await listarRepresentantes({ estado: "activos" }))[0]).toMatchObject({
       nombreCompleto: "Álvarez, Luis",
       etiqueta: "Álvarez, Luis · Policlínico Norte",

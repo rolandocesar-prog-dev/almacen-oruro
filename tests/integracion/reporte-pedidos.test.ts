@@ -5,7 +5,7 @@ import { registrarDistribucion } from "@/servicios/distribuciones";
 import { anularPedido } from "@/servicios/pedidos";
 import { reportePedidos } from "@/servicios/reportes";
 import { vaciarTablas } from "../ayudantes/base-de-datos";
-import { crearRepresentanteDePrueba } from "../ayudantes/catalogos";
+import { crearRepresentanteDePrueba, nombreDelCentro } from "../ayudantes/catalogos";
 import { datosDistribucion, prepararPedidoConStock } from "../ayudantes/distribuciones";
 
 const rango = { desde: "2026-09-01", hasta: "2026-09-30", estado: "todos" as const, incluirAnulados: false, pagina: 1 };
@@ -77,6 +77,7 @@ describe("reportePedidos", () => {
     const suyos = await reportePedidos({ ...rango, representanteId: otroRepresentante.id });
     expect(suyos.filas).toHaveLength(1);
     expect(suyos.filas[0]?.representante).toBe("Mamani, Luis");
+    expect(suyos.filas[0]?.centroSalud).toBe(await nombreDelCentro(otroRepresentante));
     expect(suyos.totales.porEstado).toEqual({ PENDIENTE: 1, PARCIAL: 0, ATENDIDO: 0, ANULADO: 0 });
   });
 

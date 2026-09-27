@@ -18,6 +18,7 @@ import { aFechaDocumento, textoDeFechaDocumento } from "@/lib/fechas";
 import { prisma } from "@/lib/prisma";
 import { coincideBusqueda, compararEnEspanol } from "@/lib/texto";
 import { estaBajoMinimo } from "./catalogos/productos";
+import { etiquetaRepresentante } from "./catalogos/representantes";
 
 type Transaccion = Prisma.TransactionClient;
 
@@ -164,7 +165,11 @@ export async function obtenerKardex(productoId: number, { desde, hasta }: { desd
       include: {
         compra: { select: { id: true, nroFactura: true, proveedor: { select: { razonSocial: true } } } },
         distribucion: {
-          select: { id: true, nroVale: true, pedido: { select: { representante: { select: { nombre: true, apellido: true } } } } },
+          select: {
+            id: true,
+            nroVale: true,
+            pedido: { select: { representante: { select: { nombre: true, apellido: true, centroSalud: { select: { nombre: true } } } } } },
+          },
         },
       },
     }),
@@ -190,7 +195,11 @@ export async function obtenerKardex(productoId: number, { desde, hasta }: { desd
         : movimiento.distribucion
           ? {
               ruta: `/distribuciones/${movimiento.distribucion.id}`,
-              texto: `Vale ${movimiento.distribucion.nroVale} · ${movimiento.distribucion.pedido.representante.apellido}, ${movimiento.distribucion.pedido.representante.nombre}`,
+              // FR-011 (F-009): con varios centros, el nombre solo no alcanza para saber a quién se entregó.
+              texto: `Vale ${movimiento.distribucion.nroVale} · ${etiquetaRepresentante({
+                ...movimiento.distribucion.pedido.representante,
+                centroSalud: movimiento.distribucion.pedido.representante.centroSalud.nombre,
+              })}`,
             }
           : null,
     })),

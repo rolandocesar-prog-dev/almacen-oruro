@@ -26,7 +26,8 @@ export default async function PaginaImprimirReportePedidos({ searchParams }: { s
     listarRepresentantes({ estado: "todos" }),
     obtenerConfiguracion(),
   ]);
-  const nombreRepresentante = representantes.find((r) => r.id === filtro.representante)?.nombreCompleto;
+  // El encabezado dice a quién corresponde la hoja, con su centro de salud (FR-011, D-23).
+  const representanteDelFiltro = representantes.find((r) => r.id === filtro.representante)?.etiqueta;
 
   return (
     <article className="flex flex-col gap-6">
@@ -42,7 +43,7 @@ export default async function PaginaImprimirReportePedidos({ searchParams }: { s
         filtros={textoDeFiltros([
           { etiqueta: `Del ${formatearFecha(filtro.desde)} al ${formatearFecha(filtro.hasta)}` },
           { etiqueta: "Estado", valor: ETIQUETA_ESTADO[filtro.estado] },
-          { etiqueta: "Representante", valor: nombreRepresentante },
+          { etiqueta: "Representante", valor: representanteDelFiltro },
           ...(filtro.incluirAnulados ? [{ etiqueta: "Incluye anulados" }] : []),
         ])}
         emitidoPor={`${usuario.nombre} ${usuario.apellido}`}
