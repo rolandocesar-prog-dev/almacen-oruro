@@ -257,7 +257,7 @@ Exportar a Excel o PDF descargable (se imprime o guarda como PDF desde el navega
 - Para un producto con stock actual mayor que pronóstico + mínimo, la reposición sugerida es 0.
 - Toda cifra que aparece en el texto de un informe IA existe en su tabla de datos de entrada (verificación manual en la demostración).
 - Sin conexión a internet, el módulo de pronóstico funciona y los informes guardados se pueden abrir.
-- En todas las pantallas con datos simulados aparece la leyenda "Datos simulados con fines de demostración".
+- La base generada queda marcada como simulada, con la fecha y la semilla de la simulación. (Hasta el 29/09 las pantallas mostraban además la leyenda "Datos simulados con fines de demostración"; se quitó a pedido de Raymond, D-26.)
 
 ### Fuera de alcance
 Modelos de aprendizaje profundo, pronóstico por representante, reentrenamiento programado, chat conversacional con los datos, pronóstico de precios.

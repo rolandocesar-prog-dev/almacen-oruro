@@ -6,7 +6,6 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { ErrorDeNegocio } from "@/lib/errores";
 import { textoDeFechaDocumento } from "@/lib/fechas";
 import { prisma } from "@/lib/prisma";
-import { obtenerConfiguracion } from "@/servicios/configuracion";
 import { verificarConsistenciaInventario } from "@/servicios/inventario";
 import { generarHistorico } from "@/servicios/ia/generador";
 import { crearUsuarioDePrueba, vaciarTablas } from "../ayudantes/base-de-datos";
@@ -155,10 +154,10 @@ describe("generarHistorico (Historia 1)", () => {
   it("marca la base como de demostración, con fecha y semilla (FR-021, H1 · E6)", async () => {
     await generarReducido();
 
-    const { modoDemostracion, datosSimuladosEn } = await obtenerConfiguracion();
-    expect(modoDemostracion).toBe(true);
-    expect(datosSimuladosEn).toBeInstanceOf(Date);
+    // La marca ya no se muestra en pantalla (I-75), pero la base sigue diciendo que sus datos son simulados.
     const fila = await prisma.configuracion.findUniqueOrThrow({ where: { id: 1 } });
+    expect(fila.modoDemostracion).toBe(true);
+    expect(fila.datosSimuladosEn).toBeInstanceOf(Date);
     expect(fila.semillaSimulacion).toBe(REDUCIDO.semilla);
   });
 

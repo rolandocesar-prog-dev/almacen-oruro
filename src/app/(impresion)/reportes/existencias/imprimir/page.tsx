@@ -5,7 +5,6 @@ import { BotonImprimir } from "@/componentes/ui/boton-imprimir";
 import { esquemaReporteExistencias, textoDeFiltros } from "@/esquemas/reportes";
 import { requerirSesion } from "@/lib/sesion";
 import { listarCategorias } from "@/servicios/catalogos/categorias";
-import { obtenerConfiguracion } from "@/servicios/configuracion";
 import { reporteExistencias } from "@/servicios/reportes";
 
 export const metadata = { title: "Reporte de existencias · Almacén Regional Oruro" };
@@ -15,10 +14,9 @@ export default async function PaginaImprimirReporteExistencias({ searchParams }:
   const { usuario } = await requerirSesion();
   const filtro = esquemaReporteExistencias.parse(await searchParams);
 
-  const [reporte, categorias, { modoDemostracion }] = await Promise.all([
+  const [reporte, categorias] = await Promise.all([
     reporteExistencias({ categoriaId: filtro.categoria, soloBajoMinimo: filtro.soloBajoMinimo }),
     listarCategorias({ estado: "todos" }),
-    obtenerConfiguracion(),
   ]);
   const nombreCategoria = categorias.find((categoria) => categoria.id === filtro.categoria)?.nombre;
 
@@ -39,7 +37,6 @@ export default async function PaginaImprimirReporteExistencias({ searchParams }:
           ...(filtro.soloBajoMinimo ? [{ etiqueta: "Solo bajo mínimo" }] : []),
         ])}
         emitidoPor={`${usuario.nombre} ${usuario.apellido}`}
-        demostracion={modoDemostracion}
       />
 
       {reporte.grupos.length === 0 && <p className="px-2 py-6 text-center">{SIN_RESULTADOS}</p>}

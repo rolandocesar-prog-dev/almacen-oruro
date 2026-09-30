@@ -97,8 +97,8 @@ plano).
   originaron.
 - Cada informe generado DEBE guardarse con sus datos de entrada, fecha y modelo usado, para poder
   mostrarlo sin conexión.
-- Los datos históricos simulados DEBEN declararse como simulados en la interfaz y en la
-  documentación.
+- Los datos históricos simulados DEBEN declararse como simulados en la documentación y en la
+  defensa, y la base DEBE registrar que lo son (marca, fecha y semilla de la simulación).
 - Al modelo de lenguaje NO se le envían contraseñas ni datos de contacto.
 
 **Fundamento:** el tribunal tiene que poder verificar cada cifra (D-06, D-07). El pronóstico
@@ -140,6 +140,8 @@ debe aparecer igual en la especificación, la base y el código.
   demás ideas siguen yendo a `docs/trabajo-futuro.md`.
 - Si una observación contradice una decisión cerrada (D-xx), la decisión NO se borra: se marca
   como revertida y se registra la que la reemplaza, con fecha y motivo.
+- Una observación que solo quita o cambia algo visible, sin agregar ni cambiar reglas de negocio ni
+  datos, puede registrarse únicamente como decisión (D-xx), sin el ciclo completo de Spec Kit.
 
 **Fundamento:** no hay días de margen; el orden de corte se fija antes de necesitarlo. Tras la
 entrega, quien defiende el sistema lo estudia y detecta lo que no refleja la operación real del
@@ -187,4 +189,4 @@ que también se defiende.
   `/speckit-analyze` revisa la consistencia antes de implementar. Toda excepción DEBE quedar
   justificada en la sección de complejidad del plan.
 
-**Version**: 1.1.0 | **Ratified**: 2026-09-13 | **Last Amended**: 2026-09-26
+**Version**: 1.2.0 | **Ratified**: 2026-09-13 | **Last Amended**: 2026-09-29

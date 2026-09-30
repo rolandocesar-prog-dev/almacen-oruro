@@ -6,7 +6,6 @@ import { esquemaReportePedidos, textoDeFiltros, type FiltroReportePedidos } from
 import { formatearFecha, hoyEnLaPaz, inicioDelMesEnCurso } from "@/lib/fechas";
 import { requerirSesion } from "@/lib/sesion";
 import { listarRepresentantes } from "@/servicios/catalogos/representantes";
-import { obtenerConfiguracion } from "@/servicios/configuracion";
 import { reportePedidos } from "@/servicios/reportes";
 import { ETIQUETA_ESTADO } from "@/app/(sistema)/reportes/pedidos/parametros";
 
@@ -21,10 +20,9 @@ export default async function PaginaImprimirReportePedidos({ searchParams }: { s
     ? validacion.data
     : { desde: inicioDelMesEnCurso(), hasta: hoyEnLaPaz(), estado: "todos", incluirAnulados: false, pagina: 1 };
 
-  const [reporte, representantes, { modoDemostracion }] = await Promise.all([
+  const [reporte, representantes] = await Promise.all([
     reportePedidos({ ...filtro, representanteId: filtro.representante, todas: true }),
     listarRepresentantes({ estado: "todos" }),
-    obtenerConfiguracion(),
   ]);
   // El encabezado dice a quién corresponde la hoja, con su centro de salud (FR-011, D-23).
   const representanteDelFiltro = representantes.find((r) => r.id === filtro.representante)?.etiqueta;
@@ -47,7 +45,6 @@ export default async function PaginaImprimirReportePedidos({ searchParams }: { s
           ...(filtro.incluirAnulados ? [{ etiqueta: "Incluye anulados" }] : []),
         ])}
         emitidoPor={`${usuario.nombre} ${usuario.apellido}`}
-        demostracion={modoDemostracion}
       />
 
       <TablaReporte

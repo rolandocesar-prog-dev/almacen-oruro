@@ -4,7 +4,6 @@ import { CeldaReporte, SIN_RESULTADOS, TablaReporte } from "@/componentes/report
 import { esquemaReporteExistencias, textoDeFiltros } from "@/esquemas/reportes";
 import { requerirSesion } from "@/lib/sesion";
 import { listarCategorias } from "@/servicios/catalogos/categorias";
-import { obtenerConfiguracion } from "@/servicios/configuracion";
 import { reporteExistencias } from "@/servicios/reportes";
 import { FiltrosReporteExistencias } from "./filtros-reporte-existencias";
 import { parametrosDeExistencias } from "./parametros";
@@ -17,10 +16,9 @@ export default async function PaginaReporteExistencias({ searchParams }: { searc
   // Los valores inválidos toman el valor por defecto: el reporte siempre se puede emitir (FR-002).
   const filtro = esquemaReporteExistencias.parse(await searchParams);
 
-  const [reporte, categorias, { modoDemostracion }] = await Promise.all([
+  const [reporte, categorias] = await Promise.all([
     reporteExistencias({ categoriaId: filtro.categoria, soloBajoMinimo: filtro.soloBajoMinimo }),
     listarCategorias({ estado: "todos" }),
-    obtenerConfiguracion(),
   ]);
   const nombreCategoria = categorias.find((categoria) => categoria.id === filtro.categoria)?.nombre;
   const parametros = parametrosDeExistencias(filtro);
@@ -52,7 +50,6 @@ export default async function PaginaReporteExistencias({ searchParams }: { searc
           ...(filtro.soloBajoMinimo ? [{ etiqueta: "Solo bajo mínimo" }] : []),
         ])}
         emitidoPor={`${usuario.nombre} ${usuario.apellido}`}
-        demostracion={modoDemostracion}
       />
 
       {reporte.grupos.length === 0 && <p className="px-2 py-6 text-center text-texto-suave">{SIN_RESULTADOS}</p>}

@@ -9,7 +9,6 @@ import { formatearBolivianos } from "@/lib/dinero";
 import { formatearFecha, hoyEnLaPaz, inicioDelMesEnCurso } from "@/lib/fechas";
 import { requerirSesion } from "@/lib/sesion";
 import { listarProveedores } from "@/servicios/catalogos/proveedores";
-import { obtenerConfiguracion } from "@/servicios/configuracion";
 import { FILAS_POR_PAGINA_REPORTE, reporteCompras } from "@/servicios/reportes";
 import { FiltrosReporteCompras } from "./filtros-reporte-compras";
 import { parametrosDeCompras } from "./parametros";
@@ -25,10 +24,9 @@ export default async function PaginaReporteCompras({ searchParams }: { searchPar
     ? validacion.data
     : { desde: inicioDelMesEnCurso(), hasta: hoyEnLaPaz(), incluirAnulados: false, pagina: 1 };
 
-  const [reporte, proveedores, { modoDemostracion }] = await Promise.all([
+  const [reporte, proveedores] = await Promise.all([
     reporteCompras({ ...filtro, proveedorId: filtro.proveedor }),
     listarProveedores({ estado: "todos" }),
-    obtenerConfiguracion(),
   ]);
   const paginas = Math.max(1, Math.ceil(reporte.total / FILAS_POR_PAGINA_REPORTE));
   const nombreProveedor = proveedores.find((proveedor) => proveedor.id === filtro.proveedor)?.razonSocial;
@@ -64,7 +62,6 @@ export default async function PaginaReporteCompras({ searchParams }: { searchPar
           ...(filtro.incluirAnulados ? [{ etiqueta: "Incluye anuladas" }] : []),
         ])}
         emitidoPor={`${usuario.nombre} ${usuario.apellido}`}
-        demostracion={modoDemostracion}
       />
 
       <TablaReporte encabezados={["Fecha", "Nº de factura", "Proveedor", "Ítems", "Total", "Estado"]} vacio={reporte.filas.length === 0 ? SIN_RESULTADOS : undefined}>

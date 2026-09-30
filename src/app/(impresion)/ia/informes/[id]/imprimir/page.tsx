@@ -8,7 +8,6 @@ import { textoDeFiltros } from "@/esquemas/reportes";
 import { formatearFecha, formatearFechaHora } from "@/lib/fechas";
 import { idDeRuta } from "@/lib/parametros";
 import { requerirSesion } from "@/lib/sesion";
-import { obtenerConfiguracion } from "@/servicios/configuracion";
 import { obtenerInforme } from "@/servicios/ia/informes";
 
 export const metadata = { title: "Informe IA · Almacén Regional Oruro" };
@@ -20,7 +19,7 @@ export const metadata = { title: "Informe IA · Almacén Regional Oruro" };
 export default async function PaginaImprimirInforme({ params }: { params: Promise<{ id: string }> }) {
   const { usuario } = await requerirSesion();
   const id = idDeRuta((await params).id);
-  const [informe, { modoDemostracion }] = await Promise.all([id ? obtenerInforme(id) : null, obtenerConfiguracion()]);
+  const informe = id ? await obtenerInforme(id) : null;
   if (!informe) notFound();
 
   return (
@@ -36,7 +35,6 @@ export default async function PaginaImprimirInforme({ params }: { params: Promis
         titulo={TITULO_DEL_INFORME[informe.tipo]}
         filtros={textoDeFiltros([{ etiqueta: `Del ${formatearFecha(informe.desde)} al ${formatearFecha(informe.hasta)}` }])}
         emitidoPor={`${usuario.nombre} ${usuario.apellido}`}
-        demostracion={modoDemostracion}
       />
 
       <p className="text-sm">

@@ -7,7 +7,6 @@ import { formatearBolivianos } from "@/lib/dinero";
 import { formatearFecha, hoyEnLaPaz, inicioDelMesEnCurso } from "@/lib/fechas";
 import { requerirSesion } from "@/lib/sesion";
 import { listarProveedores } from "@/servicios/catalogos/proveedores";
-import { obtenerConfiguracion } from "@/servicios/configuracion";
 import { reporteCompras } from "@/servicios/reportes";
 
 export const metadata = { title: "Reporte de compras · Almacén Regional Oruro" };
@@ -25,10 +24,9 @@ export default async function PaginaImprimirReporteCompras({ searchParams }: { s
     ? validacion.data
     : { desde: inicioDelMesEnCurso(), hasta: hoyEnLaPaz(), incluirAnulados: false, pagina: 1 };
 
-  const [reporte, proveedores, { modoDemostracion }] = await Promise.all([
+  const [reporte, proveedores] = await Promise.all([
     reporteCompras({ ...filtro, proveedorId: filtro.proveedor, todas: true }),
     listarProveedores({ estado: "todos" }),
-    obtenerConfiguracion(),
   ]);
   const nombreProveedor = proveedores.find((proveedor) => proveedor.id === filtro.proveedor)?.razonSocial;
 
@@ -49,7 +47,6 @@ export default async function PaginaImprimirReporteCompras({ searchParams }: { s
           ...(filtro.incluirAnulados ? [{ etiqueta: "Incluye anuladas" }] : []),
         ])}
         emitidoPor={`${usuario.nombre} ${usuario.apellido}`}
-        demostracion={modoDemostracion}
       />
 
       <TablaReporte encabezados={["Fecha", "Nº de factura", "Proveedor", "Ítems", "Total", "Estado"]} vacio={reporte.filas.length === 0 ? SIN_RESULTADOS : undefined}>

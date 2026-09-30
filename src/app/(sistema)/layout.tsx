@@ -2,7 +2,6 @@ import Link from "next/link";
 import { MenuLateral } from "@/componentes/navegacion/menu-lateral";
 import { Icono } from "@/componentes/ui/icono";
 import { requerirSesion } from "@/lib/sesion";
-import { obtenerConfiguracion } from "@/servicios/configuracion";
 import { salir } from "./acciones-sesion";
 
 // Estructura común de las páginas del sistema: menú lateral con el usuario y el contenido.
@@ -11,9 +10,6 @@ import { salir } from "./acciones-sesion";
 export default async function LayoutSistema({ children }: { children: React.ReactNode }) {
   // El layout permite el cambio pendiente: si no, la pantalla /cambiar-contrasena nunca se mostraría.
   const { usuario } = await requerirSesion({ permitirCambioPendiente: true });
-  // La marca vale para toda la base y la pone el generador de F-007: mientras esté encendida, ninguna
-  // pantalla puede confundirse con datos reales (D-07, aclaración de F-006 del 13/09).
-  const { modoDemostracion } = await obtenerConfiguracion();
   const conMenu = !usuario.debeCambiarContrasena;
   const iniciales = `${usuario.nombre.charAt(0)}${usuario.apellido.charAt(0)}`.toUpperCase();
 
@@ -53,11 +49,6 @@ export default async function LayoutSistema({ children }: { children: React.Reac
     <div className="min-h-screen lg:flex">
       <MenuLateral conMenu={conMenu} pie={pie} />
       <div className="flex min-w-0 flex-1 flex-col">
-        {modoDemostracion && (
-          <p className="bg-aviso-claro px-4 py-2 text-center text-sm font-semibold text-aviso" role="status">
-            Datos simulados con fines de demostración
-          </p>
-        )}
         <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">{children}</main>
       </div>
     </div>

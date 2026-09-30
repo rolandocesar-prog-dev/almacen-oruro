@@ -84,8 +84,8 @@ npm run datos:simulados -- --semilla 20260915
 - Con la misma semilla, los datos son siempre los mismos.
 - **Solo funciona sobre una base sin compras, pedidos ni distribuciones**; si ya hay documentos, se niega y
   no cambia nada. No se ofrece en ninguna pantalla, a propósito.
-- Mientras la base tenga estos datos, todas las pantallas y hojas impresas dicen "Datos simulados con
-  fines de demostración".
+- La base queda marcada como simulada, con la fecha y la semilla. Las pantallas y los reportes ya no
+  muestran un aviso (D-26): que los datos son simulados se explica en la defensa.
 - Para volver a generarlo, se recrea la base: `docker compose down -v`, `docker compose up -d`,
   `npx prisma migrate deploy`, `npx prisma db seed` y otra vez este comando. **Eso borra todos los datos.**
 
@@ -188,8 +188,6 @@ igual. La ficha del centro muestra quién es su representante y quiénes lo fuer
 - **Imprimir** abre la hoja con el nombre del sistema, el nombre del reporte, los filtros aplicados, la
   fecha y hora de emisión y quién lo emite; los botones no salen impresos. Desde el navegador también se
   puede guardar como PDF.
-- Si la base tiene datos simulados (los carga el generador del módulo de inteligencia artificial), todas
-  las pantallas y las hojas impresas muestran "Datos simulados con fines de demostración".
 
 **10. Pronóstico, reposición e informes IA**
 

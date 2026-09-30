@@ -9,17 +9,17 @@ const pantallas = [
   {
     ruta: "/ia/pronostico",
     titulo: "Pronóstico y reposición",
-    descripcion: "Cuánto se va a consumir este mes de cada producto y cuánto conviene reponer",
+    descripcion: "Cuánto se va a consumir este mes de cada producto, según lo aprendido de su historial, y cuánto conviene reponer",
   },
   {
     ruta: "/ia/evaluacion",
     titulo: "Evaluación del pronóstico",
-    descripcion: "Cuánto se equivoca el método frente a dos métodos simples, con los números a la vista",
+    descripcion: "Qué tan bien predice: se prueba con meses que el método no vio y se compara con dos métodos simples",
   },
   {
     ruta: "/ia/informes",
     titulo: "Informes IA",
-    descripcion: "Informes de compras y distribuciones redactados a partir de los datos del período",
+    descripcion: "Un modelo de lenguaje redacta informes de compras y distribuciones con las cifras ya calculadas; necesita internet para generar uno nuevo",
   },
 ] as const;
 
@@ -31,12 +31,12 @@ export default async function PaginaIa() {
       <div>
         <h1 className="text-2xl font-bold sm:text-[28px]">Inteligencia artificial</h1>
         <p className="text-sm text-texto-suave">
-          El sistema calcula: la serie de consumo, el pronóstico, la evaluación y la reposición sugerida salen del kardex con un método
-          escrito en el propio sistema, sin internet y sin guardar nada. El modelo de lenguaje solo redacta los informes a partir de datos ya
-          calculados, que se muestran junto al texto.
+          El sistema aprende del consumo de cada producto para predecir cuánto se va a usar este mes y cuánto conviene reponer, y comprueba
+          qué tan bien predice. Ese aprendizaje ocurre dentro del propio sistema, con los datos del kardex y sin internet. El modelo de lenguaje
+          solo redacta los informes a partir de cifras ya calculadas, que se muestran junto al texto.
         </p>
         <p className="mt-2 text-sm text-texto-suave">
-          El procedimiento completo, paso a paso y con un ejemplo, está en{" "}
+          Por qué esto es inteligencia artificial y el procedimiento completo, paso a paso y con un ejemplo, están en{" "}
           <code className="rounded bg-marca-claro px-1">docs/metodo-pronostico.md</code>.
         </p>
       </div>

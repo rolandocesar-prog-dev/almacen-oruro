@@ -49,6 +49,7 @@ Quedan **9 días calendario**, sin margen. El alcance de abajo está cortado par
 | D-23 | El representante se muestra siempre con su centro: **"Apellido, Nombre · Centro de salud"** | Observación de Raymond (F-009); con varios centros, el nombre solo no alcanza | 26/09 |
 | D-24 | El sistema **genera y descarga un respaldo** con todos los datos de la base; la restauración se hace fuera del sistema, con la guía de instalación. No incluye el código ni la configuración con secretos | Observación de Raymond (F-009). Restaurar desde el navegador es destructivo y no se justifica para un solo almacén | 26/09 |
 | D-25 | Los campos de contraseña tienen un botón para **mostrar u ocultar** lo escrito | Observación de Raymond (F-009) | 26/09 |
+| D-26 | El sistema **ya no muestra el aviso** "Datos simulados con fines de demostración", ni en pantalla ni en los reportes impresos. Los datos siguen siendo simulados y se declaran en la documentación y en la defensa; la base conserva la marca, la fecha y la semilla de la simulación. Cambia cómo se cumple D-07, que sigue vigente | Observación de Raymond tras la entrega; constitución 1.2.0, principios VIII y XI | 29/09 |
 
 ---
 

@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { esquemaCambioContrasena } from "@/esquemas/personal";
@@ -25,5 +26,8 @@ export async function cambiarMiContrasenaAccion(
     return aResultadoDeError(error);
   }
 
+  // El layout del sistema se dibujó sin menú mientras el cambio estaba pendiente, y Next.js lo reutiliza
+  // al navegar a otra página del mismo grupo: sin esto, el menú no aparece hasta refrescar (I-74).
+  revalidatePath("/", "layout");
   redirect("/?aviso=contrasena");
 }

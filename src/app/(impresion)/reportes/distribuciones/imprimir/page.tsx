@@ -7,7 +7,6 @@ import { formatearFecha, hoyEnLaPaz, inicioDelMesEnCurso } from "@/lib/fechas";
 import { requerirSesion } from "@/lib/sesion";
 import { listarProductos } from "@/servicios/catalogos/productos";
 import { listarRepresentantes } from "@/servicios/catalogos/representantes";
-import { obtenerConfiguracion } from "@/servicios/configuracion";
 import { reporteDistribuciones } from "@/servicios/reportes";
 
 export const metadata = { title: "Reporte de distribuciones · Almacén Regional Oruro" };
@@ -21,11 +20,10 @@ export default async function PaginaImprimirReporteDistribuciones({ searchParams
     ? validacion.data
     : { desde: inicioDelMesEnCurso(), hasta: hoyEnLaPaz(), incluirAnulados: false, pagina: 1 };
 
-  const [reporte, representantes, productos, { modoDemostracion }] = await Promise.all([
+  const [reporte, representantes, productos] = await Promise.all([
     reporteDistribuciones({ ...filtro, representanteId: filtro.representante, productoId: filtro.producto, todas: true }),
     listarRepresentantes({ estado: "todos" }),
     listarProductos({ estado: "todos" }),
-    obtenerConfiguracion(),
   ]);
   // El encabezado dice a quién corresponde la hoja, con su centro de salud (FR-011, D-23).
   const representanteDelFiltro = representantes.find((r) => r.id === filtro.representante)?.etiqueta;
@@ -49,7 +47,6 @@ export default async function PaginaImprimirReporteDistribuciones({ searchParams
           ...(filtro.incluirAnulados ? [{ etiqueta: "Incluye anuladas" }] : []),
         ])}
         emitidoPor={`${usuario.nombre} ${usuario.apellido}`}
-        demostracion={modoDemostracion}
       />
 
       <TablaReporte

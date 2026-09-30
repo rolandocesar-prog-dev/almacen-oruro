@@ -52,7 +52,7 @@ export const gruposMenu: readonly GrupoMenu[] = [
       { ruta: "/unidades", texto: "Unidades de medida", icono: "unidades", descripcion: "Cómo se cuenta cada producto" },
       { ruta: "/proveedores", texto: "Proveedores", icono: "proveedores", descripcion: "A quiénes se compra y qué productos ofrecen" },
       { ruta: "/centros-salud", texto: "Centros de salud", icono: "centrosSalud", descripcion: "Dónde trabajan los representantes" },
-      { ruta: "/representantes", texto: "Representantes", icono: "representantes", descripcion: "Quiénes hacen los pedidos de cada servicio" },
+      { ruta: "/representantes", texto: "Representantes", icono: "representantes", descripcion: "Quién hace los pedidos de cada centro de salud" },
     ],
   },
   {

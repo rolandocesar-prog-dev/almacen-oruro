@@ -6,7 +6,6 @@ import { BotonImprimir } from "@/componentes/ui/boton-imprimir";
 import { esquemaReporteKardex, textoDeFiltros, type FiltroReporteKardex } from "@/esquemas/reportes";
 import { formatearFecha, hoyEnLaPaz, inicioDelMesEnCurso } from "@/lib/fechas";
 import { requerirSesion } from "@/lib/sesion";
-import { obtenerConfiguracion } from "@/servicios/configuracion";
 import { reporteKardex } from "@/servicios/reportes";
 
 export const metadata = { title: "Reporte de kardex · Almacén Regional Oruro" };
@@ -18,7 +17,6 @@ export default async function PaginaImprimirReporteKardex({ searchParams }: { se
   const validacion = esquemaReporteKardex.safeParse(await searchParams);
   const filtro: FiltroReporteKardex = validacion.success ? validacion.data : { desde: inicioDelMesEnCurso(), hasta: hoyEnLaPaz() };
 
-  const { modoDemostracion } = await obtenerConfiguracion();
   const reporte = filtro.producto ? await reporteKardex(filtro.producto, { desde: filtro.desde, hasta: filtro.hasta }) : null;
 
   return (
@@ -41,7 +39,6 @@ export default async function PaginaImprimirReporteKardex({ searchParams }: { se
               { etiqueta: "Unidad", valor: reporte.producto.unidadMedida.nombre },
             ])}
             emitidoPor={`${usuario.nombre} ${usuario.apellido}`}
-            demostracion={modoDemostracion}
           />
 
           <p className="text-base font-semibold">Saldo inicial: {reporte.saldoInicial}</p>

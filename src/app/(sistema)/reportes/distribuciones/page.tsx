@@ -9,7 +9,6 @@ import { formatearFecha, hoyEnLaPaz, inicioDelMesEnCurso } from "@/lib/fechas";
 import { requerirSesion } from "@/lib/sesion";
 import { listarProductos } from "@/servicios/catalogos/productos";
 import { listarRepresentantes } from "@/servicios/catalogos/representantes";
-import { obtenerConfiguracion } from "@/servicios/configuracion";
 import { FILAS_POR_PAGINA_REPORTE, reporteDistribuciones } from "@/servicios/reportes";
 import { FiltrosReporteDistribuciones } from "./filtros-reporte-distribuciones";
 import { parametrosDeDistribuciones } from "./parametros";
@@ -25,11 +24,10 @@ export default async function PaginaReporteDistribuciones({ searchParams }: { se
     ? validacion.data
     : { desde: inicioDelMesEnCurso(), hasta: hoyEnLaPaz(), incluirAnulados: false, pagina: 1 };
 
-  const [reporte, representantes, productos, { modoDemostracion }] = await Promise.all([
+  const [reporte, representantes, productos] = await Promise.all([
     reporteDistribuciones({ ...filtro, representanteId: filtro.representante, productoId: filtro.producto }),
     listarRepresentantes({ estado: "todos" }),
     listarProductos({ estado: "todos" }),
-    obtenerConfiguracion(),
   ]);
   const paginas = Math.max(1, Math.ceil(reporte.total / FILAS_POR_PAGINA_REPORTE));
   const parametros = parametrosDeDistribuciones(filtro);
@@ -69,7 +67,6 @@ export default async function PaginaReporteDistribuciones({ searchParams }: { se
           ...(filtro.incluirAnulados ? [{ etiqueta: "Incluye anuladas" }] : []),
         ])}
         emitidoPor={`${usuario.nombre} ${usuario.apellido}`}
-        demostracion={modoDemostracion}
       />
 
       <TablaReporte

@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { borrarCookieSesion, leerTokenDeCookie } from "@/lib/sesion";
 import { cerrarSesion } from "@/servicios/acceso";
@@ -17,5 +18,7 @@ export async function salir(): Promise<void> {
     await cerrarSesion(token);
   }
   await borrarCookieSesion();
+  // Que no quede guardado el layout con el menú y el nombre de esta sesión (I-74).
+  revalidatePath("/", "layout");
   redirect("/ingreso");
 }

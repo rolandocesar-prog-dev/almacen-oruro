@@ -51,7 +51,7 @@ function errorValeDuplicado(nroVale: string, distribucionId?: number) {
 }
 
 /**
- * Pedido preparado para el formulario de distribución (FR-002, RN-36): representante con su servicio y,
+ * Pedido preparado para el formulario de distribución (FR-002, RN-36): representante con su centro de salud y,
  * por cada línea, lo solicitado, lo entregado, lo pendiente, el stock y el máximo entregable. El stock es
  * informativo: puede cambiar antes de guardar, y la verificación con autoridad se hace al registrar.
  */

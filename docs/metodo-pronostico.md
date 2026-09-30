@@ -9,6 +9,35 @@ VIII). Las cifras del ejemplo salieron del código del sistema. El código está
 número de esta página lo produce un modelo de lenguaje: son cuentas deterministas sobre el kardex, que se
 repiten igual cada vez y no necesitan internet.
 
+Al final están las [preguntas probables del tribunal](#preguntas-probables-del-tribunal), con una respuesta
+corta para cada una.
+
+---
+
+## Por qué esto es inteligencia artificial
+
+El módulo tiene tres piezas. Solo una usa un servicio externo, y **no es la que aprende**:
+
+| Pieza | Qué hace | ¿Aprende de los datos? | ¿Necesita internet? |
+|---|---|---|---|
+| **Pronóstico** | Ajusta un modelo al consumo de cada producto y predice el mes en curso | **Sí**: elige sus parámetros entre 729 combinaciones según cuánto se equivoca con el historial de ese producto | No |
+| **Evaluación** | Oculta los últimos 6 meses, pronostica sin verlos y mide el error contra dos métodos simples | Comprueba el aprendizaje con datos que el modelo no vio | No |
+| **Informes IA** | Un modelo de lenguaje (Claude) redacta en español las cifras que el sistema ya calculó | No: no aprende ni recuerda nada entre un informe y otro | Solo para generar uno nuevo |
+
+La reposición sugerida es una cuenta sencilla (Paso 4); lo inteligente es el pronóstico del que depende.
+
+**El argumento en tres frases.** El aprendizaje automático es la rama de la inteligencia artificial que
+construye modelos a partir de datos para predecir casos que no vio. El pronóstico hace exactamente eso: no
+tiene reglas escritas a mano sobre cuánto se consume cada producto; aprende de su historial la estación, la
+tendencia y el nivel, con parámetros propios para cada producto, y predice un mes que todavía no ocurrió.
+La evaluación hace lo que exige cualquier trabajo serio de aprendizaje automático: probar el modelo con
+datos que no usó para ajustarse y compararlo con alternativas simples.
+
+**Lo que hay que reconocer.** Holt-Winters nació en la estadística (Holt, 1957; Winters, 1960) y la frontera
+entre estadística y aprendizaje automático es difusa: muchos métodos pertenecen a las dos. Se eligió a
+propósito un modelo que Raymond puede explicar paso a paso, con papel y lápiz, en lugar de una red neuronal
+que nadie podría explicar frente al tribunal (constitución, principio VIII).
+
 ---
 
 ## Paso 1 · La serie de consumo
@@ -182,7 +211,65 @@ y 17,7 % del ingenuo estacional y 19,9 y 32,1 % del promedio móvil.
 En los **Informes IA** el sistema calcula primero los datos del período (totales, comparación con el
 período anterior, proveedores, representantes, productos, bajo mínimo, reposición y pronóstico) y se los
 entrega a un modelo de lenguaje (Claude, `claude-opus-5`) con la instrucción de **redactar en español
-usando solo esas cifras**. El modelo no calcula el pronóstico ni la reposición, y no ve datos personales.
+usando solo esas cifras**. El modelo no calcula el pronóstico ni la reposición. Recibe nombres de
+productos, proveedores, centros de salud y representantes, pero **nunca** CI, teléfonos, direcciones, correos
+ni contraseñas (hay una prueba automática que lo verifica).
 
 El informe guarda y muestra **junto al texto** la tabla exacta que recibió el modelo, y cada número del
 texto que no aparece en esa tabla se marca con "Cifra no encontrada en los datos".
+
+---
+
+## Preguntas probables del tribunal
+
+Cada respuesta está pensada para decirse en voz alta; entre paréntesis, dónde está el respaldo.
+
+**1. "Holt-Winters es estadística, no inteligencia artificial."**
+Es un modelo predictivo que se ajusta con datos: prueba 729 combinaciones de parámetros para cada producto y
+se queda con la que menos se equivoca en su historial. Después se valida con meses que no vio. Eso es
+aprendizaje automático, aunque el método venga de la estadística; la frontera entre las dos es difusa y
+muchos métodos son de ambas. (Sección "Por qué esto es inteligencia artificial"; Pasos 3.3 y 5.)
+
+**2. "¿Por qué no usaron redes neuronales, ARIMA u otro método más moderno?"**
+Por dos razones. Cada producto tiene unos 36 meses de historia: una red neuronal necesita miles de datos y con
+tan pocos memoriza en vez de aprender. Y el sistema tiene que poder explicarse: Holt-Winters se sigue con
+papel y lápiz, como en el ejemplo de este documento. ARIMA también sirve para pocos datos, pero exige
+pruebas estadísticas previas que complican la explicación sin una ganancia demostrada. (Constitución,
+principio VIII. Por qué el método se escribió en el propio sistema y no con una librería:
+`specs/007-inteligencia-artificial/research.md`, A-02.)
+
+**3. "¿Por qué no le piden el pronóstico directamente a Claude?"**
+Porque un modelo de lenguaje no calcula de forma verificable: la misma pregunta puede dar números
+distintos, y no se puede explicar de dónde salió una cifra. En el sistema, todo número lo calcula un
+algoritmo que da siempre el mismo resultado con los mismos datos; Claude solo redacta. (Paso 6.)
+
+**4. "Los datos son simulados: ¿cómo saben que funciona con datos reales?"**
+No lo sabemos, y está declarado como limitación: el almacén no tiene años de datos reales. Lo que sí se
+demuestra es que el modelo **descubre por sí solo** un patrón que no se le dijo: el generador de datos le
+puso estación de invierno, un crecimiento del 3 % anual y un ruido de hasta ±15 %, y el pronóstico solo ve el
+kardex, no esos valores. Con datos reales se ejecuta el mismo código, y la pantalla de evaluación dirá
+cuánto se equivoca. (`src/servicios/ia/generador.ts`; D-07.)
+
+**5. "Su método le gana al ingenuo estacional por muy poco."**
+Es cierto: MAE promedio 10,6 contra 10,9, y WAPE 17,1 % contra 17,7 %. Con una estación estable, "lo mismo
+que el año pasado" es un competidor fuerte. Holt-Winters además sigue la tendencia y se adapta si el consumo
+cambia, cosa que el ingenuo no hace. Al promedio móvil, que no ve la estación, le gana con claridad: 19,9 y
+32,1 %. Y el sistema muestra la comparación tal como sale, aunque en algún producto gane un método simple.
+(Paso 5; pantalla "Evaluación del pronóstico".)
+
+**6. "¿Qué impide que Claude invente cifras?"**
+Tres cosas. La instrucción le ordena usar solo los datos enviados. El sistema revisa el texto y marca cada
+número que no aparece en esos datos con "Cifra no encontrada en los datos". Y el informe muestra, junto al
+texto, la tabla exacta que recibió el modelo, para que cualquiera compare. (Paso 6;
+`src/servicios/ia/verificacion-cifras.ts`.)
+
+**7. "¿Y si no hay internet, o si la empresa del modelo deja de dar el servicio?"**
+El pronóstico, la evaluación y la reposición no usan internet, y los informes ya generados se abren e
+imprimen sin conexión. Sin internet solo no se puede generar un informe nuevo, y el sistema lo dice con un
+mensaje claro. Un solo archivo habla con el servicio externo (`src/servicios/ia/redactor.ts`); para cambiar
+de proveedor se cambia ese archivo. (Constitución, principio VIII.)
+
+**8. "¿Qué datos salen del sistema hacia Claude?"**
+Solo cifras agregadas del período y nombres: productos, proveedores, centros de salud y representantes.
+Nunca CI, teléfonos, direcciones, correos ni contraseñas; las pruebas automáticas lo verifican cada vez
+que se ejecutan. (Paso 6; `tests/integracion/informe-compras.test.ts` e `informe-distribuciones.test.ts`.)

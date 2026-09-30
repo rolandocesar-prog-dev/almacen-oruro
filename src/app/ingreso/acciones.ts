@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { esquemaIngreso } from "@/esquemas/acceso";
@@ -26,6 +27,10 @@ export async function ingresar(_estadoPrevio: ResultadoAccion | undefined, formD
     return aResultadoDeError(error);
   }
 
-  // 3. redirect() se llama fuera del try: internamente lanza una excepción que Next.js necesita recibir.
+  // 3. La sesión cambió: el layout del sistema (menú y nombre del usuario) se vuelve a dibujar y no se
+  //    reutiliza uno guardado de una sesión anterior (I-74).
+  revalidatePath("/", "layout");
+
+  // 4. redirect() se llama fuera del try: internamente lanza una excepción que Next.js necesita recibir.
   redirect(destino);
 }

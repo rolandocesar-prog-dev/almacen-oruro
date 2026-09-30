@@ -208,7 +208,7 @@ erDiagram
 
 | Campo | Tipo | Reglas |
 |---|---|---|
-| modo_demostracion | booleano | falso al crear la base; el generador de datos simulados lo pone en verdadero. Si es verdadero, todas las pantallas y reportes muestran "Datos simulados con fines de demostración" (D-07) |
+| modo_demostracion | booleano | falso al crear la base; el generador de datos simulados lo pone en verdadero. Deja constancia en la base de que sus datos son simulados (D-07); desde el 29/09 no se muestra en pantalla (D-26) |
 | datos_simulados_en | fecha y hora, nulo | cuándo se ejecutó el generador |
 | semilla_simulacion | entero, nulo | semilla usada, para poder reproducir los datos |
 

@@ -7,7 +7,6 @@ import { esquemaReportePedidos, textoDeFiltros, type FiltroReportePedidos } from
 import { formatearFecha, hoyEnLaPaz, inicioDelMesEnCurso } from "@/lib/fechas";
 import { requerirSesion } from "@/lib/sesion";
 import { listarRepresentantes } from "@/servicios/catalogos/representantes";
-import { obtenerConfiguracion } from "@/servicios/configuracion";
 import { FILAS_POR_PAGINA_REPORTE, reportePedidos } from "@/servicios/reportes";
 import { InsigniaPedido } from "../../pedidos/insignia-pedido";
 import { FiltrosReportePedidos } from "./filtros-reporte-pedidos";
@@ -23,10 +22,9 @@ export default async function PaginaReportePedidos({ searchParams }: { searchPar
     ? validacion.data
     : { desde: inicioDelMesEnCurso(), hasta: hoyEnLaPaz(), estado: "todos", incluirAnulados: false, pagina: 1 };
 
-  const [reporte, representantes, { modoDemostracion }] = await Promise.all([
+  const [reporte, representantes] = await Promise.all([
     reportePedidos({ ...filtro, representanteId: filtro.representante }),
     listarRepresentantes({ estado: "todos" }),
-    obtenerConfiguracion(),
   ]);
   const paginas = Math.max(1, Math.ceil(reporte.total / FILAS_POR_PAGINA_REPORTE));
   const parametros = parametrosDePedidos(filtro);
@@ -64,7 +62,6 @@ export default async function PaginaReportePedidos({ searchParams }: { searchPar
           ...(filtro.incluirAnulados ? [{ etiqueta: "Incluye anulados" }] : []),
         ])}
         emitidoPor={`${usuario.nombre} ${usuario.apellido}`}
-        demostracion={modoDemostracion}
       />
 
       <TablaReporte

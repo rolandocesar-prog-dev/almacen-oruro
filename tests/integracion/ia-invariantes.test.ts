@@ -51,7 +51,7 @@ describe("invariantes del código de IA", () => {
   });
 
   it("el generador no se ofrece en ninguna pantalla: solo lo usa el comando de instalación (FR-024)", () => {
-    // Se buscan importaciones y llamadas: la palabra "generador" aparece en comentarios de la banda de demostración.
+    // Se buscan importaciones y llamadas, no la palabra suelta, que puede aparecer en un comentario.
     const usos = [...archivos("src/app"), ...archivos("src/componentes")].filter((archivo) =>
       /servicios\/ia\/generador|generarHistorico/.test(leer(archivo)),
     );

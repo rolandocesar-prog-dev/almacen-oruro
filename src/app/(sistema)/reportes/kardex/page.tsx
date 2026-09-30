@@ -7,7 +7,6 @@ import { esquemaReporteKardex, textoDeFiltros, type FiltroReporteKardex } from "
 import { formatearFecha, hoyEnLaPaz, inicioDelMesEnCurso } from "@/lib/fechas";
 import { requerirSesion } from "@/lib/sesion";
 import { listarProductos } from "@/servicios/catalogos/productos";
-import { obtenerConfiguracion } from "@/servicios/configuracion";
 import { reporteKardex } from "@/servicios/reportes";
 import { FiltrosReporteKardex } from "./filtros-reporte-kardex";
 import { parametrosDeKardex } from "./parametros";
@@ -20,7 +19,7 @@ export default async function PaginaReporteKardex({ searchParams }: { searchPara
   const validacion = esquemaReporteKardex.safeParse(await searchParams);
   const filtro: FiltroReporteKardex = validacion.success ? validacion.data : { desde: inicioDelMesEnCurso(), hasta: hoyEnLaPaz() };
 
-  const [productos, { modoDemostracion }] = await Promise.all([listarProductos({ estado: "todos" }), obtenerConfiguracion()]);
+  const productos = await listarProductos({ estado: "todos" });
   // Historia 4 · E3: sin producto elegido no se consulta nada; el reporte lo pide.
   const reporte = filtro.producto ? await reporteKardex(filtro.producto, { desde: filtro.desde, hasta: filtro.hasta }) : null;
   const parametros = parametrosDeKardex(filtro);
@@ -60,7 +59,6 @@ export default async function PaginaReporteKardex({ searchParams }: { searchPara
               { etiqueta: "Unidad", valor: reporte.producto.unidadMedida.nombre },
             ])}
             emitidoPor={`${usuario.nombre} ${usuario.apellido}`}
-            demostracion={modoDemostracion}
           />
 
           <p className="text-base font-semibold">Saldo inicial: {reporte.saldoInicial}</p>

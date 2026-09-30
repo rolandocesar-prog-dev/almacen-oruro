@@ -282,3 +282,23 @@ Raymond estudió el sistema y detectó reglas que no reflejan la operación real
 | I-71 | 26/09 | El recorrido de F-009 usó una copia aislada de la base, el build de producción y un usuario de revisión; la descarga del respaldo se interceptó en la página y la restauración se hizo con los comandos de la guía **en PowerShell** | Mismo criterio que I-15. En Git Bash, `/tmp/respaldo.sql` se convierte en una ruta de Windows y `psql -f` falla; la guía está escrita para PowerShell |
 | I-72 | 26/09 | `respaldo-*.sql` en `.gitignore` | Un respaldo guardado por error en la carpeta del proyecto no debe versionarse: trae datos personales |
 | I-73 | 26/09 | Los textos de pantalla no muestran códigos de reglas: se quitó "(RN-18)" del aviso del formulario de representante | Los códigos son para la documentación. Queda "(RN-50)" en la verificación de existencias, de F-003, fuera del alcance de F-009 |
+
+## Observaciones del 29/09/2026
+
+Cambios chicos sin especificación propia, como permite la constitución 1.2.0 (principio XI). La decisión de
+negocio es D-26, en [`especificacion/00-decisiones-y-alcance.md`](especificacion/00-decisiones-y-alcance.md).
+
+**Enmienda de la constitución 1.1.0 → 1.2.0 (29/09).** Principio VIII: los datos simulados se declaran en la
+documentación y en la defensa, y la base registra que lo son; ya no se exige un aviso en la interfaz.
+Principio XI: una observación que solo quita o cambia algo visible, sin tocar reglas de negocio ni datos,
+se registra como decisión, sin el ciclo completo de Spec Kit. Motivo: Raymond pidió quitar el aviso de
+datos simulados, y un ciclo completo para eso habría producido varios documentos sin ninguna regla que
+especificar. Es MENOR y no MAYOR porque ningún principio se elimina ni cambia de sentido: la IA sigue
+siendo transparente y los datos siguen declarados como simulados.
+
+| # | Fecha | Decisión | Fundamento |
+|---|---|---|---|
+| I-74 | 29/09 | Las tres acciones que cambian la sesión (ingresar, cambiar la contraseña y cerrar sesión) llaman a `revalidatePath("/", "layout")` antes de redirigir | Defecto reportado por Rolando: tras el primer ingreso, que obliga a cambiar la contraseña, el inicio aparecía sin menú hasta refrescar. El layout del sistema se había dibujado sin menú (cambio pendiente) y Next.js lo reutiliza al navegar a otra página del mismo grupo. Se reprodujo en el navegador antes de corregirlo |
+| I-75 | 29/09 | Se quitan la franja del layout y el recuadro del encabezado de reportes; se borra `src/servicios/configuracion.ts`, que solo servía para leer la marca, y su prueba | D-26. La columna `modo_demostracion` se queda: la escribe el generador y el respaldo la conserva. Sin lector, el servicio habría sido código muerto |
+| I-76 | 29/09 | La tarjeta de Representantes del inicio dice "Quién hace los pedidos de cada centro de salud" | Restos de "servicio" que quedaron de antes de F-009 (D-22), vistos en el recorrido de I-74; también un comentario de `obtenerPedidoParaDistribuir` |
+| I-77 | 29/09 | `docs/metodo-pronostico.md` suma "Por qué esto es inteligencia artificial" y "Preguntas probables del tribunal"; la pantalla de IA dice primero qué aprende el sistema y después cómo | Duda de Rolando: parecía incongruente que el menú de IA tuviera pantallas que no usan la API. Faltaba escrito el argumento de defensa. El Paso 6 decía que el modelo "no ve datos personales", pero recibe los nombres de los representantes; se corrigió |
